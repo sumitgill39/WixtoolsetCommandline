@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <Product 
+    Id="*"
+    Name="PostInstall Setup"
+    Language="1033"
+    Version="1.0.0.0"
+    Manufacturer="MyCompany"
+    UpgradeCode="22222222-2222-2222-2222-222222222222">
+
+    <Package InstallerVersion="200"
+             Compressed="yes"
+             InstallScope="perMachine" />
+
+    <!-- Media element for packaging files -->
+    <Media Id="1" Cabinet="PostInstall.cab" EmbedCab="yes" />
+
+    <!-- Prevent registration in Add/Remove Programs -->
+    <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
+
+    <!-- Major Upgrade Logic -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+    <!-- Define custom installation folder property -->
+    <Property Id="INSTALLFOLDER" Value="C:\SysAdmin\Scripts" />
+
+    <!-- Post-installation PowerShell Custom Action -->
+    <CustomAction Id="PostInstallPowerShell"
+                  ExeCommand="powershell.exe -ExecutionPolicy Bypass -File &quot;[INSTALLFOLDER]PostInstall.ps1&quot;"
+                  Directory="INSTALLFOLDER"
+                  Execute="deferred"
+                  Return="check" />
+
+    <!-- Directory structure -->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="INSTALLFOLDER" />
+    </Directory>
+
+    <!-- Component with PostInstall script -->
+    <ComponentGroup Id="PostInstallComponents">
+      <Component Id="PostInstallScript" Directory="INSTALLFOLDER" Guid="06bf9381-7053-4482-9d0c-ac214094e522">
+        <File Id="PostInstallPS1" Source="Scripts\PostInstall.ps1" KeyPath="yes" DiskId="1" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- Feature -->
+    <Feature Id="PostInstallFeature" Title="Post-Installation" Level="1">
+      <ComponentGroupRef Id="PostInstallComponents" />
+    </Feature>
+
+    <!-- Installation sequence -->
+    <InstallExecuteSequence>
+      <Custom Action="PostInstallPowerShell" Before="InstallFinalize">NOT REMOVE</Custom>
+    </InstallExecuteSequence>
+
+  </Product>
+</Wix>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <!-- Main Product element -->
+  <Product 
+    Id="*"
+    Name="My Windows Service"
+    Language="1033"
+    Version="1.0.0.0"
+    Manufacturer="Your Company Name"
+    UpgradeCode="12345678-1234-1234-1234-123456789012">
+
+    <Package 
+      InstallerVersion="200"
+      Compressed="yes"
+      InstallScope="perMachine"
+      Description="My Windows Service Installer"
+      Comments="Installs My Windows Service" />
+
+    <!-- Major upgrade configuration -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+    <!-- Embed all files in a cabinet -->
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Default installation path -->
+    <Property Id="INSTALLFOLDER" Value="D:\Console App\Event\Service\MyWindowsService" />
+
+    <!-- UI for installation path selection -->
+    <UIRef Id="WixUI_InstallDir" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+
+    <!-- Features -->
+    <Feature Id="ProductFeature" Title="My Windows Service" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentRef Id="ServiceComponent" />
+    </Feature>
+
+  </Product>
+
+  <!-- Fragment for directory structure -->
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="INSTALLFOLDER" Name="MyWindowsService" />
+    </Directory>
+  </Fragment>
+
+  <!-- Fragment for service component -->
+  <Fragment>
+    <!-- Heat.exe output goes here (ProductComponents) -->
+
+    <!-- Service installation component -->
+    <Component Id="ServiceComponent" Directory="INSTALLFOLDER" Guid="A1B2C3D4-E5F6-7890-ABCD-123456789012">
+      <!-- Service executable file -->
+      <File Id="ServiceExe" Source="$(var.ServiceOutputDir)\WindowsService.exe" KeyPath="yes" />
+
+      <!-- Service install definition -->
+      <ServiceInstall 
+        Id="MyWindowsService"
+        Type="ownProcess"
+        Vital="yes"
+        Name="MyWindowsService"
+        DisplayName="My Windows Service"
+        Description="This is my custom Windows service"
+        Start="auto"
+        Account="NT AUTHORITY\LocalService"
+        ErrorControl="ignore"
+        Interactive="no">
+        <!-- Optional service dependency -->
+        <!-- <ServiceDependency Id="Tcpip" /> -->
+      </ServiceInstall>
+
+      <!-- Service control for start/stop/uninstall -->
+      <ServiceControl 
+        Id="StartService"
+        Stop="both"
+        Remove="both"
+        Name="MyWindowsService"
+        Wait="yes" />
+
+    </Component>
+  </Fragment>
+
+</Wix>
