@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:iis="http://schemas.microsoft.com/wix/IIsExtension">
+
+  <!-- CHANGE THESE VALUES FOR YOUR APPLICATION -->
+  <?define AppName = "EListner" ?>
+  <?define AppVersion = "1.1.0.0" ?>
+  <?define CompanyName = "Your Company" ?>
+  <?define AppUpgradeCode = "6042d831-d640-4f28-923d-1d405c628e46" ?>
+  
+  <!-- DIRECT WEBSITE DEPLOYMENT - CHOOSE ONE -->
+  <!-- OPTION 1: Create new website on custom port -->
+  <?define WebSiteName = "$(var.AppName) Website" ?>
+  <?define WebSitePort = "8080" ?>
+  
+  <!-- OPTION 2: Replace Default Web Site (uncomment below, comment above) -->
+  <!-- <?define WebSiteName = "Default Web Site" ?> -->
+  <!-- <?define WebSitePort = "80" ?> -->
+
+  <Product Id="*" 
+           Name="$(var.AppName)" 
+           Language="1033" 
+           Version="$(var.AppVersion)" 
+           Manufacturer="$(var.CompanyName)" 
+           UpgradeCode="$(var.AppUpgradeCode)">
+
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+    <MajorUpgrade DowngradeErrorMessage="A newer version is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Installation path -->
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    <Property Id="INSTALLFOLDER" Value="C:\WebSites\$(var.AppName)" />
+
+    <!-- Directory structure -->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="INSTALLFOLDER" />
+    </Directory>
+
+    <!-- Application Pool -->
+    <ComponentGroup Id="AppPool">
+      <Component Id="CreateAppPool" Directory="INSTALLFOLDER" Guid="11FF2067-cbb4-4872-93df-3d3138828426">
+        <iis:WebAppPool Id="MyAppPool" 
+                        Name="$(var.AppName)AppPool" 
+                        ManagedRuntimeVersion="v4.0" />
+        <CreateFolder />
+      </Component>
+    </ComponentGroup>
+
+    <!-- Website with integrated application -->
+    <ComponentGroup Id="WebSite">
+      <Component Id="CreateWebSite" Directory="INSTALLFOLDER" Guid="A1B2C3D4-E5F6-7890-ABCD-123456789012">
+        <iis:WebSite Id="MyWebSite" 
+                     Description="$(var.WebSiteName)"
+                     Directory="INSTALLFOLDER"
+                     AutoStart="yes">
+          <iis:WebAddress Id="WebSiteAddress" Port="$(var.WebSitePort)" IP="*" />
+          <!-- Web Application directly inside WebSite -->
+          <iis:WebApplication Id="MyWebApplication"
+                              Name="$(var.AppName)"
+                              WebAppPool="MyAppPool" />
+        </iis:WebSite>
+        <CreateFolder />
+      </Component>
+    </ComponentGroup>
+
+    <!-- Features -->
+    <Feature Id="Complete" Title="$(var.AppName)" Level="1">
+      <ComponentGroupRef Id="WebApplicationFiles" />
+      <ComponentGroupRef Id="AppPool" />
+      <ComponentGroupRef Id="WebSite" />
+    </Feature>
+
+    <!-- User Interface -->
+    <UI>
+      <UIRef Id="WixUI_InstallDir" />
+    </UI>
+    
+  </Product>
+</Wix>
