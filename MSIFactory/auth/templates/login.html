@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Login - MSI Factory{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 500px; margin: 2rem auto;">
+    <h2 style="text-align: center; margin-bottom: 2rem; color: #2c3e50;">
+        🔐 Login to MSI Factory
+    </h2>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" 
+                   id="username" 
+                   name="username" 
+                   value="{{ request.args.get('username', '') }}"
+                   required 
+                   placeholder="Enter your username">
+        </div>
+        
+        <div class="form-group">
+            <label for="domain">Domain:</label>
+            <select id="domain" name="domain">
+                <option value="COMPANY">COMPANY</option>
+                <option value="EXTERNAL">EXTERNAL</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <button type="submit" class="btn" style="width: 100%;">
+                🚀 Login
+            </button>
+        </div>
+    </form>
+    
+    <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #eee;">
+        <h3 style="color: #666; font-size: 1rem; margin-bottom: 1rem;">Demo Accounts:</h3>
+        <p><strong>Admin:</strong> username: <code>admin</code></p>
+        <p><strong>User:</strong> username: <code>john.doe</code></p>
+        <p><strong>New User:</strong> Any other username will show access request form</p>
+    </div>
+</div>
+
+<div class="card" style="max-width: 800px; margin: 2rem auto;">
+    <h3 style="color: #2c3e50; margin-bottom: 1rem;">
+        📋 How the Authentication System Works:
+    </h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+            <h4 style="color: #27ae60;">✅ Approved Users</h4>
+            <p>Can login directly and access their assigned applications</p>
+        </div>
+        
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+            <h4 style="color: #f39c12;">⏳ New Users</h4>
+            <p>Must fill access request form with AppShortKey verification</p>
+        </div>
+        
+        <div style="padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+            <h4 style="color: #3498db;">👨‍💼 Admin Users</h4>
+            <p>Can approve/deny access requests and manage users</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

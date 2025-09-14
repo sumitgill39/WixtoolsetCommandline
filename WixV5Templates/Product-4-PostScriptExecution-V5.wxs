@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+
+  <!-- WiX v5 uses Package instead of Product -->
+  <Package 
+    Name="PostInstall Setup"
+    Version="1.0.0.0"
+    Manufacturer="MyCompany"
+    UpgradeCode="22222222-2222-2222-2222-222222222222"
+    Compressed="true"
+    Scope="perMachine">
+
+    <!-- Hide from Add/Remove Programs -->
+    <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
+
+    <!-- Major Upgrade is built-in by default in v5 -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+    <!-- Installation folder -->
+    <Property Id="INSTALLFOLDER" Value="C:\SysAdmin\Scripts" />
+
+    <!-- WiX v5: Include script files -->
+    <File Source="Scripts\PostInstall.ps1" />
+
+    <!-- Post-installation PowerShell Custom Action -->
+    <CustomAction Id="PostInstallPowerShell"
+                  ExeCommand="powershell.exe -ExecutionPolicy Bypass -File &quot;[INSTALLFOLDER]PostInstall.ps1&quot;"
+                  Directory="INSTALLFOLDER"
+                  Execute="deferred"
+                  Return="check" />
+
+    <!-- Custom Action scheduling -->
+    <InstallExecuteSequence>
+      <Custom Action="PostInstallPowerShell" Before="InstallFinalize">NOT REMOVE</Custom>
+    </InstallExecuteSequence>
+
+    <!-- WiX v5 provides default Feature if not specified -->
+    <Feature Id="PostInstallFeature" Title="Post-Installation" Level="1">
+      <!-- Files are automatically included in default components -->
+    </Feature>
+
+  </Package>
+</Wix>

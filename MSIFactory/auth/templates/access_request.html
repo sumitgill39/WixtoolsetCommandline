@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Access Request - MSI Factory{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 2rem auto;">
+    <h2 style="text-align: center; margin-bottom: 2rem; color: #2c3e50;">
+        📝 Request Access to MSI Factory
+    </h2>
+    
+    <div class="alert alert-info" style="margin-bottom: 2rem;">
+        <strong>New User Detected!</strong> Please fill out this form to request access. 
+        An admin will review your request and approve/deny access.
+    </div>
+    
+    <form method="POST">
+        <h3 style="color: #34495e; margin-bottom: 1rem;">Personal Information</h3>
+        
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" 
+                   id="username" 
+                   name="username" 
+                   value="{{ username }}" 
+                   readonly 
+                   style="background-color: #f8f9fa;">
+        </div>
+        
+        <div class="form-group">
+            <label for="email">Email Address:</label>
+            <input type="email" 
+                   id="email" 
+                   name="email" 
+                   required 
+                   placeholder="your.email@company.com">
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label for="first_name">First Name:</label>
+                <input type="text" 
+                       id="first_name" 
+                       name="first_name" 
+                       required 
+                       placeholder="John">
+            </div>
+            
+            <div class="form-group">
+                <label for="middle_name">Middle Name:</label>
+                <input type="text" 
+                       id="middle_name" 
+                       name="middle_name" 
+                       placeholder="Michael">
+            </div>
+            
+            <div class="form-group">
+                <label for="last_name">Last Name:</label>
+                <input type="text" 
+                       id="last_name" 
+                       name="last_name" 
+                       required 
+                       placeholder="Doe">
+            </div>
+        </div>
+        
+        <h3 style="color: #34495e; margin: 2rem 0 1rem 0;">Application Access</h3>
+        
+        <div class="form-group">
+            <label for="app_short_key">Application Short Key:</label>
+            <select id="app_short_key" name="app_short_key" required>
+                <option value="">Select an application...</option>
+                {% for app in applications %}
+                <option value="{{ app.app_short_key }}">
+                    {{ app.app_short_key }} - {{ app.app_name }}
+                </option>
+                {% endfor %}
+            </select>
+            <small style="color: #666; font-size: 0.9rem; margin-top: 0.5rem; display: block;">
+                Select the application you need access to. This will be verified against our application registry.
+            </small>
+        </div>
+        
+        <div class="form-group">
+            <label for="reason">Reason for Access:</label>
+            <textarea id="reason" 
+                     name="reason" 
+                     rows="4" 
+                     required 
+                     placeholder="Please explain why you need access to this application. Include your role, team, and how you plan to use the MSI Factory."></textarea>
+        </div>
+        
+        <div class="form-group" style="margin-top: 2rem;">
+            <button type="submit" class="btn btn-success" style="width: 100%; padding: 1rem;">
+                📤 Submit Access Request
+            </button>
+        </div>
+        
+        <div class="form-group">
+            <a href="{{ url_for('login') }}" class="btn" style="width: 100%; text-align: center;">
+                ← Back to Login
+            </a>
+        </div>
+    </form>
+</div>
+
+<div class="card" style="max-width: 800px; margin: 2rem auto;">
+    <h3 style="color: #2c3e50; margin-bottom: 1rem;">
+        ℹ️ Available Applications
+    </h3>
+    
+    <div class="app-grid">
+        {% for app in applications %}
+        <div class="app-card">
+            <h4 style="color: #3498db;">{{ app.app_short_key }}</h4>
+            <h5 style="color: #2c3e50; margin-bottom: 0.5rem;">{{ app.app_name }}</h5>
+            <p style="font-size: 0.9rem;">{{ app.description }}</p>
+            <p style="font-size: 0.8rem; color: #7f8c8d;">
+                <strong>Team:</strong> {{ app.owner_team }}<br>
+                <strong>Status:</strong> {{ app.status }}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:iis="http://wixtoolset.org/schemas/v4/wxs/iis">
+
+  <!-- Variables for the web application -->
+  <?define AppName = "TestWebApp" ?>
+  <?define AppVersion = "1.0.0.0" ?>
+  <?define CompanyName = "Test Company" ?>
+  <?define AppUpgradeCode = "12345678-1234-1234-1234-123456789ABC" ?>
+
+  <!-- WiX v6 Package element -->
+  <Package 
+    Name="$(var.AppName)"
+    Version="$(var.AppVersion)"
+    Manufacturer="$(var.CompanyName)"
+    UpgradeCode="$(var.AppUpgradeCode)"
+    Compressed="true"
+    Scope="perMachine">
+
+    <!-- Major upgrade handling -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version is already installed." />
+
+    <!-- Installation location for IIS -->
+    <Property Id="INSTALLFOLDER" Value="C:\inetpub\wwwroot\$(var.AppName)" />
+
+    <!-- Files are defined in Files.wxs for better organization -->
+
+    <!-- IIS Application Pool with Advanced Settings -->
+    <!-- 
+    Supported WiX v6 Application Pool Configuration:
+    - Identity: applicationPoolIdentity (most secure, isolated account)
+    - IdleTimeout: 20 minutes (shuts down when idle to save resources)
+    - RecycleMinutes: 1740 (29 hours, avoids peak hours)
+    - RecycleRequests: 0 (disabled, recycle based on time only)
+    - ManagedRuntimeVersion: v4.0 (.NET Framework version)
+    - ManagedPipelineMode: Integrated (recommended mode)
+    Note: Some advanced settings like memory limits require post-install configuration
+    -->
+    <Component Id="CreateAppPool" Directory="INSTALLFOLDER" Guid="11111111-1111-1111-1111-111111111111">
+      <iis:WebAppPool Id="TestAppPool"
+                      Name="$(var.AppName)AppPool"
+                      ManagedRuntimeVersion="v4.0"
+                      ManagedPipelineMode="Integrated"
+                      Identity="applicationPoolIdentity"
+                      IdleTimeout="20"
+                      RecycleMinutes="1740"
+                      RecycleRequests="0" />
+    </Component>
+
+    <!-- Reference to existing Default Web Site (locator only) -->
+    <iis:WebSite Id="DefaultWebSite" Description="Default Web Site">
+      <iis:WebAddress Id="DefaultWebSiteAddress" Port="80" IP="*" />
+    </iis:WebSite>
+
+    <!-- IIS Web Application -->
+    <Component Id="CreateWebApp" Directory="INSTALLFOLDER" Guid="22222222-2222-2222-2222-222222222222">
+      <!-- Virtual Directory under Default Web Site -->
+      <iis:WebVirtualDir Id="TestWebVirtualDir"
+                         Alias="$(var.AppName)"
+                         Directory="INSTALLFOLDER"
+                         WebSite="DefaultWebSite">
+        <iis:WebApplication Id="TestWebApplication"
+                            Name="$(var.AppName)"
+                            WebAppPool="TestAppPool" />
+      </iis:WebVirtualDir>
+    </Component>
+
+    <!-- Feature to install -->
+    <Feature Id="Complete" Title="$(var.AppName) Web Application" Level="1">
+      <ComponentGroupRef Id="WebApplicationFiles" />
+      <ComponentRef Id="CreateAppPool" />
+      <ComponentRef Id="CreateWebApp" />
+    </Feature>
+
+    <!-- User Interface - Removed as it requires UI extension -->
+    <!-- To enable UI, add: -ext WixToolset.UI.wixext to build command -->
+
+  </Package>
+</Wix>

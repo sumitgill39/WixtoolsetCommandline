@@ -1,0 +1,2 @@
+- Add to Memoery : "We need to use wixtool set v6 version"
+- add to memor : do not use any java script just python.

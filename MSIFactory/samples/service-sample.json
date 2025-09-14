@@ -1,0 +1,126 @@
+{
+  "componentId": "87654321-4321-8765-2109-876543210987",
+  "appShortKey": "DATASYNC",
+  "componentName": "Data Synchronization Service",
+  "componentType": "service",
+  "framework": "netframework",
+  "version": "1.5.2",
+  "description": "Background service for synchronizing data between systems",
+  "owner": {
+    "team": "Integration Team",
+    "email": "integration-team@company.com",
+    "manager": "Jane Doe"
+  },
+  "environments": {
+    "DEV": {
+      "servers": [
+        "dev-svc01.company.com"
+      ],
+      "installPath": "C:\\Program Files\\Company\\DataSync\\Dev",
+      "serviceAccount": {
+        "type": "LocalService"
+      },
+      "configOverrides": {
+        "ConnectionStrings.SourceDb": "Server=dev-sql01;Database=SourceDev;Integrated Security=true;",
+        "ConnectionStrings.TargetDb": "Server=dev-sql02;Database=TargetDev;Integrated Security=true;",
+        "SyncInterval": "00:05:00",
+        "Environment": "Development",
+        "LogLevel": "Debug"
+      },
+      "features": {
+        "ssl": false,
+        "firewall": true,
+        "eventLog": true,
+        "performanceCounters": true
+      }
+    },
+    "PROD": {
+      "servers": [
+        "prod-svc01.company.com",
+        "prod-svc02.company.com"
+      ],
+      "installPath": "C:\\Program Files\\Company\\DataSync",
+      "serviceAccount": {
+        "type": "CustomUser",
+        "username": "svc-datasync",
+        "domain": "COMPANY"
+      },
+      "configOverrides": {
+        "ConnectionStrings.SourceDb": "Server=prod-sql-cluster;Database=Source;Integrated Security=true;",
+        "ConnectionStrings.TargetDb": "Server=prod-sql-cluster;Database=Target;Integrated Security=true;",
+        "SyncInterval": "00:15:00",
+        "Environment": "Production",
+        "LogLevel": "Information"
+      },
+      "features": {
+        "ssl": true,
+        "firewall": true,
+        "eventLog": true,
+        "performanceCounters": true
+      }
+    }
+  },
+  "artifactSources": {
+    "primary": "https://jfrog.company.com/artifactory/service-releases/DataSync/",
+    "fallback": [
+      "https://backup-jfrog.company.com/artifactory/service-releases/DataSync/"
+    ],
+    "pollingFrequency": "30m",
+    "filePattern": "DataSync-*.zip",
+    "authentication": {
+      "type": "bearer",
+      "credentials": "encrypted_bearer_token_here"
+    }
+  },
+  "configTransformation": {
+    "enabled": true,
+    "apiEndpoint": "https://config-api.company.com/v1/transform",
+    "templateType": "web.config",
+    "transformationEngine": "msdeploy",
+    "customTransforms": {
+      "MaxRetryAttempts": "5",
+      "TimeoutSeconds": "300"
+    }
+  },
+  "buildSettings": {
+    "generateCab": true,
+    "signMsi": true,
+    "certificatePath": "C:\\Certificates\\ServiceSigning.pfx",
+    "customWixExtensions": [
+      "WixToolset.Util.wixext",
+      "WixToolset.Firewall.wixext"
+    ],
+    "buildFlags": [
+      "-v"
+    ]
+  },
+  "deployment": {
+    "preInstallScript": "Scripts/PreInstall-DataSync.ps1",
+    "postInstallScript": "Scripts/PostInstall-DataSync.ps1",
+    "requiresReboot": false,
+    "installationTimeout": 300
+  },
+  "validation": {
+    "requiredFiles": [
+      "DataSync.exe",
+      "DataSync.exe.config"
+    ],
+    "excludedFiles": [
+      "*.pdb",
+      "test-config.xml"
+    ],
+    "healthCheckTimeout": 60
+  },
+  "metadata": {
+    "tags": [
+      "windows-service",
+      "data-sync",
+      "background-service",
+      "net-framework"
+    ],
+    "documentation": "https://wiki.company.com/DataSyncService",
+    "repository": "https://github.com/company/data-sync-service",
+    "lastModified": "2024-09-13T14:45:00Z",
+    "createdBy": "integration-team@company.com"
+  }
+}

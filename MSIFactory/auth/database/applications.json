@@ -1,0 +1,25 @@
+{
+  "applications": [
+    {
+      "app_short_key": "WEBAPP01",
+      "app_name": "Customer Portal Web App",
+      "description": "Customer-facing web portal",
+      "owner_team": "Customer Experience",
+      "status": "active"
+    },
+    {
+      "app_short_key": "PORTAL",
+      "app_name": "Employee Portal Website",
+      "description": "Employee self-service portal",
+      "owner_team": "HR Technology",
+      "status": "active"
+    },
+    {
+      "app_short_key": "DATASYNC",
+      "app_name": "Data Synchronization Service",
+      "description": "Background data sync service",
+      "owner_team": "Integration Team",
+      "status": "active"
+    }
+  ]
+}

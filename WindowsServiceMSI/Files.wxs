@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <!-- Directory Structure -->
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Directory Id="Dir_Config" Name="Config" />
+    </DirectoryRef>
+    
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Directory Id="Dir_Plugins" Name="Plugins" />
+    </DirectoryRef>
+
+    <!-- File Components (excluding MyService.exe which is in Product.wxs) -->
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Component Id="Comp_ServiceConfig" Guid="AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE">
+        <File Id="ServiceConfigFile"
+              Source="ServiceFiles/service.config"
+              Name="service.config"
+              KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Component Id="Comp_PerfCounterDll" Guid="BBBBBBBB-CCCC-DDDD-EEEE-FFFFFFFFFFFF">
+        <File Id="PerfCounterDllFile"
+              Source="ServiceFiles/PerfCounter.dll"
+              Name="PerfCounter.dll"
+              KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="Dir_Config">
+      <Component Id="Comp_AppSettings" Guid="CCCCCCCC-DDDD-EEEE-FFFF-000000000000">
+        <File Id="AppSettingsFile"
+              Source="ServiceFiles/Config/appsettings.json"
+              Name="appsettings.json"
+              KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <DirectoryRef Id="Dir_Plugins">
+      <Component Id="Comp_PluginDll" Guid="DDDDDDDD-EEEE-FFFF-0000-111111111111">
+        <File Id="PluginDllFile"
+              Source="ServiceFiles/Plugins/plugin.dll"
+              Name="plugin.dll"
+              KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+
+    <!-- Feature for Service Files (excluding executable) -->
+    <Feature Id="ServiceFiles" Title="Service Support Files" Level="1">
+      <ComponentRef Id="Comp_ServiceConfig" />
+      <ComponentRef Id="Comp_PerfCounterDll" />
+      <ComponentRef Id="Comp_AppSettings" />
+      <ComponentRef Id="Comp_PluginDll" />
+    </Feature>
+
+  </Fragment>
+</Wix>

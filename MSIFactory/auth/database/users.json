@@ -1,0 +1,35 @@
+{
+  "users": [
+    {
+      "username": "john.doe",
+      "email": "john.doe@company.com",
+      "domain": "COMPANY",
+      "first_name": "John",
+      "middle_name": "M",
+      "last_name": "Doe",
+      "status": "approved",
+      "role": "user",
+      "approved_apps": [
+        "WEBAPP01",
+        "PORTAL"
+      ],
+      "created_date": "2024-09-01",
+      "approved_by": "admin@company.com"
+    },
+    {
+      "username": "admin",
+      "email": "admin@company.com",
+      "domain": "COMPANY",
+      "first_name": "System",
+      "middle_name": "",
+      "last_name": "Admin",
+      "status": "approved",
+      "role": "admin",
+      "approved_apps": [
+        "*"
+      ],
+      "created_date": "2024-08-01",
+      "approved_by": "system"
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:iis="http://wixtoolset.org/schemas/v4/wxs/iis">
+
+  <!-- Variables for the standalone website -->
+  <?define SiteName = "MyWebSite" ?>
+  <?define AppName = "MyWebApp" ?>
+  <?define AppVersion = "1.0.0.0" ?>
+  <?define CompanyName = "My Company" ?>
+  <?define AppUpgradeCode = "87654321-4321-4321-4321-210987654321" ?>
+  <?define SitePort = "8080" ?>
+  <?define SiteIP = "*" ?>
+  <?define SitePath = "C:\Websites\$(var.SiteName)" ?>
+
+  <!-- WiX v6 Package element -->
+  <Package 
+    Name="$(var.SiteName) Website"
+    Version="$(var.AppVersion)"
+    Manufacturer="$(var.CompanyName)"
+    UpgradeCode="$(var.AppUpgradeCode)"
+    Compressed="true"
+    Scope="perMachine">
+
+    <!-- Major upgrade handling -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version is already installed." />
+
+    <!-- Installation location for the website -->
+    <Property Id="INSTALLFOLDER" Value="$(var.SitePath)" />
+    <Property Id="WEBSITE_PORT" Value="$(var.SitePort)" />
+    <Property Id="WEBSITE_IP" Value="$(var.SiteIP)" />
+
+    <!-- Files are defined in Files.wxs for better organization -->
+
+    <!-- IIS Application Pool for the Website -->
+    <!-- 
+    Dedicated Application Pool Configuration:
+    - Identity: applicationPoolIdentity (most secure, isolated account)
+    - IdleTimeout: 20 minutes (shuts down when idle to save resources)
+    - RecycleMinutes: 1740 (29 hours, avoids peak hours)
+    - RecycleRequests: 0 (disabled, recycle based on time only)
+    - ManagedRuntimeVersion: v4.0 (.NET Framework version)
+    - ManagedPipelineMode: Integrated (recommended mode)
+    -->
+    <Component Id="CreateAppPool" Directory="INSTALLFOLDER" Guid="AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA">
+      <iis:WebAppPool Id="WebSiteAppPool"
+                      Name="$(var.SiteName)AppPool"
+                      ManagedRuntimeVersion="v4.0"
+                      ManagedPipelineMode="Integrated"
+                      Identity="applicationPoolIdentity"
+                      IdleTimeout="20"
+                      RecycleMinutes="1740"
+                      RecycleRequests="0" />
+    </Component>
+
+    <!-- IIS Website Configuration -->
+    <!-- Creates a complete standalone website with its own bindings -->
+    <Component Id="CreateWebSite" Directory="INSTALLFOLDER" Guid="BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB">
+      <iis:WebSite Id="MainWebSite"
+                   Description="$(var.SiteName)"
+                   Directory="INSTALLFOLDER"
+                   AutoStart="yes"
+                   ConfigureIfExists="yes">
+        <!-- Primary HTTP binding -->
+        <iis:WebAddress Id="HttpBinding" 
+                        Port="$(var.SitePort)" 
+                        IP="$(var.SiteIP)" />
+        <!-- Optional HTTPS binding (uncomment if SSL certificate is available) -->
+        <!--
+        <iis:WebAddress Id="HttpsBinding" 
+                        Port="443" 
+                        IP="$(var.SiteIP)"
+                        Secure="yes" />
+        -->
+        
+        <!-- Main Application for the website -->
+        <iis:WebApplication Id="MainWebApplication"
+                            Name="$(var.AppName)"
+                            WebAppPool="WebSiteAppPool" />
+      </iis:WebSite>
+    </Component>
+
+    <!-- Optional: Custom Error Pages Component -->
+    <Component Id="ConfigureErrorPages" Directory="INSTALLFOLDER" Guid="CCCCCCCC-CCCC-CCCC-CCCC-CCCCCCCCCCCC">
+      <!-- Custom error page configurations can be added here -->
+      <!-- Example: 404 error page, 500 error page, etc. -->
+    </Component>
+
+    <!-- Optional: MIME Types Component -->
+    <Component Id="ConfigureMimeTypes" Directory="INSTALLFOLDER" Guid="DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDDD">
+      <!-- Custom MIME type configurations can be added here -->
+      <!-- Example: .json, .woff2, .svg, etc. -->
+    </Component>
+
+    <!-- PowerShell Script for Advanced AppPool Configuration -->
+    <Component Id="AppPoolConfigScript" Directory="INSTALLFOLDER" Guid="EEEEEEEE-EEEE-EEEE-EEEE-EEEEEEEEEEEE">
+      <File Id="ConfigureAppPoolScript" 
+            Source="ConfigureAppPool.ps1" 
+            Name="ConfigureAppPool.ps1" 
+            KeyPath="yes" />
+    </Component>
+
+    <!-- Custom Action for Advanced Configuration -->
+    <CustomAction Id="ConfigureAdvancedAppPool"
+                  Directory="INSTALLFOLDER"  
+                  ExeCommand="powershell.exe -ExecutionPolicy Bypass -File &quot;[INSTALLFOLDER]ConfigureAppPool.ps1&quot; -AppPoolName &quot;$(var.SiteName)AppPool&quot; -PrivateMemoryLimit 1048576 -VirtualMemoryLimit 2097152 -QueueLength 1000 -MaxProcesses 1"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="ignore" />
+
+    <!-- Install Sequence -->
+    <InstallExecuteSequence>
+      <!-- Run advanced configuration after IIS components are created -->
+      <Custom Action="ConfigureAdvancedAppPool" After="InstallFiles" Condition="NOT Installed" />
+    </InstallExecuteSequence>
+
+    <!-- Feature to install -->
+    <Feature Id="Complete" Title="$(var.SiteName) Website Installation" Level="1">
+      <ComponentGroupRef Id="WebApplicationFiles" />
+      <ComponentRef Id="CreateAppPool" />
+      <ComponentRef Id="CreateWebSite" />
+      <ComponentRef Id="ConfigureErrorPages" />
+      <ComponentRef Id="ConfigureMimeTypes" />
+      <ComponentRef Id="AppPoolConfigScript" />
+    </Feature>
+
+    <!-- User Interface - Removed as it requires UI extension -->
+    <!-- To enable UI, add: -ext WixToolset.UI.wixext to build command -->
+
+  </Package>
+</Wix>

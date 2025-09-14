@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util"
+     xmlns:fw="http://wixtoolset.org/schemas/v4/wxs/firewall">
+
+  <!-- Variables for the Windows Service -->
+  <?define ServiceName = "MyWindowsService" ?>
+  <?define ServiceDisplayName = "My Windows Service" ?>
+  <?define ServiceDescription = "A sample Windows service installed via WiX v6" ?>
+  <?define AppVersion = "1.0.0.0" ?>
+  <?define CompanyName = "My Company" ?>
+  <?define AppUpgradeCode = "ABCDEF12-3456-7890-ABCD-EF1234567890" ?>
+  <?define InstallPath = "C:\Program Files\$(var.CompanyName)\$(var.ServiceName)" ?>
+
+  <!-- WiX v6 Package element -->
+  <Package 
+    Name="$(var.ServiceDisplayName)"
+    Version="$(var.AppVersion)"
+    Manufacturer="$(var.CompanyName)"
+    UpgradeCode="$(var.AppUpgradeCode)"
+    Compressed="true"
+    Scope="perMachine">
+
+    <!-- Major upgrade handling -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version is already installed." />
+
+    <!-- Installation location -->
+    <Property Id="INSTALLFOLDER" Value="$(var.InstallPath)" />
+    
+    <!-- Service Account Properties -->
+    <Property Id="SERVICE_ACCOUNT" Value="LocalSystem" Secure="yes" />
+    <Property Id="SERVICE_PASSWORD" Hidden="yes" Secure="yes" />
+    <Property Id="SERVICE_DOMAIN" Secure="yes" />
+    
+    <!-- Service Configuration Properties -->
+    <Property Id="SERVICE_START_TYPE" Value="auto" />
+    <Property Id="SERVICE_ERROR_CONTROL" Value="normal" />
+    <Property Id="SERVICE_INTERACTIVE" Value="no" />
+    
+    <!-- UI Properties for Service Account Selection -->
+    <Property Id="SERVICE_ACCOUNT_TYPE" Value="LocalSystem" />
+    <Property Id="SERVICE_CUSTOM_USER" Secure="yes" />
+    <Property Id="SHOW_SERVICE_ACCOUNT_UI" Value="1" />
+    
+    <!-- Custom Action to Set Service Account -->
+    <CustomAction Id="SetServiceAccount_LocalSystem" Property="SERVICE_ACCOUNT" Value="LocalSystem" />
+    <CustomAction Id="SetServiceAccount_LocalService" Property="SERVICE_ACCOUNT" Value="NT AUTHORITY\LocalService" />
+    <CustomAction Id="SetServiceAccount_NetworkService" Property="SERVICE_ACCOUNT" Value="NT AUTHORITY\NetworkService" />
+    <CustomAction Id="SetServiceAccount_VirtualAccount" Property="SERVICE_ACCOUNT" Value="NT SERVICE\$(var.ServiceName)" />
+    <CustomAction Id="SetServiceAccount_CustomUser" Property="SERVICE_ACCOUNT" Value="[SERVICE_CUSTOM_USER]" />
+
+    <!-- Directory Structure -->
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="CompanyFolder" Name="$(var.CompanyName)">
+        <Directory Id="INSTALLFOLDER" Name="$(var.ServiceName)" />
+      </Directory>
+    </StandardDirectory>
+
+    <!-- Windows Service Executable Component -->
+    <Component Id="ServiceExecutable" Directory="INSTALLFOLDER" Guid="11111111-2222-3333-4444-555555555555">
+      <!-- The main service executable -->
+      <File Id="ServiceExeFile" 
+            Source="ServiceFiles\MyService.exe" 
+            Name="MyService.exe" 
+            KeyPath="yes" />
+      
+      <!-- Windows Service Installation -->
+      <ServiceInstall
+        Id="ServiceInstaller"
+        Name="$(var.ServiceName)"
+        DisplayName="$(var.ServiceDisplayName)"
+        Description="$(var.ServiceDescription)"
+        Type="ownProcess"
+        Start="auto"
+        ErrorControl="normal"
+        Account="[SERVICE_ACCOUNT]"
+        Password="[SERVICE_PASSWORD]"
+        Arguments="/service"
+        Interactive="no"
+        Vital="yes">
+        
+        <!-- Service Dependencies (if needed) -->
+        <!-- <ServiceDependency Id="EventLog" /> -->
+        <!-- <ServiceDependency Id="Tcpip" /> -->
+        
+        <!-- Service Failure Actions -->
+        <util:ServiceConfig
+          FirstFailureActionType="restart"
+          SecondFailureActionType="restart"
+          ThirdFailureActionType="restart"
+          RestartServiceDelayInSeconds="60"
+          ResetPeriodInDays="1" />
+      </ServiceInstall>
+      
+      <!-- Service Control during installation -->
+      <ServiceControl
+        Id="ServiceControl"
+        Name="$(var.ServiceName)"
+        Start="install"
+        Stop="both"
+        Remove="uninstall"
+        Wait="yes" />
+    </Component>
+
+
+    <!-- Service Logging Directory -->
+    <Directory Id="LogsFolder" Name="Logs">
+      <Component Id="LogsFolderComponent" Directory="LogsFolder" Guid="44444444-5555-6666-7777-888888888888">
+        <CreateFolder />
+      </Component>
+    </Directory>
+
+    <!-- Event Log Source Registration -->
+    <Component Id="EventLogSource" Directory="INSTALLFOLDER" Guid="55555555-6666-7777-8888-999999999999">
+      <util:EventSource
+        Name="$(var.ServiceName)"
+        Log="Application"
+        EventMessageFile="[INSTALLFOLDER]MyService.exe"
+        CategoryMessageFile="[INSTALLFOLDER]MyService.exe"
+        CategoryCount="1" />
+    </Component>
+
+
+    <!-- Firewall Exception for Service -->
+    <Component Id="FirewallException" Directory="INSTALLFOLDER" Guid="77777777-8888-9999-AAAA-BBBBBBBBBBBB">
+      <File Id="DummyFileForFirewall" Source="ServiceFiles\MyService.exe" Name="MyService2.exe" KeyPath="yes">
+        <fw:FirewallException
+          Id="ServiceFirewallException"
+          Name="$(var.ServiceDisplayName)"
+          Scope="any"
+          Protocol="tcp"
+          Port="8888" />
+      </File>
+    </Component>
+
+    <!-- Registry Settings for Service -->
+    <Component Id="RegistrySettings" Directory="INSTALLFOLDER" Guid="88888888-9999-AAAA-BBBB-CCCCCCCCCCCC">
+      <RegistryKey Root="HKLM" Key="SOFTWARE\$(var.CompanyName)\$(var.ServiceName)">
+        <RegistryValue Name="InstallPath" Type="string" Value="[INSTALLFOLDER]" />
+        <RegistryValue Name="Version" Type="string" Value="$(var.AppVersion)" />
+        <RegistryValue Name="ServiceName" Type="string" Value="$(var.ServiceName)" />
+      </RegistryKey>
+    </Component>
+
+    <!-- Environment Variables -->
+    <Component Id="EnvironmentVars" Directory="INSTALLFOLDER" Guid="99999999-AAAA-BBBB-CCCC-DDDDDDDDDDDD">
+      <Environment Id="ServiceHomePath"
+                   Name="SERVICE_HOME"
+                   Value="[INSTALLFOLDER]"
+                   Action="set"
+                   System="yes"
+                   Part="all" />
+    </Component>
+
+
+    <!-- Install Sequence -->
+    <InstallExecuteSequence>
+      <!-- Set service account based on selection -->
+      <Custom Action="SetServiceAccount_LocalSystem" Before="InstallServices" Condition="SERVICE_ACCOUNT_TYPE = &quot;LocalSystem&quot;" />
+      <Custom Action="SetServiceAccount_LocalService" Before="InstallServices" Condition="SERVICE_ACCOUNT_TYPE = &quot;LocalService&quot;" />
+      <Custom Action="SetServiceAccount_NetworkService" Before="InstallServices" Condition="SERVICE_ACCOUNT_TYPE = &quot;NetworkService&quot;" />
+      <Custom Action="SetServiceAccount_VirtualAccount" Before="InstallServices" Condition="SERVICE_ACCOUNT_TYPE = &quot;VirtualAccount&quot;" />
+      <Custom Action="SetServiceAccount_CustomUser" Before="InstallServices" Condition="SERVICE_ACCOUNT_TYPE = &quot;CustomUser&quot; AND SERVICE_CUSTOM_USER" />
+    </InstallExecuteSequence>
+
+
+    <!-- Feature to install -->
+    <Feature Id="Complete" Title="$(var.ServiceDisplayName) Installation" Level="1">
+      <ComponentRef Id="ServiceExecutable" />
+      <ComponentRef Id="LogsFolderComponent" />
+      <ComponentRef Id="EventLogSource" />
+      <ComponentRef Id="FirewallException" />
+      <ComponentRef Id="RegistrySettings" />
+      <ComponentRef Id="EnvironmentVars" />
+      
+      <!-- Reference to harvested files (excluding service executable) -->
+      <FeatureRef Id="ServiceFiles" />
+    </Feature>
+
+  </Package>
+</Wix>

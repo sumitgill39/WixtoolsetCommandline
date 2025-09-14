@@ -1,0 +1,37 @@
+now we need to foucs on creating the organisational level of professional application where are can offer different type of   
+  creating the msi, as of now we have figured out that we can create Number of application packaging WebAPP, WindowsServer,     
+  Website based msi.\
+  Now First we need to create great professional prompt for yourself to create such application by observing my thoughts of     
+  steps first. Then you can share yours.\
+  \
+  Application Logging : A central application which has an anuthentication system by connecting the application to different    
+  doamins in orgarnisation. As user tried to login if he\she apporoved user he can login into the application, but if the user  
+   tried to login and he\she is not approved then it will get the request form to fill the request and submit it and Admin of   
+  the application will approve the user access request. In the request form it need to have few items like What application     
+  againts they need access they need to share AppShort Key and the app need to get verified using API of other application and  
+   once the application verified that given name is availble in other application and submit the request access to Admin.\      
+  Central Dashboard : As user logging into the application it will get the a very professional dashboard about the user login   
+  profile where they add their profile Pic and they will get thier first name and middle name and last name. Then if user       
+  logged into frist time after the approval it get blank with onboarding the project details against which they have raised     
+  the request. But now it could be possible that a single user can be part of multiple project (appshort keys), but at the      
+  time of request they should have atleast one project. Now when user select the among which project they need to create        
+  select what what type of component its website, webapp, windows service, task scheduler, etc type will be added laster as     
+  user demand. Now each component has a unique ID like guid ID which will also get stored in Product.wxs after that it need to  
+   share some information like against how many envrionments its has like DEV,QA,UAT,PREPROD,PROD,SIT,DR and against each       
+  envrionment what are the servers (this needs to be a drop down and get the values from servicenow API as user type name it    
+  need to fillterout the same if the server name is not vaild then prompt the error) its possible that user can select
+  multiple servre it could be possible for aaplications like using HPC which have serval node for proccessing. then it need to  
+   share from which location application will get the artifacts to make them msi like Jfrog URL path where user can set
+  polling frequency to check if their is new zip file is being uploaded by Github action, aaplication should have feature like  
+   where they can configure multiple links of jfrog cause that possibility that if primiary link goes down then it can check    
+  the other links. from the primary link it need to dowload the latest artifacts and then based on the selected type of msi it  
+   need to build, yes before building it need to extract the zip and get all the files then harvest it for mis building.Now we  
+   also need ask the user on form what type of component it is. is it .net framework based or .net core, react based, angular   
+   based because  type were having different types of configuration like web.config or appsetting.json which need to be get     
+  transform also. here we are using the msdeploy for transforming the config where we have stored web.setparameter.xml in some  
+   other organistion application in form of Key and value and we have the access of that application API which can generate     
+  the required file and by using that file from different envrionment from the api we need to create different multiple msi     
+  based on envirionment sets. By using this transformation we are making the ready msi for the installtion on remote machine.\  
+  \
+  Lets first create the part where we will build different msi for different environments for different AppShort keys Master    
+  application agsint their components.

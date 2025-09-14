@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - MSI Factory{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="color: #2c3e50; margin-bottom: 1rem;">
+        👨‍💼 Admin Panel
+    </h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        <div style="background: #e74c3c; color: white; padding: 1rem; border-radius: 8px; text-align: center;">
+            <h3 style="margin: 0; font-size: 2rem;">{{ requests|length }}</h3>
+            <p style="margin: 0;">Pending Requests</p>
+        </div>
+        
+        <div style="background: #27ae60; color: white; padding: 1rem; border-radius: 8px; text-align: center;">
+            <h3 style="margin: 0; font-size: 2rem;">Admin</h3>
+            <p style="margin: 0;">Your Role</p>
+        </div>
+        
+        <div style="background: #3498db; color: white; padding: 1rem; border-radius: 8px; text-align: center;">
+            <h3 style="margin: 0; font-size: 2rem;">Active</h3>
+            <p style="margin: 0;">System Status</p>
+        </div>
+        
+        <div style="background: #f39c12; color: white; padding: 1rem; border-radius: 8px; text-align: center;">
+            <h3 style="margin: 0; font-size: 2rem;">MSI Factory</h3>
+            <p style="margin: 0;">Service</p>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="color: #2c3e50; margin-bottom: 1rem;">
+        ⏳ Pending Access Requests
+    </h3>
+    
+    {% if requests %}
+        <div style="overflow-x: auto;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User Details</th>
+                        <th>Application</th>
+                        <th>Reason</th>
+                        <th>Requested Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in requests %}
+                    <tr>
+                        <td><strong>#{{ request.request_id }}</strong></td>
+                        <td>
+                            <div>
+                                <strong>{{ request.first_name }} {{ request.last_name }}</strong><br>
+                                <small style="color: #666;">{{ request.username }}</small><br>
+                                <small style="color: #666;">{{ request.email }}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <strong style="color: #3498db;">{{ request.app_short_key }}</strong><br>
+                                <small style="color: #666;">{{ request.app_name }}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="max-width: 200px;">
+                                <small>{{ request.reason }}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <small>{{ request.requested_date }}</small>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                                <a href="{{ url_for('approve_request', request_id=request.request_id) }}" 
+                                   class="btn btn-success" 
+                                   style="font-size: 0.8rem; padding: 0.3rem 0.6rem;"
+                                   onclick="return confirm('Approve access for {{ request.first_name }} {{ request.last_name }}?')">
+                                    ✅ Approve
+                                </a>
+                                <a href="{{ url_for('deny_request', request_id=request.request_id, reason='Access denied by admin') }}" 
+                                   class="btn btn-danger" 
+                                   style="font-size: 0.8rem; padding: 0.3rem 0.6rem;"
+                                   onclick="return confirm('Deny access for {{ request.first_name }} {{ request.last_name }}?')">
+                                    ❌ Deny
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 3rem; background: #f8f9fa; border-radius: 8px;">
+            <h4 style="color: #27ae60;">🎉 No Pending Requests!</h4>
+            <p style="color: #666;">All access requests have been processed.</p>
+        </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3 style="color: #2c3e50; margin-bottom: 1rem;">
+        🛠️ Admin Actions
+    </h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+        <div style="padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px;">
+            <h4 style="color: #3498db; margin-bottom: 1rem;">👥 User Management</h4>
+            <p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">
+                Manage user accounts, roles, and application access permissions.
+            </p>
+            <button class="btn" onclick="alert('User Management - Coming Soon!')" style="width: 100%;">
+                Manage Users
+            </button>
+        </div>
+        
+        <div style="padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px;">
+            <h4 style="color: #27ae60; margin-bottom: 1rem;">📱 Application Registry</h4>
+            <p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">
+                Add, edit, or remove applications from the MSI Factory registry.
+            </p>
+            <button class="btn btn-success" onclick="alert('Application Management - Coming Soon!')" style="width: 100%;">
+                Manage Applications
+            </button>
+        </div>
+        
+        <div style="padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px;">
+            <h4 style="color: #f39c12; margin-bottom: 1rem;">📊 System Reports</h4>
+            <p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">
+                View system usage, MSI generation statistics, and audit logs.
+            </p>
+            <button class="btn" onclick="alert('System Reports - Coming Soon!')" style="width: 100%;">
+                View Reports
+            </button>
+        </div>
+        
+        <div style="padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px;">
+            <h4 style="color: #9b59b6; margin-bottom: 1rem;">⚙️ System Settings</h4>
+            <p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">
+                Configure MSI Factory settings, integration APIs, and notifications.
+            </p>
+            <button class="btn" onclick="alert('System Settings - Coming Soon!')" style="width: 100%;">
+                Configure System
+            </button>
+        </div>
+        
+        <div style="padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px;">
+            <h4 style="color: #e74c3c; margin-bottom: 1rem;">🔒 Security Audit</h4>
+            <p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">
+                Review security logs, failed login attempts, and access violations.
+            </p>
+            <button class="btn btn-danger" onclick="alert('Security Audit - Coming Soon!')" style="width: 100%;">
+                Security Audit
+            </button>
+        </div>
+        
+        <div style="padding: 1.5rem; border: 1px solid #ddd; border-radius: 8px;">
+            <h4 style="color: #1abc9c; margin-bottom: 1rem;">🔗 API Integrations</h4>
+            <p style="color: #666; margin-bottom: 1rem; font-size: 0.9rem;">
+                Configure ServiceNow, JFrog, and other external API connections.
+            </p>
+            <button class="btn" onclick="alert('API Integrations - Coming Soon!')" style="width: 100%;">
+                Manage APIs
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="color: #2c3e50; margin-bottom: 1rem;">
+        📈 Quick Statistics
+    </h3>
+    
+    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center;">
+            <div>
+                <h4 style="color: #3498db; margin-bottom: 0.5rem;">System Health</h4>
+                <div style="font-size: 2rem;">🟢</div>
+                <p style="margin: 0; color: #27ae60; font-weight: bold;">Healthy</p>
+            </div>
+            
+            <div>
+                <h4 style="color: #f39c12; margin-bottom: 0.5rem;">Pending Approvals</h4>
+                <div style="font-size: 2rem; color: #e74c3c;">{{ requests|length }}</div>
+                <p style="margin: 0; color: #666;">Requests</p>
+            </div>
+            
+            <div>
+                <h4 style="color: #9b59b6; margin-bottom: 0.5rem;">Active Users</h4>
+                <div style="font-size: 2rem; color: #27ae60;">2</div>
+                <p style="margin: 0; color: #666;">Users Online</p>
+            </div>
+            
+            <div>
+                <h4 style="color: #1abc9c; margin-bottom: 0.5rem;">MSI Generated</h4>
+                <div style="font-size: 2rem; color: #3498db;">0</div>
+                <p style="margin: 0; color: #666;">Today</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if requests %}
+<div class="card">
+    <h3 style="color: #2c3e50; margin-bottom: 1rem;">
+        ⚡ Bulk Actions
+    </h3>
+    
+    <div style="background: #fff3cd; padding: 1rem; border-radius: 4px; border: 1px solid #ffeaa7;">
+        <p style="margin: 0; color: #856404;">
+            <strong>Quick Actions:</strong> Use these buttons to process multiple requests at once.
+        </p>
+    </div>
+    
+    <div style="margin-top: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+        <button class="btn btn-success" onclick="alert('Bulk Approve - Coming Soon!')">
+            ✅ Approve All Pending
+        </button>
+        <button class="btn btn-danger" onclick="alert('Bulk Deny - Coming Soon!')">
+            ❌ Deny All Pending
+        </button>
+        <button class="btn" onclick="alert('Export Requests - Coming Soon!')">
+            📄 Export Requests
+        </button>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,139 @@
+{
+  "componentId": "11223344-5566-7788-9900-112233445566",
+  "appShortKey": "PORTAL",
+  "componentName": "Employee Portal Website",
+  "componentType": "website",
+  "framework": "react",
+  "version": "3.0.1",
+  "description": "Employee self-service portal with React frontend",
+  "owner": {
+    "team": "Frontend Development Team",
+    "email": "frontend-team@company.com",
+    "manager": "Mike Johnson"
+  },
+  "environments": {
+    "DEV": {
+      "servers": [
+        "dev-web01.company.com"
+      ],
+      "installPath": "C:\\Websites\\EmployeePortal\\Dev",
+      "configOverrides": {
+        "API_BASE_URL": "https://api-dev.company.com",
+        "ENVIRONMENT": "development",
+        "DEBUG_MODE": "true",
+        "PORT": "3000"
+      },
+      "features": {
+        "ssl": false,
+        "firewall": true,
+        "eventLog": true,
+        "performanceCounters": false
+      }
+    },
+    "QA": {
+      "servers": [
+        "qa-web01.company.com"
+      ],
+      "installPath": "C:\\Websites\\EmployeePortal\\QA",
+      "configOverrides": {
+        "API_BASE_URL": "https://api-qa.company.com",
+        "ENVIRONMENT": "qa",
+        "DEBUG_MODE": "false",
+        "PORT": "3001"
+      },
+      "features": {
+        "ssl": true,
+        "firewall": true,
+        "eventLog": true,
+        "performanceCounters": false
+      }
+    },
+    "PROD": {
+      "servers": [
+        "prod-web01.company.com",
+        "prod-web02.company.com"
+      ],
+      "installPath": "C:\\Websites\\EmployeePortal",
+      "configOverrides": {
+        "API_BASE_URL": "https://api.company.com",
+        "ENVIRONMENT": "production",
+        "DEBUG_MODE": "false",
+        "PORT": "80"
+      },
+      "features": {
+        "ssl": true,
+        "firewall": true,
+        "eventLog": true,
+        "performanceCounters": true
+      }
+    }
+  },
+  "artifactSources": {
+    "primary": "https://jfrog.company.com/artifactory/frontend-releases/EmployeePortal/",
+    "fallback": [
+      "https://backup-jfrog.company.com/artifactory/frontend-releases/EmployeePortal/"
+    ],
+    "pollingFrequency": "15m",
+    "filePattern": "employee-portal-build-*.zip",
+    "authentication": {
+      "type": "apikey",
+      "credentials": "encrypted_frontend_api_key_here"
+    }
+  },
+  "configTransformation": {
+    "enabled": true,
+    "apiEndpoint": "https://config-api.company.com/v1/transform",
+    "templateType": "custom",
+    "transformationEngine": "builtin",
+    "customTransforms": {
+      "BUILD_VERSION": "{{version}}",
+      "DEPLOYMENT_TIME": "{{timestamp}}"
+    }
+  },
+  "buildSettings": {
+    "generateCab": true,
+    "signMsi": false,
+    "customWixExtensions": [
+      "WixToolset.Iis.wixext",
+      "WixToolset.Util.wixext"
+    ],
+    "buildFlags": [
+      "-v",
+      "-nologo"
+    ]
+  },
+  "deployment": {
+    "preInstallScript": "Scripts/PreInstall-Portal.ps1",
+    "postInstallScript": "Scripts/PostInstall-Portal.ps1",
+    "requiresReboot": false,
+    "installationTimeout": 180
+  },
+  "validation": {
+    "requiredFiles": [
+      "index.html",
+      "static/js/main.*.js",
+      "static/css/main.*.css"
+    ],
+    "excludedFiles": [
+      "*.map",
+      "src/*",
+      "node_modules/*",
+      ".env*"
+    ],
+    "healthCheckUrl": "https://employeeportal.company.com/health",
+    "healthCheckTimeout": 20
+  },
+  "metadata": {
+    "tags": [
+      "website",
+      "react",
+      "frontend",
+      "employee-portal",
+      "spa"
+    ],
+    "documentation": "https://wiki.company.com/EmployeePortal",
+    "repository": "https://github.com/company/employee-portal-frontend",
+    "lastModified": "2024-09-13T16:20:00Z",
+    "createdBy": "frontend-team@company.com"
+  }
+}

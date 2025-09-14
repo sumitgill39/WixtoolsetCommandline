@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python MSI Generator - WiX v6</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container-main {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin: 2rem auto;
+            padding: 0;
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .content {
+            padding: 2rem;
+        }
+        .app-type-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            height: 100%;
+        }
+        .app-type-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+        .app-type-card.selected {
+            border-color: #667eea;
+            background-color: #f8f9ff;
+            transform: translateY(-5px);
+        }
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .form-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid #667eea;
+        }
+        .step {
+            display: none;
+        }
+        .step.active {
+            display: block;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        #preview-modal .modal-dialog {
+            max-width: 80%;
+        }
+        #wix-preview {
+            background: #2d3748;
+            color: #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .progress-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        .success-message {
+            display: none;
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        .error-message {
+            display: none;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="container-main">
+            <div class="header">
+                <h1><i class="fas fa-box"></i> Python MSI Generator</h1>
+                <p class="mb-0">Create Windows Installer packages using WiX Toolset v6</p>
+            </div>
+            
+            <div class="content">
+                <!-- Progress Bar -->
+                <div class="mb-4">
+                    <div class="progress" style="height: 8px;">
+                        <div class="progress-bar" id="progressBar" role="progressbar" style="width: 33%"></div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-2">
+                        <small class="text-muted">1. Choose Type</small>
+                        <small class="text-muted">2. Configure</small>
+                        <small class="text-muted">3. Generate</small>
+                    </div>
+                </div>
+
+                <!-- Messages -->
+                <div id="successMessage" class="success-message">
+                    <i class="fas fa-check-circle"></i> <span></span>
+                </div>
+                <div id="errorMessage" class="error-message">
+                    <i class="fas fa-exclamation-circle"></i> <span></span>
+                </div>
+
+                <form id="msiForm" enctype="multipart/form-data">
+                    <!-- Step 1: Application Type Selection -->
+                    <div class="step active" id="step1">
+                        <h3 class="mb-4">Choose Your Application Type</h3>
+                        <div class="row">
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card app-type-card" data-type="WebApplication">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-globe card-icon text-primary"></i>
+                                        <h5 class="card-title">Web Application</h5>
+                                        <p class="card-text">Deploy to IIS Default Web Site with virtual directory</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card app-type-card" data-type="CustomWebSite">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-server card-icon text-success"></i>
+                                        <h5 class="card-title">Custom Web Site</h5>
+                                        <p class="card-text">Create a new IIS website with custom port</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card app-type-card" data-type="WindowsService">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-cogs card-icon text-info"></i>
+                                        <h5 class="card-title">Windows Service</h5>
+                                        <p class="card-text">Install and configure Windows background service</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card app-type-card" data-type="PowerShellScript">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-terminal card-icon text-warning"></i>
+                                        <h5 class="card-title">PowerShell Script</h5>
+                                        <p class="card-text">Package and execute PowerShell scripts</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card app-type-card" data-type="DesktopApplication">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-desktop card-icon text-secondary"></i>
+                                        <h5 class="card-title">Desktop Application</h5>
+                                        <p class="card-text">Simple file deployment to Program Files</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <button type="button" class="btn btn-primary btn-lg" id="nextStep1" disabled>
+                                Next <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Configuration -->
+                    <div class="step" id="step2">
+                        <h3 class="mb-4">Configure Your Installation</h3>
+                        
+                        <!-- Basic Information -->
+                        <div class="form-section">
+                            <h5><i class="fas fa-info-circle text-primary"></i> Basic Information</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Application Name *</label>
+                                    <input type="text" class="form-control" name="application_name" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Version</label>
+                                    <input type="text" class="form-control" name="version" value="1.0.0.0">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Manufacturer *</label>
+                                    <input type="text" class="form-control" name="manufacturer" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Install Location</label>
+                                    <input type="text" class="form-control" name="install_location" 
+                                           placeholder="Leave empty for default (Program Files)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Web Application Configuration -->
+                        <div id="webAppConfig" class="form-section" style="display: none;">
+                            <h5><i class="fas fa-globe text-success"></i> Web Application Settings</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">App Pool Name</label>
+                                    <input type="text" class="form-control" name="web_app_pool_name">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Virtual Directory</label>
+                                    <input type="text" class="form-control" name="web_virtual_directory">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Port</label>
+                                    <input type="number" class="form-control" name="web_port" value="80">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">.NET Runtime Version</label>
+                                    <select class="form-select" name="web_runtime_version">
+                                        <option value="v4.0">v4.0</option>
+                                        <option value="v2.0">v2.0</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4" id="websiteNameField" style="display: none;">
+                                    <label class="form-label">Website Name</label>
+                                    <input type="text" class="form-control" name="web_site_name">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Windows Service Configuration -->
+                        <div id="serviceConfig" class="form-section" style="display: none;">
+                            <h5><i class="fas fa-cogs text-info"></i> Windows Service Settings</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Service Name *</label>
+                                    <input type="text" class="form-control" name="service_name" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Display Name</label>
+                                    <input type="text" class="form-control" name="service_display_name">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Description</label>
+                                    <textarea class="form-control" name="service_description" rows="2"></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Start Type</label>
+                                    <select class="form-select" name="service_start_type">
+                                        <option value="auto">Automatic</option>
+                                        <option value="manual">Manual</option>
+                                        <option value="disabled">Disabled</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Service Account</label>
+                                    <select class="form-select" name="service_account">
+                                        <option value="NT AUTHORITY\LocalService">Local Service</option>
+                                        <option value="NT AUTHORITY\NetworkService">Network Service</option>
+                                        <option value="NT AUTHORITY\LocalSystem">Local System</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PowerShell Configuration -->
+                        <div id="powershellConfig" class="form-section" style="display: none;">
+                            <h5><i class="fas fa-terminal text-warning"></i> PowerShell Settings</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Main Script Path</label>
+                                    <input type="text" class="form-control" name="ps_script_path" 
+                                           placeholder="e.g., install.ps1">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Execution Policy</label>
+                                    <select class="form-select" name="ps_execution_policy">
+                                        <option value="Bypass">Bypass</option>
+                                        <option value="Unrestricted">Unrestricted</option>
+                                        <option value="RemoteSigned">RemoteSigned</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="ps_run_pre_install">
+                                        <label class="form-check-label">
+                                            Run script before installation (default: after installation)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- File Upload -->
+                        <div class="form-section">
+                            <h5><i class="fas fa-upload text-primary"></i> Files to Package</h5>
+                            <input type="file" class="form-control" name="files" multiple>
+                            <div class="form-text">
+                                Select all files and folders that should be included in the installer
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" id="prevStep2">
+                                <i class="fas fa-arrow-left"></i> Previous
+                            </button>
+                            <button type="button" class="btn btn-primary" id="nextStep2">
+                                Next <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Generate -->
+                    <div class="step" id="step3">
+                        <h3 class="mb-4">Generate MSI Package</h3>
+                        
+                        <div class="form-section">
+                            <h5><i class="fas fa-eye text-info"></i> Preview WiX Source</h5>
+                            <p class="text-muted">Review the generated WiX source code before building</p>
+                            <button type="button" class="btn btn-info" id="previewBtn">
+                                <i class="fas fa-code"></i> Show WiX Preview
+                            </button>
+                        </div>
+
+                        <div class="form-section text-center">
+                            <h5><i class="fas fa-rocket text-success"></i> Ready to Build Your MSI</h5>
+                            <p class="text-muted">Click the button below to generate your Windows Installer package</p>
+                            
+                            <button type="submit" class="btn btn-success btn-lg" id="generateBtn">
+                                <i class="fas fa-download"></i> Generate MSI Package
+                            </button>
+                            
+                            <div id="loading" class="loading">
+                                <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <h5 class="mt-3">Generating your MSI package...</h5>
+                                <p class="text-muted">This may take a few moments</p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" id="prevStep3">
+                                <i class="fas fa-arrow-left"></i> Previous
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal fade" id="previewModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-code"></i> WiX Source Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <pre id="wixPreview" class="p-3"></pre>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentStep = 1;
+        let selectedAppType = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeEventHandlers();
+            // Test server connection
+            testServerConnection();
+        });
+
+        async function testServerConnection() {
+            try {
+                const response = await fetch(`${window.location.origin}/api/health`);
+                const result = await response.json();
+                console.log('Server health check:', result);
+                if (!result.wix_available) {
+                    showError('WiX Toolset not detected. Please install: dotnet tool install --global wix');
+                }
+            } catch (error) {
+                console.error('Server connection failed:', error);
+                showError('Cannot connect to server. Please ensure the Flask application is running.');
+            }
+        }
+
+        function initializeEventHandlers() {
+            // Application type selection
+            document.querySelectorAll('.app-type-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    document.querySelectorAll('.app-type-card').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedAppType = this.dataset.type;
+                    document.getElementById('nextStep1').disabled = false;
+                });
+            });
+
+            // Navigation buttons
+            document.getElementById('nextStep1').addEventListener('click', () => goToStep(2));
+            document.getElementById('nextStep2').addEventListener('click', () => goToStep(3));
+            document.getElementById('prevStep2').addEventListener('click', () => goToStep(1));
+            document.getElementById('prevStep3').addEventListener('click', () => goToStep(2));
+
+            // Preview button
+            document.getElementById('previewBtn').addEventListener('click', showPreview);
+
+            // Form submission
+            document.getElementById('msiForm').addEventListener('submit', generateMsi);
+
+            // Auto-populate fields when application name changes
+            document.querySelector('input[name="application_name"]').addEventListener('input', populateDefaults);
+        }
+
+        function goToStep(step) {
+            // Hide all steps
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            
+            // Show current step
+            document.getElementById(`step${step}`).classList.add('active');
+            
+            // Update progress bar
+            const progress = (step / 3) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+            
+            currentStep = step;
+
+            if (step === 2) {
+                showConfigurationForAppType(selectedAppType);
+                populateDefaults();
+            }
+        }
+
+        function showConfigurationForAppType(appType) {
+            // Hide all config sections
+            document.getElementById('webAppConfig').style.display = 'none';
+            document.getElementById('serviceConfig').style.display = 'none';
+            document.getElementById('powershellConfig').style.display = 'none';
+            document.getElementById('websiteNameField').style.display = 'none';
+
+            // Show relevant config
+            switch(appType) {
+                case 'WebApplication':
+                    document.getElementById('webAppConfig').style.display = 'block';
+                    break;
+                case 'CustomWebSite':
+                    document.getElementById('webAppConfig').style.display = 'block';
+                    document.getElementById('websiteNameField').style.display = 'block';
+                    break;
+                case 'WindowsService':
+                    document.getElementById('serviceConfig').style.display = 'block';
+                    break;
+                case 'PowerShellScript':
+                    document.getElementById('powershellConfig').style.display = 'block';
+                    break;
+            }
+        }
+
+        function populateDefaults() {
+            const appName = document.querySelector('input[name="application_name"]').value || '';
+            
+            if (appName) {
+                // Web app defaults
+                const appPoolInput = document.querySelector('input[name="web_app_pool_name"]');
+                if (appPoolInput && !appPoolInput.value) {
+                    appPoolInput.value = `${appName}AppPool`;
+                }
+
+                const virtualDirInput = document.querySelector('input[name="web_virtual_directory"]');
+                if (virtualDirInput && !virtualDirInput.value) {
+                    virtualDirInput.value = appName;
+                }
+
+                const websiteNameInput = document.querySelector('input[name="web_site_name"]');
+                if (websiteNameInput && !websiteNameInput.value) {
+                    websiteNameInput.value = `${appName} Website`;
+                }
+
+                // Service defaults
+                const serviceNameInput = document.querySelector('input[name="service_name"]');
+                if (serviceNameInput && !serviceNameInput.value) {
+                    serviceNameInput.value = `${appName}Service`;
+                }
+
+                const displayNameInput = document.querySelector('input[name="service_display_name"]');
+                if (displayNameInput && !displayNameInput.value) {
+                    displayNameInput.value = `${appName} Service`;
+                }
+            }
+        }
+
+        async function showPreview() {
+            const config = getFormConfig();
+            
+            try {
+                const response = await fetch(`${window.location.origin}/api/preview`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(config)
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    document.getElementById('wixPreview').textContent = result.wix_source;
+                    new bootstrap.Modal(document.getElementById('previewModal')).show();
+                } else {
+                    showError(result.error || 'Failed to generate preview');
+                }
+            } catch (error) {
+                showError('Failed to generate preview: ' + error.message);
+            }
+        }
+
+        function getFormConfig() {
+            const formData = new FormData(document.getElementById('msiForm'));
+            const config = {
+                application_name: formData.get('application_name'),
+                version: formData.get('version'),
+                manufacturer: formData.get('manufacturer'),
+                install_location: formData.get('install_location'),
+                app_type: selectedAppType
+            };
+
+            // Add type-specific config
+            if (selectedAppType === 'WebApplication' || selectedAppType === 'CustomWebSite') {
+                config.web_app = {
+                    app_pool_name: formData.get('web_app_pool_name'),
+                    virtual_directory: formData.get('web_virtual_directory'),
+                    port: formData.get('web_port'),
+                    runtime_version: formData.get('web_runtime_version'),
+                    website_name: formData.get('web_site_name')
+                };
+            } else if (selectedAppType === 'WindowsService') {
+                config.service = {
+                    service_name: formData.get('service_name'),
+                    display_name: formData.get('service_display_name'),
+                    description: formData.get('service_description'),
+                    start_type: formData.get('service_start_type'),
+                    account: formData.get('service_account')
+                };
+            } else if (selectedAppType === 'PowerShellScript') {
+                config.powershell = {
+                    script_path: formData.get('ps_script_path'),
+                    execution_policy: formData.get('ps_execution_policy'),
+                    run_pre_install: formData.get('ps_run_pre_install') === 'on'
+                };
+            }
+
+            return config;
+        }
+
+        async function generateMsi(event) {
+            event.preventDefault();
+            
+            const generateBtn = document.getElementById('generateBtn');
+            const loading = document.getElementById('loading');
+            
+            generateBtn.disabled = true;
+            loading.style.display = 'block';
+
+            try {
+                const formData = new FormData(document.getElementById('msiForm'));
+                formData.append('app_type', selectedAppType);
+
+                const response = await fetch(`${window.location.origin}/api/generate`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `${formData.get('application_name')}.msi`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    a.remove();
+                    
+                    showSuccess('MSI package generated and downloaded successfully!');
+                } else {
+                    const result = await response.json();
+                    showError(result.error || 'Failed to generate MSI');
+                }
+            } catch (error) {
+                showError('Failed to generate MSI: ' + error.message);
+            } finally {
+                generateBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.querySelector('span').textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.querySelector('span').textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 10000);
+        }
+    </script>
+</body>
+</html>

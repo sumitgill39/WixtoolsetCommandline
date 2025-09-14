@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <!-- Files.wxs - Auto-generated from WebFiles -->
+  <Fragment>
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Directory Id="Dir_css" Name="css" />
+      <Directory Id="Dir_images" Name="images" />
+      <Directory Id="Dir_js" Name="js" />
+    </DirectoryRef>
+    <ComponentGroup Id="WebApplicationFiles" Directory="INSTALLFOLDER">
+      <Component Id="File_index_html_0" Guid="E15D5211-4C6B-016B-C290-4044C96E3D46">
+        <File Id="File_index_html_F_0" Source="WebFiles/index.html" Name="index.html" />
+      </Component>
+      <Component Id="File_web_config_1" Guid="BDD6BFCB-5474-FC7E-BB8C-EE1ECCEA2058">
+        <File Id="File_web_config_F_1" Source="WebFiles/web.config" Name="web.config" />
+      </Component>
+      <Component Id="File_site_css_2" Guid="BF66CA06-7931-A772-BB65-04E8B22F3CBE" Directory="Dir_css">
+        <File Id="File_site_css_F_2" Source="WebFiles/css/site.css" Name="site.css" />
+      </Component>
+      <Component Id="EmptyDir_images_0" Guid="2613D131-E7AD-5EF4-B307-06CCD8201EFE" Directory="Dir_images">
+        <CreateFolder Directory="Dir_images" />
+      </Component>
+      <Component Id="File_site_js_3" Guid="3BFA7427-B9DB-7E2D-917B-FB384F0BC8BD" Directory="Dir_js">
+        <File Id="File_site_js_F_3" Source="WebFiles/js/site.js" Name="site.js" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

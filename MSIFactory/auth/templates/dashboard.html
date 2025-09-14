@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - MSI Factory{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="color: #2c3e50; margin-bottom: 1rem;">
+        👋 Welcome, {{ session.first_name }} {{ session.last_name }}!
+    </h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+        <div style="background: #3498db; color: white; padding: 1rem; border-radius: 8px; text-align: center;">
+            <h3 style="margin: 0; font-size: 2rem;">{{ applications|length }}</h3>
+            <p style="margin: 0;">Applications</p>
+        </div>
+        
+        <div style="background: #27ae60; color: white; padding: 1rem; border-radius: 8px; text-align: center;">
+            <h3 style="margin: 0; font-size: 2rem;">{{ session.role|title }}</h3>
+            <p style="margin: 0;">Role</p>
+        </div>
+        
+        <div style="background: #f39c12; color: white; padding: 1rem; border-radius: 8px; text-align: center;">
+            <h3 style="margin: 0; font-size: 2rem;">Active</h3>
+            <p style="margin: 0;">Status</p>
+        </div>
+        
+        <div style="background: #9b59b6; color: white; padding: 1rem; border-radius: 8px; text-align: center;">
+            <h3 style="margin: 0; font-size: 2rem;">{{ session.email.split('@')[1] }}</h3>
+            <p style="margin: 0;">Domain</p>
+        </div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div>
+            <h3 style="color: #34495e;">👤 User Profile</h3>
+            <table class="table">
+                <tr>
+                    <td><strong>Username:</strong></td>
+                    <td>{{ session.username }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Email:</strong></td>
+                    <td>{{ session.email }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Full Name:</strong></td>
+                    <td>{{ session.first_name }} {{ session.last_name }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Role:</strong></td>
+                    <td>
+                        <span style="background: {% if session.role == 'admin' %}#e74c3c{% else %}#3498db{% endif %}; 
+                                     color: white; padding: 2px 8px; border-radius: 3px; font-size: 0.8rem;">
+                            {{ session.role|title }}
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Access Level:</strong></td>
+                    <td>
+                        {% if '*' in session.approved_apps %}
+                            <span style="color: #27ae60;">🌟 All Applications</span>
+                        {% else %}
+                            <span style="color: #f39c12;">📋 Specific Applications</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <div>
+            <h3 style="color: #34495e;">🔐 Access Summary</h3>
+            <table class="table">
+                <tr>
+                    <td><strong>Approved Apps:</strong></td>
+                    <td>
+                        {% if '*' in session.approved_apps %}
+                            All Applications
+                        {% else %}
+                            {{ session.approved_apps|join(', ') }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Can Create MSI:</strong></td>
+                    <td><span style="color: #27ae60;">✅ Yes</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Can View Reports:</strong></td>
+                    <td><span style="color: #27ae60;">✅ Yes</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Admin Access:</strong></td>
+                    <td>
+                        {% if session.role == 'admin' %}
+                            <span style="color: #27ae60;">✅ Yes</span>
+                        {% else %}
+                            <span style="color: #95a5a6;">❌ No</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="color: #2c3e50; margin-bottom: 1rem;">
+        🏭 Your Applications
+    </h3>
+    
+    {% if applications %}
+        <div class="app-grid">
+            {% for app in applications %}
+            <div class="app-card" style="border-left: 4px solid #3498db;">
+                <h4 style="color: #2c3e50;">{{ app.app_short_key }}</h4>
+                <h5 style="color: #34495e; margin-bottom: 0.5rem;">{{ app.app_name }}</h5>
+                <p style="font-size: 0.9rem; color: #666;">{{ app.description }}</p>
+                
+                <div style="margin: 1rem 0; padding: 0.5rem; background: #f8f9fa; border-radius: 4px; font-size: 0.8rem;">
+                    <strong>Owner Team:</strong> {{ app.owner_team }}<br>
+                    <strong>Status:</strong> 
+                    <span style="color: {% if app.status == 'active' %}#27ae60{% else %}#e74c3c{% endif %};">
+                        {{ app.status|title }}
+                    </span>
+                </div>
+                
+                <div style="margin-top: 1rem;">
+                    <button class="btn" style="width: 100%;" onclick="alert('MSI Factory Core Engine - Coming Soon!')">
+                        🚀 Generate MSI
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 3rem; background: #f8f9fa; border-radius: 8px;">
+            <h4 style="color: #7f8c8d;">No Applications Available</h4>
+            <p style="color: #95a5a6;">You don't have access to any applications yet.</p>
+            <a href="{{ url_for('access_request', username=session.username) }}" class="btn btn-success">
+                📝 Request Application Access
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3 style="color: #2c3e50; margin-bottom: 1rem;">
+        🎯 Quick Actions
+    </h3>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+        <div style="padding: 1rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+            <h4 style="color: #3498db;">📦 Generate MSI</h4>
+            <p style="font-size: 0.9rem; color: #666;">Create MSI packages for your applications</p>
+            <button class="btn" onclick="alert('MSI Factory - Coming Soon!')">Start Generation</button>
+        </div>
+        
+        <div style="padding: 1rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+            <h4 style="color: #27ae60;">📊 View Reports</h4>
+            <p style="font-size: 0.9rem; color: #666;">Check MSI generation history and logs</p>
+            <button class="btn" onclick="alert('Reports - Coming Soon!')">View Reports</button>
+        </div>
+        
+        <div style="padding: 1rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+            <h4 style="color: #f39c12;">⚙️ Settings</h4>
+            <p style="font-size: 0.9rem; color: #666;">Configure your preferences and notifications</p>
+            <button class="btn" onclick="alert('Settings - Coming Soon!')">Open Settings</button>
+        </div>
+        
+        {% if session.role == 'admin' %}
+        <div style="padding: 1rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
+            <h4 style="color: #e74c3c;">👨‍💼 Admin Panel</h4>
+            <p style="font-size: 0.9rem; color: #666;">Manage users and access requests</p>
+            <a href="{{ url_for('admin') }}" class="btn btn-danger">Open Admin Panel</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

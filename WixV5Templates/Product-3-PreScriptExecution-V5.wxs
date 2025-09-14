@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+
+  <!-- WiX v5 uses Package instead of Product -->
+  <Package 
+    Name="PreInstall Setup"
+    Version="1.0.0.0"
+    Manufacturer="MyCompany"
+    UpgradeCode="11111111-1111-1111-1111-111111111111"
+    Compressed="true"
+    Scope="perMachine">
+
+    <!-- Hide from Add/Remove Programs -->
+    <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
+
+    <!-- Installation folder -->
+    <Property Id="INSTALLFOLDER" Value="C:\SysAdmin\Scripts" />
+
+    <!-- WiX v5: Include script files -->
+    <File Source="Scripts\PreInstall.ps1" />
+
+    <!-- Pre-installation PowerShell Custom Action -->
+    <CustomAction Id="PreInstallPowerShell"
+                  ExeCommand="powershell.exe -ExecutionPolicy Bypass -File &quot;[INSTALLFOLDER]PreInstall.ps1&quot;"
+                  Directory="INSTALLFOLDER"
+                  Execute="deferred"
+                  Return="check" />
+
+    <!-- Custom Action scheduling -->
+    <InstallExecuteSequence>
+      <Custom Action="PreInstallPowerShell" After="InstallFiles">NOT REMOVE</Custom>
+    </InstallExecuteSequence>
+
+    <!-- WiX v5 provides default Feature if not specified -->
+    <Feature Id="PreInstallFeature" Title="Pre-Installation" Level="1">
+      <!-- Files are automatically included in default components -->
+    </Feature>
+
+  </Package>
+</Wix>

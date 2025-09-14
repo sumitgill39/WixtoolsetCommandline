@@ -1,0 +1,318 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MSI Factory Component Configuration",
+  "description": "Schema for defining application components for MSI generation",
+  "type": "object",
+  "required": [
+    "componentId",
+    "appShortKey", 
+    "componentName",
+    "componentType",
+    "framework",
+    "environments",
+    "artifactSources"
+  ],
+  "properties": {
+    "componentId": {
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+      "description": "Unique GUID identifier for the component"
+    },
+    "appShortKey": {
+      "type": "string",
+      "pattern": "^[A-Z0-9]{3,10}$",
+      "description": "Application short key (3-10 uppercase alphanumeric characters)"
+    },
+    "componentName": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 100,
+      "description": "Human-readable component name"
+    },
+    "componentType": {
+      "type": "string",
+      "enum": ["webapp", "website", "service", "scheduler"],
+      "description": "Type of component to be packaged"
+    },
+    "framework": {
+      "type": "string",
+      "enum": ["netframework", "netcore", "react", "angular", "static"],
+      "description": "Technology framework used by the component"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(\\.\\d+)?$",
+      "default": "1.0.0",
+      "description": "Component version (semantic versioning)"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 500,
+      "description": "Component description for documentation"
+    },
+    "owner": {
+      "type": "object",
+      "properties": {
+        "team": {"type": "string"},
+        "email": {"type": "string", "format": "email"},
+        "manager": {"type": "string"}
+      },
+      "description": "Component ownership information"
+    },
+    "environments": {
+      "type": "object",
+      "minProperties": 1,
+      "patternProperties": {
+        "^(DEV|QA|UAT|PREPROD|PROD|SIT|DR)$": {
+          "type": "object",
+          "required": ["servers", "installPath"],
+          "properties": {
+            "servers": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "pattern": "^[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+                "description": "Fully qualified domain name"
+              },
+              "description": "List of target servers for this environment"
+            },
+            "installPath": {
+              "type": "string",
+              "pattern": "^[A-Za-z]:\\\\.*",
+              "description": "Windows installation path"
+            },
+            "serviceAccount": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["LocalSystem", "LocalService", "NetworkService", "VirtualAccount", "CustomUser"],
+                  "default": "LocalSystem"
+                },
+                "username": {
+                  "type": "string",
+                  "description": "Username for CustomUser account type"
+                },
+                "domain": {
+                  "type": "string",
+                  "description": "Domain for CustomUser account type"
+                }
+              },
+              "description": "Service account configuration (for service components)"
+            },
+            "configOverrides": {
+              "type": "object",
+              "additionalProperties": true,
+              "description": "Environment-specific configuration overrides"
+            },
+            "features": {
+              "type": "object",
+              "properties": {
+                "ssl": {"type": "boolean", "default": false},
+                "firewall": {"type": "boolean", "default": false},
+                "eventLog": {"type": "boolean", "default": true},
+                "performanceCounters": {"type": "boolean", "default": false}
+              },
+              "description": "Environment-specific feature enablement"
+            }
+          }
+        }
+      },
+      "description": "Environment-specific configurations"
+    },
+    "artifactSources": {
+      "type": "object",
+      "required": ["primary"],
+      "properties": {
+        "primary": {
+          "type": "string",
+          "format": "uri",
+          "description": "Primary JFrog/artifact repository URL"
+        },
+        "fallback": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "description": "Fallback artifact repository URLs"
+        },
+        "pollingFrequency": {
+          "type": "string",
+          "pattern": "^\\d+[mhd]$",
+          "default": "5m",
+          "description": "Polling frequency (e.g., 5m, 1h, 1d)"
+        },
+        "filePattern": {
+          "type": "string",
+          "default": "*.zip",
+          "description": "File pattern to match for downloads"
+        },
+        "authentication": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["apikey", "bearer", "basic", "none"],
+              "default": "apikey"
+            },
+            "credentials": {
+              "type": "string",
+              "description": "Authentication credentials (encrypted)"
+            }
+          }
+        }
+      },
+      "description": "Artifact source configurations"
+    },
+    "configTransformation": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable configuration transformation"
+        },
+        "apiEndpoint": {
+          "type": "string",
+          "format": "uri",
+          "description": "Configuration transformation API endpoint"
+        },
+        "templateType": {
+          "type": "string",
+          "enum": ["web.config", "appsettings.json", "custom"],
+          "description": "Configuration template type"
+        },
+        "transformationEngine": {
+          "type": "string",
+          "enum": ["msdeploy", "custom", "builtin"],
+          "default": "msdeploy",
+          "description": "Transformation engine to use"
+        },
+        "customTransforms": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Custom transformation rules"
+        }
+      },
+      "description": "Configuration transformation settings"
+    },
+    "buildSettings": {
+      "type": "object",
+      "properties": {
+        "generateCab": {
+          "type": "boolean",
+          "default": true,
+          "description": "Generate CAB files for compression"
+        },
+        "signMsi": {
+          "type": "boolean",
+          "default": false,
+          "description": "Digitally sign generated MSI"
+        },
+        "certificatePath": {
+          "type": "string",
+          "description": "Path to code signing certificate"
+        },
+        "customWixExtensions": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Additional WiX extensions to include"
+        },
+        "buildFlags": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Additional WiX build flags"
+        }
+      },
+      "description": "MSI build configuration"
+    },
+    "deployment": {
+      "type": "object",
+      "properties": {
+        "preInstallScript": {
+          "type": "string",
+          "description": "PowerShell script to run before installation"
+        },
+        "postInstallScript": {
+          "type": "string",
+          "description": "PowerShell script to run after installation"
+        },
+        "requiresReboot": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether installation requires system reboot"
+        },
+        "installationTimeout": {
+          "type": "integer",
+          "minimum": 60,
+          "maximum": 3600,
+          "default": 300,
+          "description": "Installation timeout in seconds"
+        }
+      },
+      "description": "Deployment-specific settings"
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "requiredFiles": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Files that must be present in artifact"
+        },
+        "excludedFiles": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Files to exclude from MSI"
+        },
+        "healthCheckUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL for post-deployment health check"
+        },
+        "healthCheckTimeout": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 300,
+          "default": 30,
+          "description": "Health check timeout in seconds"
+        }
+      },
+      "description": "Validation and health check settings"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "tags": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Component tags for categorization"
+        },
+        "documentation": {
+          "type": "string",
+          "format": "uri",
+          "description": "Link to component documentation"
+        },
+        "repository": {
+          "type": "string",
+          "format": "uri",
+          "description": "Source code repository URL"
+        },
+        "lastModified": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last modification timestamp"
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "User who created this configuration"
+        }
+      },
+      "description": "Component metadata and documentation"
+    }
+  }
+}

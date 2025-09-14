@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+
+  <!-- WiX v5 uses Package instead of Product -->
+  <Package 
+    Name="My Windows Service"
+    Version="1.0.0.0"
+    Manufacturer="Your Company Name"
+    UpgradeCode="12345678-1234-1234-1234-123456789012"
+    Compressed="true"
+    Scope="perMachine">
+
+    <!-- Major upgrade is built-in by default in v5 -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+    <!-- Installation folder -->
+    <Property Id="INSTALLFOLDER" Value="D:\Console App\Event\Service\MyWindowsService" />
+
+    <!-- UI for installation path selection -->
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    
+    <!-- WiX v5: Include service files automatically -->
+    <Files Include="$(var.ServiceOutputDir)\**\*.*" />
+    
+    <!-- Or specify individual files -->
+    <File Source="$(var.ServiceOutputDir)\WindowsService.exe" />
+
+    <!-- Service installation component -->
+    <Component Id="ServiceComponent" Directory="INSTALLFOLDER">
+      <!-- Service install definition -->
+      <ServiceInstall 
+        Id="MyWindowsService"
+        Type="ownProcess"
+        Vital="yes"
+        Name="MyWindowsService"
+        DisplayName="My Windows Service"
+        Description="This is my custom Windows service"
+        Start="auto"
+        Account="NT AUTHORITY\LocalService"
+        ErrorControl="ignore"
+        Interactive="no">
+        <!-- Optional service dependency -->
+        <!-- <ServiceDependency Id="Tcpip" /> -->
+      </ServiceInstall>
+
+      <!-- Service control for start/stop/uninstall -->
+      <ServiceControl 
+        Id="StartService"
+        Stop="both"
+        Remove="both"
+        Name="MyWindowsService"
+        Wait="yes" />
+    </Component>
+
+    <!-- Feature definition -->
+    <Feature Id="ProductFeature" Title="My Windows Service" Level="1">
+      <ComponentRef Id="ServiceComponent" />
+      <!-- Files are automatically included from Files element -->
+    </Feature>
+
+    <!-- User Interface -->
+    <UI>
+      <UIRef Id="WixUI_InstallDir" />
+    </UI>
+
+  </Package>
+</Wix>

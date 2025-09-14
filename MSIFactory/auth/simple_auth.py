@@ -1,0 +1,446 @@
+#!/usr/bin/env python3
+"""
+Simple Authentication System for MSI Factory
+Handles user login, access requests, and admin approvals
+"""
+
+import json
+import os
+from datetime import datetime
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+
+class SimpleAuth:
+    def __init__(self):
+        """Initialize authentication system"""
+        self.users_file = "database/users.json"
+        self.requests_file = "database/access_requests.json"
+        self.apps_file = "database/applications.json"
+        
+        # Create database files if they don't exist
+        self.init_database()
+    
+    def init_database(self):
+        """Create database files with sample data"""
+        
+        # Create database folder
+        os.makedirs("database", exist_ok=True)
+        
+        # Sample users database
+        if not os.path.exists(self.users_file):
+            users_data = {
+                "users": [
+                    {
+                        "username": "john.doe",
+                        "email": "john.doe@company.com",
+                        "domain": "COMPANY",
+                        "first_name": "John",
+                        "middle_name": "M",
+                        "last_name": "Doe",
+                        "status": "approved",
+                        "role": "user",
+                        "approved_apps": ["WEBAPP01", "PORTAL"],
+                        "created_date": "2024-09-01",
+                        "approved_by": "admin@company.com"
+                    },
+                    {
+                        "username": "admin",
+                        "email": "admin@company.com",
+                        "domain": "COMPANY",
+                        "first_name": "System",
+                        "middle_name": "",
+                        "last_name": "Admin",
+                        "status": "approved",
+                        "role": "admin",
+                        "approved_apps": ["*"],
+                        "created_date": "2024-08-01",
+                        "approved_by": "system"
+                    }
+                ]
+            }
+            
+            with open(self.users_file, 'w') as f:
+                json.dump(users_data, f, indent=2)
+        
+        # Sample access requests database
+        if not os.path.exists(self.requests_file):
+            requests_data = {
+                "requests": []
+            }
+            
+            with open(self.requests_file, 'w') as f:
+                json.dump(requests_data, f, indent=2)
+        
+        # Sample applications database
+        if not os.path.exists(self.apps_file):
+            apps_data = {
+                "applications": [
+                    {
+                        "app_short_key": "WEBAPP01",
+                        "app_name": "Customer Portal Web App",
+                        "description": "Customer-facing web portal",
+                        "owner_team": "Customer Experience",
+                        "status": "active"
+                    },
+                    {
+                        "app_short_key": "PORTAL",
+                        "app_name": "Employee Portal Website",
+                        "description": "Employee self-service portal",
+                        "owner_team": "HR Technology",
+                        "status": "active"
+                    },
+                    {
+                        "app_short_key": "DATASYNC",
+                        "app_name": "Data Synchronization Service",
+                        "description": "Background data sync service",
+                        "owner_team": "Integration Team",
+                        "status": "active"
+                    }
+                ]
+            }
+            
+            with open(self.apps_file, 'w') as f:
+                json.dump(apps_data, f, indent=2)
+    
+    def load_users(self):
+        """Load users from database"""
+        with open(self.users_file, 'r') as f:
+            data = json.load(f)
+        return data['users']
+    
+    def save_users(self, users):
+        """Save users to database"""
+        data = {"users": users}
+        with open(self.users_file, 'w') as f:
+            json.dump(data, f, indent=2)
+    
+    def load_requests(self):
+        """Load access requests from database"""
+        with open(self.requests_file, 'r') as f:
+            data = json.load(f)
+        return data['requests']
+    
+    def save_requests(self, requests):
+        """Save access requests to database"""
+        data = {"requests": requests}
+        with open(self.requests_file, 'w') as f:
+            json.dump(data, f, indent=2)
+    
+    def load_applications(self):
+        """Load applications from database"""
+        with open(self.apps_file, 'r') as f:
+            data = json.load(f)
+        return data['applications']
+    
+    def check_user_login(self, username, domain="COMPANY"):
+        """Check if user can login"""
+        users = self.load_users()
+        
+        for user in users:
+            if user['username'].lower() == username.lower() and user['domain'] == domain:
+                return user
+        
+        return None
+    
+    def is_user_approved(self, username):
+        """Check if user is approved"""
+        user = self.check_user_login(username)
+        if user:
+            return user['status'] == 'approved'
+        return False
+    
+    def verify_app_short_key(self, app_short_key):
+        """Verify if AppShortKey exists in applications database"""
+        applications = self.load_applications()
+        
+        for app in applications:
+            if app['app_short_key'].upper() == app_short_key.upper():
+                return app
+        
+        return None
+    
+    def create_access_request(self, username, email, first_name, middle_name, last_name, app_short_key, reason):
+        """Create new access request"""
+        
+        # Verify AppShortKey exists
+        app = self.verify_app_short_key(app_short_key)
+        if not app:
+            return False, "Invalid AppShortKey - Application not found"
+        
+        requests = self.load_requests()
+        
+        # Check if request already exists
+        for req in requests:
+            if req['username'].lower() == username.lower() and req['app_short_key'].upper() == app_short_key.upper():
+                if req['status'] == 'pending':
+                    return False, "Access request already pending for this application"
+        
+        # Create new request
+        new_request = {
+            "request_id": len(requests) + 1,
+            "username": username,
+            "email": email,
+            "first_name": first_name,
+            "middle_name": middle_name,
+            "last_name": last_name,
+            "app_short_key": app_short_key.upper(),
+            "app_name": app['app_name'],
+            "reason": reason,
+            "status": "pending",
+            "requested_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "approved_date": None,
+            "approved_by": None
+        }
+        
+        requests.append(new_request)
+        self.save_requests(requests)
+        
+        return True, "Access request submitted successfully"
+    
+    def get_pending_requests(self):
+        """Get all pending access requests for admin"""
+        requests = self.load_requests()
+        
+        pending_requests = [req for req in requests if req['status'] == 'pending']
+        return pending_requests
+    
+    def approve_request(self, request_id, admin_username):
+        """Approve access request"""
+        requests = self.load_requests()
+        users = self.load_users()
+        
+        # Find the request
+        request_found = None
+        for req in requests:
+            if req['request_id'] == int(request_id):
+                request_found = req
+                break
+        
+        if not request_found:
+            return False, "Request not found"
+        
+        if request_found['status'] != 'pending':
+            return False, "Request is not pending"
+        
+        # Approve the request
+        request_found['status'] = 'approved'
+        request_found['approved_date'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        request_found['approved_by'] = admin_username
+        
+        # Create or update user
+        user_exists = False
+        for user in users:
+            if user['username'].lower() == request_found['username'].lower():
+                # Add app to approved apps
+                if request_found['app_short_key'] not in user['approved_apps']:
+                    user['approved_apps'].append(request_found['app_short_key'])
+                user_exists = True
+                break
+        
+        if not user_exists:
+            # Create new user
+            new_user = {
+                "username": request_found['username'],
+                "email": request_found['email'],
+                "domain": "COMPANY",
+                "first_name": request_found['first_name'],
+                "middle_name": request_found['middle_name'],
+                "last_name": request_found['last_name'],
+                "status": "approved",
+                "role": "user",
+                "approved_apps": [request_found['app_short_key']],
+                "created_date": datetime.now().strftime("%Y-%m-%d"),
+                "approved_by": admin_username
+            }
+            users.append(new_user)
+        
+        # Save changes
+        self.save_requests(requests)
+        self.save_users(users)
+        
+        return True, "Request approved successfully"
+    
+    def deny_request(self, request_id, admin_username, reason=""):
+        """Deny access request"""
+        requests = self.load_requests()
+        
+        # Find the request
+        request_found = None
+        for req in requests:
+            if req['request_id'] == int(request_id):
+                request_found = req
+                break
+        
+        if not request_found:
+            return False, "Request not found"
+        
+        if request_found['status'] != 'pending':
+            return False, "Request is not pending"
+        
+        # Deny the request
+        request_found['status'] = 'denied'
+        request_found['approved_date'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        request_found['approved_by'] = admin_username
+        request_found['denial_reason'] = reason
+        
+        self.save_requests(requests)
+        
+        return True, "Request denied"
+    
+    def get_user_apps(self, username):
+        """Get applications user has access to"""
+        user = self.check_user_login(username)
+        if user and user['status'] == 'approved':
+            return user['approved_apps']
+        return []
+
+# Flask Web Application
+app = Flask(__name__)
+app.secret_key = 'msi_factory_secret_key_change_in_production'
+
+# Initialize authentication system
+auth_system = SimpleAuth()
+
+@app.route('/')
+def home():
+    """Home page - redirect to login or dashboard"""
+    if 'username' in session:
+        return redirect(url_for('dashboard'))
+    return redirect(url_for('login'))
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """Login page"""
+    if request.method == 'POST':
+        username = request.form['username']
+        domain = request.form.get('domain', 'COMPANY')
+        
+        # Check if user exists and is approved
+        user = auth_system.check_user_login(username, domain)
+        
+        if user and user['status'] == 'approved':
+            # User is approved - login successful
+            session['username'] = user['username']
+            session['email'] = user['email']
+            session['first_name'] = user['first_name']
+            session['last_name'] = user['last_name']
+            session['role'] = user['role']
+            session['approved_apps'] = user['approved_apps']
+            
+            flash(f'Welcome {user["first_name"]}!', 'success')
+            return redirect(url_for('dashboard'))
+        
+        elif user and user['status'] == 'pending':
+            flash('Your access request is pending approval', 'warning')
+            return render_template('login.html')
+        
+        else:
+            # User doesn't exist or not approved - show access request form
+            flash('Access request required for this application', 'info')
+            return redirect(url_for('access_request', username=username))
+    
+    return render_template('login.html')
+
+@app.route('/access_request', methods=['GET', 'POST'])
+def access_request():
+    """Access request form"""
+    username = request.args.get('username', '')
+    
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        first_name = request.form['first_name']
+        middle_name = request.form.get('middle_name', '')
+        last_name = request.form['last_name']
+        app_short_key = request.form['app_short_key']
+        reason = request.form['reason']
+        
+        success, message = auth_system.create_access_request(
+            username, email, first_name, middle_name, last_name, app_short_key, reason
+        )
+        
+        if success:
+            flash(message, 'success')
+            return redirect(url_for('login'))
+        else:
+            flash(message, 'error')
+    
+    # Get available applications
+    applications = auth_system.load_applications()
+    
+    return render_template('access_request.html', username=username, applications=applications)
+
+@app.route('/dashboard')
+def dashboard():
+    """User dashboard"""
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
+    user_apps = session.get('approved_apps', [])
+    applications = auth_system.load_applications()
+    
+    # Filter applications user has access to
+    user_applications = []
+    for app in applications:
+        if app['app_short_key'] in user_apps or '*' in user_apps:
+            user_applications.append(app)
+    
+    return render_template('dashboard.html', applications=user_applications)
+
+@app.route('/admin')
+def admin():
+    """Admin panel"""
+    if 'username' not in session or session.get('role') != 'admin':
+        flash('Admin access required', 'error')
+        return redirect(url_for('login'))
+    
+    pending_requests = auth_system.get_pending_requests()
+    
+    return render_template('admin.html', requests=pending_requests)
+
+@app.route('/admin/approve/<int:request_id>')
+def approve_request(request_id):
+    """Approve access request"""
+    if 'username' not in session or session.get('role') != 'admin':
+        flash('Admin access required', 'error')
+        return redirect(url_for('login'))
+    
+    success, message = auth_system.approve_request(request_id, session['username'])
+    
+    if success:
+        flash(message, 'success')
+    else:
+        flash(message, 'error')
+    
+    return redirect(url_for('admin'))
+
+@app.route('/admin/deny/<int:request_id>')
+def deny_request(request_id):
+    """Deny access request"""
+    if 'username' not in session or session.get('role') != 'admin':
+        flash('Admin access required', 'error')
+        return redirect(url_for('login'))
+    
+    reason = request.args.get('reason', 'No reason provided')
+    success, message = auth_system.deny_request(request_id, session['username'], reason)
+    
+    if success:
+        flash(message, 'success')
+    else:
+        flash(message, 'error')
+    
+    return redirect(url_for('admin'))
+
+@app.route('/logout')
+def logout():
+    """Logout user"""
+    session.clear()
+    flash('You have been logged out', 'info')
+    return redirect(url_for('login'))
+
+if __name__ == '__main__':
+    print("Starting MSI Factory Authentication System...")
+    print("Admin login: admin / (any password)")
+    print("User login: john.doe / (any password)")
+    print("URL: http://localhost:5000")
+    
+    app.run(debug=True, host='0.0.0.0', port=5000)

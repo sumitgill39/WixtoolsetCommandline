@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:iis="http://wixtoolset.org/schemas/v4/wxs/iis">
+
+  <!-- CHANGE THESE VALUES FOR YOUR APPLICATION -->
+  <?define AppName = "EBooker" ?>
+  <?define AppVersion = "1.0.0.0" ?>
+  <?define CompanyName = "Your Company" ?>
+  <?define AppUpgradeCode = "cfcc7ad0-a6d3-4934-8bfd-ab546fecd6cf" ?> <!-- GENERATE NEW GUID IF NEEDED -->
+
+  <!-- WiX v5 uses Package instead of Product -->
+  <Package 
+    Name="$(var.AppName)"
+    Version="$(var.AppVersion)"
+    Manufacturer="$(var.CompanyName)"
+    UpgradeCode="$(var.AppUpgradeCode)"
+    Compressed="true"
+    Scope="perMachine">
+
+    <!-- MajorUpgrade is built-in by default in v5, but can be customized -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version is already installed." />
+
+    <!-- Installation path - WiX v5 provides INSTALLFOLDER by default -->
+    <Property Id="INSTALLFOLDER" Value="C:\WebApps\$(var.AppName)" />
+
+    <!-- WiX v5 simplification: Files can be harvested automatically -->
+    <!-- Include all files from your web application directory -->
+    <Files Include="$(SourceDir)\**\*.*" />
+    
+    <!-- Or if you want to specify individual files (naked files in v5) -->
+    <!-- 
+    <File Source="index.html" />
+    <File Source="app.js" />
+    <File Source="styles.css" />
+    -->
+
+    <!-- Create Application Pool -->
+    <Component Id="CreateAppPool" Directory="INSTALLFOLDER">
+      <iis:WebAppPool Id="MyAppPool"
+                      Name="$(var.AppName)AppPool"
+                      ManagedRuntimeVersion="v4.0" />
+    </Component>
+
+    <!-- Create Web Application under Default Web Site -->
+    <Component Id="CreateWebApp" Directory="INSTALLFOLDER">
+      <!-- Reference to existing Default Web Site -->
+      <iis:WebSite Id="DefaultWebSite"
+                   Description="Default Web Site"
+                   ConfigureIfExists="no">
+        <iis:WebAddress Id="DefaultWebSiteAddress" Port="80" IP="*" />
+      </iis:WebSite>
+      
+      <!-- Create Virtual Directory under Default Web Site -->
+      <iis:WebVirtualDir Id="MyVirtualDir" 
+                         Alias="$(var.AppName)" 
+                         Directory="INSTALLFOLDER"
+                         WebSite="DefaultWebSite">
+        <!-- Create Application inside Virtual Directory -->
+        <iis:WebApplication Id="MyWebApplication"
+                            Name="$(var.AppName)"
+                            WebAppPool="MyAppPool" />
+      </iis:WebVirtualDir>
+    </Component>
+
+    <!-- WiX v5 provides a default Feature automatically if you don't specify one -->
+    <!-- But we can still define it explicitly if needed -->
+    <Feature Id="Complete" Title="$(var.AppName)" Level="1">
+      <!-- Components are automatically included from Files element -->
+      <ComponentRef Id="CreateAppPool" />
+      <ComponentRef Id="CreateWebApp" />
+    </Feature>
+
+    <!-- User Interface for selecting installation directory -->
+    <UI>
+      <UIRef Id="WixUI_InstallDir" />
+    </UI>
+
+  </Package>
+</Wix>

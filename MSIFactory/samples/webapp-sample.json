@@ -1,0 +1,141 @@
+{
+  "componentId": "12345678-1234-5678-9012-123456789012",
+  "appShortKey": "WEBAPP01",
+  "componentName": "Customer Portal Web Application",
+  "componentType": "webapp",
+  "framework": "netcore",
+  "version": "2.1.0",
+  "description": "Customer-facing web portal for account management and support",
+  "owner": {
+    "team": "Customer Experience Team",
+    "email": "cx-team@company.com",
+    "manager": "John Smith"
+  },
+  "environments": {
+    "DEV": {
+      "servers": [
+        "dev-web01.company.com",
+        "dev-web02.company.com"
+      ],
+      "installPath": "C:\\inetpub\\wwwroot\\CustomerPortal",
+      "configOverrides": {
+        "ConnectionStrings__DefaultConnection": "Server=dev-sql01;Database=CustomerPortalDev;Integrated Security=true;",
+        "ApiSettings__BaseUrl": "https://api-dev.company.com",
+        "Logging__LogLevel__Default": "Debug",
+        "Environment": "Development"
+      },
+      "features": {
+        "ssl": true,
+        "firewall": true,
+        "eventLog": true,
+        "performanceCounters": false
+      }
+    },
+    "QA": {
+      "servers": [
+        "qa-web01.company.com"
+      ],
+      "installPath": "C:\\inetpub\\wwwroot\\CustomerPortal",
+      "configOverrides": {
+        "ConnectionStrings__DefaultConnection": "Server=qa-sql01;Database=CustomerPortalQA;Integrated Security=true;",
+        "ApiSettings__BaseUrl": "https://api-qa.company.com",
+        "Logging__LogLevel__Default": "Information",
+        "Environment": "QA"
+      },
+      "features": {
+        "ssl": true,
+        "firewall": true,
+        "eventLog": true,
+        "performanceCounters": true
+      }
+    },
+    "PROD": {
+      "servers": [
+        "prod-web01.company.com",
+        "prod-web02.company.com",
+        "prod-web03.company.com"
+      ],
+      "installPath": "C:\\inetpub\\wwwroot\\CustomerPortal",
+      "configOverrides": {
+        "ConnectionStrings__DefaultConnection": "Server=prod-sql-cluster;Database=CustomerPortal;Integrated Security=true;",
+        "ApiSettings__BaseUrl": "https://api.company.com",
+        "Logging__LogLevel__Default": "Warning",
+        "Environment": "Production"
+      },
+      "features": {
+        "ssl": true,
+        "firewall": true,
+        "eventLog": true,
+        "performanceCounters": true
+      }
+    }
+  },
+  "artifactSources": {
+    "primary": "https://jfrog.company.com/artifactory/webapp-releases/CustomerPortal/",
+    "fallback": [
+      "https://backup-jfrog.company.com/artifactory/webapp-releases/CustomerPortal/",
+      "https://dr-jfrog.company.com/artifactory/webapp-releases/CustomerPortal/"
+    ],
+    "pollingFrequency": "10m",
+    "filePattern": "CustomerPortal-v*.zip",
+    "authentication": {
+      "type": "apikey",
+      "credentials": "encrypted_api_key_here"
+    }
+  },
+  "configTransformation": {
+    "enabled": true,
+    "apiEndpoint": "https://config-api.company.com/v1/transform",
+    "templateType": "appsettings.json",
+    "transformationEngine": "builtin",
+    "customTransforms": {
+      "DatabaseTimeout": "300",
+      "CacheExpiry": "3600"
+    }
+  },
+  "buildSettings": {
+    "generateCab": true,
+    "signMsi": true,
+    "certificatePath": "C:\\Certificates\\CodeSigning.pfx",
+    "customWixExtensions": [
+      "WixToolset.Util.wixext",
+      "WixToolset.UI.wixext"
+    ],
+    "buildFlags": [
+      "-v",
+      "-nologo"
+    ]
+  },
+  "deployment": {
+    "preInstallScript": "Scripts/PreInstall-CustomerPortal.ps1",
+    "postInstallScript": "Scripts/PostInstall-CustomerPortal.ps1",
+    "requiresReboot": false,
+    "installationTimeout": 600
+  },
+  "validation": {
+    "requiredFiles": [
+      "CustomerPortal.dll",
+      "appsettings.json",
+      "web.config"
+    ],
+    "excludedFiles": [
+      "*.pdb",
+      "appsettings.Development.json",
+      "test-data/*"
+    ],
+    "healthCheckUrl": "https://customerportal.company.com/health",
+    "healthCheckTimeout": 30
+  },
+  "metadata": {
+    "tags": [
+      "web-application",
+      "customer-facing",
+      "dotnet-core",
+      "high-availability"
+    ],
+    "documentation": "https://wiki.company.com/CustomerPortal",
+    "repository": "https://github.com/company/customer-portal",
+    "lastModified": "2024-09-13T10:30:00Z",
+    "createdBy": "deployment-team@company.com"
+  }
+}
