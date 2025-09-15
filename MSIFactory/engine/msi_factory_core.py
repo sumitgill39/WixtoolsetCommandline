@@ -13,13 +13,13 @@ import zipfile
 import requests
 import subprocess
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+# No complex typing needed
 from datetime import datetime
 import uuid
 import re
 
 class MSIFactoryCore:
-    def __init__(self, config_file: str, output_dir: str = None):
+    def __init__(self, config_file, output_dir=None):
         """Initialize MSI Factory with component configuration"""
         self.config_file = Path(config_file)
         self.output_dir = Path(output_dir) if output_dir else Path("../output")
@@ -29,11 +29,11 @@ class MSIFactoryCore:
         self.config = self._load_configuration()
         self.templates_dir = Path("../templates")
         
-        print(f"🏭 MSI Factory initialized for component: {self.config['componentName']}")
-        print(f"📁 Output directory: {self.output_dir.absolute()}")
-        print(f"🔧 Temp directory: {self.temp_dir}")
+        print(f"MSI Factory initialized for component: {self.config['componentName']}")
+        print(f"Output directory: {self.output_dir.absolute()}")
+        print(f"Temp directory: {self.temp_dir}")
     
-    def _load_configuration(self) -> Dict:
+    def _load_configuration(self):
         """Load and validate component configuration"""
         if not self.config_file.exists():
             raise FileNotFoundError(f"Configuration file not found: {self.config_file}")
@@ -54,9 +54,9 @@ class MSIFactoryCore:
         except json.JSONDecodeError as e:
             raise ValueError(f"Invalid JSON configuration: {e}")
     
-    def download_artifacts(self) -> str:
+    def download_artifacts(self):
         """Download latest artifacts from configured sources"""
-        print(f"📦 Downloading artifacts for {self.config['appShortKey']}...")
+        print(f"Downloading artifacts for {self.config['appShortKey']}...")
         
         artifact_config = self.config['artifactSources']
         primary_url = artifact_config['primary']
@@ -70,15 +70,15 @@ class MSIFactoryCore:
             # Download from primary source
             downloaded_file = self._download_from_source(primary_url, file_pattern, artifacts_dir)
             if downloaded_file:
-                print(f"✅ Downloaded: {downloaded_file}")
+                print(f"Downloaded: {downloaded_file}")
                 return str(downloaded_file)
             
             # Try fallback sources
             for fallback_url in artifact_config.get('fallback', []):
-                print(f"🔄 Trying fallback source: {fallback_url}")
+                print(f"Trying fallback source: {fallback_url}")
                 downloaded_file = self._download_from_source(fallback_url, file_pattern, artifacts_dir)
                 if downloaded_file:
-                    print(f"✅ Downloaded from fallback: {downloaded_file}")
+                    print(f"Downloaded from fallback: {downloaded_file}")
                     return str(downloaded_file)
             
             raise Exception("Failed to download artifacts from any source")
@@ -86,7 +86,7 @@ class MSIFactoryCore:
         except Exception as e:
             raise Exception(f"Artifact download failed: {e}")
     
-    def _download_from_source(self, source_url: str, file_pattern: str, target_dir: Path) -> Optional[str]:
+    def _download_from_source(self, source_url, file_pattern, target_dir):
         """Download artifact from a specific source"""
         try:
             # For demo purposes, we'll simulate downloading the latest matching file
@@ -180,7 +180,7 @@ class MSIFactoryCore:
             
             # List extracted files
             extracted_files = list(extract_dir.rglob('*'))
-            print(f"✅ Extracted {len([f for f in extracted_files if f.is_file()])} files")
+            print(f"Extracted {len([f for f in extracted_files if f.is_file()])} files")
             
             return str(extract_dir)
             
@@ -202,7 +202,7 @@ class MSIFactoryCore:
                     env_name, env_config, extracted_artifacts_dir
                 )
                 results[env_name] = msi_path
-                print(f"✅ Generated MSI for {env_name}: {Path(msi_path).name}")
+                print(f"Generated MSI for {env_name}: {Path(msi_path).name}")
                 
             except Exception as e:
                 print(f"❌ Failed to generate MSI for {env_name}: {e}")
@@ -254,7 +254,7 @@ class MSIFactoryCore:
         elif component_type == 'website' and framework in ['react', 'angular']:
             self._transform_frontend_config(artifacts_dir, config_overrides)
         
-        print(f"✅ Applied {len(config_overrides)} configuration overrides")
+        print(f"Applied {len(config_overrides)} configuration overrides")
     
     def _transform_appsettings_json(self, artifacts_dir: Path, config_overrides: Dict):
         """Transform appsettings.json for .NET Core applications"""
@@ -322,7 +322,7 @@ class MSIFactoryCore:
     
     def _generate_product_wxs(self, env_name: str, env_config: Dict, work_dir: Path) -> str:
         """Generate environment-specific Product.wxs"""
-        print(f"📝 Generating Product.wxs for {env_name}...")
+        print(f"Generating Product.wxs for {env_name}...")
         
         component_type = self.config['componentType']
         template_name = f"{component_type}-template.wxs"
@@ -494,7 +494,7 @@ class MSIFactoryCore:
             if result.returncode != 0:
                 raise Exception(f"WiX build failed: {result.stderr}")
             
-            print(f"✅ MSI built successfully: {msi_filename}")
+            print(f"MSI built successfully: {msi_filename}")
             return str(msi_output_path)
             
         except Exception as e:
@@ -531,7 +531,7 @@ class MSIFactoryCore:
             total_count = len(results)
             
             print(f"\n🎉 MSI Generation Complete!")
-            print(f"✅ Successfully generated: {success_count}/{total_count} MSI packages")
+            print(f"Successfully generated: {success_count}/{total_count} MSI packages")
             print(f"📁 Output directory: {self.output_dir.absolute()}")
             
             return results
@@ -565,7 +565,7 @@ def main():
         print("\n📋 Results Summary:")
         print("-" * 50)
         for env, msi_path in results.items():
-            status = "✅" if msi_path else "❌"
+            status = "SUCCESS" if msi_path else "FAILED"
             path_display = Path(msi_path).name if msi_path else "FAILED"
             print(f"{status} {env:10} -> {path_display}")
         

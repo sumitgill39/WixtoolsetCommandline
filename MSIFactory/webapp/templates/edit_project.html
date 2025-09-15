@@ -1,0 +1,419 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}Edit Project - MSI Factory{% endblock %}
+{% block page_title %}Edit Project{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Edit Project - {{ project.project_name }}</h5>
+                    <div>
+                        <a href="{{ url_for('project_dashboard', project_id=project.project_id) }}" class="btn btn-outline-info me-2">
+                            <i class="fas fa-eye me-1"></i>View Project
+                        </a>
+                        <a href="{{ url_for('project_management') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>Back to Projects
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('edit_project') }}" id="editProjectForm">
+                    <input type="hidden" name="project_id" value="{{ project.project_id }}">
+                    
+                    <!-- Project Basic Information -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-info-circle me-2"></i>Basic Information</h6>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="project_name" class="form-label">Project Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="project_name" name="project_name" value="{{ project.project_name }}" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="project_key" class="form-label">Project Short Key <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control bg-light" id="project_key" name="project_key" value="{{ project.project_key }}" readonly>
+                            <small class="text-muted">Project key cannot be changed after creation</small>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="project_guid" class="form-label">Project UUID/GUID</label>
+                            <input type="text" class="form-control bg-light" id="project_guid" name="project_guid" value="{{ project.project_guid or 'Not Set' }}" readonly>
+                            <small class="text-muted">Project GUID is auto-generated and cannot be modified</small>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3">{{ project.description }}</textarea>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="project_type" class="form-label">Project Type <span class="text-danger">*</span></label>
+                            <select class="form-select" id="project_type" name="project_type" required>
+                                <option value="">Select Project Type</option>
+                                <option value="WebApp" {% if project.project_type == 'WebApp' %}selected{% endif %}>Web Application</option>
+                                <option value="Service" {% if project.project_type == 'Service' %}selected{% endif %}>Windows Service</option>
+                                <option value="Website" {% if project.project_type == 'Website' %}selected{% endif %}>Standalone Website</option>
+                                <option value="Desktop" {% if project.project_type == 'Desktop' %}selected{% endif %}>Desktop Application</option>
+                                <option value="API" {% if project.project_type == 'API' %}selected{% endif %}>API Service</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="owner_team" class="form-label">Owner Team <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="owner_team" name="owner_team" value="{{ project.owner_team }}" required>
+                        </div>
+                    </div>
+
+                    <!-- Components Section -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-cubes me-2"></i>Components 
+                                <button type="button" class="btn btn-sm btn-success ms-2" onclick="addNewComponent()">
+                                    <i class="fas fa-plus"></i> Add Component
+                                </button>
+                            </h6>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div id="componentsContainer">
+                                {% if components %}
+                                    {% for component in components %}
+                                    <div class="card border-light mb-3 component-card" data-component-id="{{ component.component_id }}">
+                                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>{{ component.component_name }}</strong>
+                                                <span class="badge bg-{{ 'success' if component.component_type == 'webapp' else 'info' if component.component_type == 'api' else 'warning' }} ms-2">
+                                                    {{ component.component_type.upper() }}
+                                                </span>
+                                                <span class="badge bg-secondary ms-1">{{ component.framework.upper() }}</span>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeComponent({{ component.component_id }})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-4 mb-2">
+                                                    <label class="form-label">Component Name</label>
+                                                    <input type="text" class="form-control" name="component_name_{{ component.component_id }}" value="{{ component.component_name }}">
+                                                </div>
+                                                <div class="col-md-4 mb-2">
+                                                    <label class="form-label">Component Type</label>
+                                                    <select class="form-select" name="component_type_{{ component.component_id }}">
+                                                        <option value="webapp" {% if component.component_type == 'webapp' %}selected{% endif %}>Web App</option>
+                                                        <option value="website" {% if component.component_type == 'website' %}selected{% endif %}>Website</option>
+                                                        <option value="service" {% if component.component_type == 'service' %}selected{% endif %}>Service</option>
+                                                        <option value="api" {% if component.component_type == 'api' %}selected{% endif %}>API</option>
+                                                        <option value="scheduler" {% if component.component_type == 'scheduler' %}selected{% endif %}>Scheduler</option>
+                                                        <option value="desktop" {% if component.component_type == 'desktop' %}selected{% endif %}>Desktop</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4 mb-2">
+                                                    <label class="form-label">Framework</label>
+                                                    <select class="form-select" name="component_framework_{{ component.component_id }}">
+                                                        <option value="netframework" {% if component.framework == 'netframework' %}selected{% endif %}>.NET Framework</option>
+                                                        <option value="netcore" {% if component.framework == 'netcore' %}selected{% endif %}>.NET Core</option>
+                                                        <option value="react" {% if component.framework == 'react' %}selected{% endif %}>React</option>
+                                                        <option value="angular" {% if component.framework == 'angular' %}selected{% endif %}>Angular</option>
+                                                        <option value="vue" {% if component.framework == 'vue' %}selected{% endif %}>Vue.js</option>
+                                                        <option value="python" {% if component.framework == 'python' %}selected{% endif %}>Python</option>
+                                                        <option value="static" {% if component.framework == 'static' %}selected{% endif %}>Static HTML</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-12 mb-2">
+                                                    <label class="form-label">Artifact Source URL</label>
+                                                    <input type="text" class="form-control" name="component_artifact_{{ component.component_id }}" value="{{ component.artifact_source }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                <div class="text-center py-4 text-muted" id="noComponentsMessage">
+                                    <i class="fas fa-cubes fa-2x mb-2"></i>
+                                    <p>No components configured. Click "Add Component" to get started.</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project Servers Configuration -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-server me-2"></i>Server Configuration</h6>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <div id="serverEnvironments">
+                                {% set available_envs = ['DEV', 'QA', 'UAT', 'PREPROD', 'PROD', 'SIT', 'DR'] %}
+                                {% for env in available_envs %}
+                                {% set env_data = project.server_config.get(env) if project.server_config else None %}
+                                <div class="card border-light mb-3">
+                                    <div class="card-header bg-light">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="env_{{ env }}" name="environments" value="{{ env }}" 
+                                                   {% if env in (project.environments or []) %}checked{% endif %}>
+                                            <label class="form-check-label fw-semibold" for="env_{{ env }}">
+                                                {{ env }} - {{ env_names[env] if env_names else env + ' Environment' }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="card-body" id="servers_{{ env }}" style="{% if env not in (project.environments or []) %}display: none;{% endif %}">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-2">
+                                                <label class="form-label">Server Names</label>
+                                                <textarea class="form-control" name="servers_{{ env }}" rows="3" placeholder="{{ env.lower() }}-server01.company.com">{{ env_data.servers|join('\n') if env_data and env_data.servers else '' }}</textarea>
+                                            </div>
+                                            <div class="col-md-6 mb-2">
+                                                <label class="form-label">Region</label>
+                                                <input type="text" class="form-control" name="region_{{ env }}" value="{{ env_data.region if env_data else '' }}" placeholder="US-EAST" style="text-transform: uppercase;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Artifact Configuration -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-archive me-2"></i>Artifact Configuration</h6>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="artifact_source_type" class="form-label">Artifact Source Type <span class="text-danger">*</span></label>
+                            <select class="form-select" id="artifact_source_type" name="artifact_source_type" required>
+                                <option value="">Select Source Type</option>
+                                <option value="jfrog" {% if project.artifact_source_type == 'jfrog' %}selected{% endif %}>JFrog Artifactory</option>
+                                <option value="unc" {% if project.artifact_source_type == 'unc' %}selected{% endif %}>UNC Network Path</option>
+                                <option value="http" {% if project.artifact_source_type == 'http' %}selected{% endif %}>HTTP/HTTPS URL</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="artifact_url" class="form-label">Artifact URL/Path <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="artifact_url" name="artifact_url" value="{{ project.artifact_url }}" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3" id="artifact_username_group">
+                            <label for="artifact_username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="artifact_username" name="artifact_username" value="{{ project.artifact_username }}">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3" id="artifact_password_group">
+                            <label for="artifact_password" class="form-label">Password/Token</label>
+                            <input type="password" class="form-control" id="artifact_password" name="artifact_password" placeholder="Leave blank to keep current password">
+                        </div>
+                    </div>
+
+                    <!-- Project Styling -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-palette me-2"></i>Project Styling</h6>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="color_primary" class="form-label">Primary Color</label>
+                            <input type="color" class="form-control form-control-color" id="color_primary" name="color_primary" value="{{ project.color_primary }}">
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="color_secondary" class="form-label">Secondary Color</label>
+                            <input type="color" class="form-control form-control-color" id="color_secondary" name="color_secondary" value="{{ project.color_secondary }}">
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="active" {% if project.status == 'active' %}selected{% endif %}>Active</option>
+                                <option value="inactive" {% if project.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                                <option value="maintenance" {% if project.status == 'maintenance' %}selected{% endif %}>Maintenance</option>
+                                <option value="archived" {% if project.status == 'archived' %}selected{% endif %}>Archived</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{{ url_for('project_management') }}" class="btn btn-secondary">
+                                    <i class="fas fa-times me-1"></i>Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Update Project
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let componentCounter = {{ components|length if components else 0 }};
+
+function generateGuid() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+function addNewComponent() {
+    componentCounter++;
+    const guid = generateGuid();
+    
+    const componentHtml = `
+        <div class="card border-light mb-3 component-card" data-component-id="new_${componentCounter}">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>New Component ${componentCounter}</strong>
+                    <span class="badge bg-success ms-2">NEW</span>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeNewComponent(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <div class="card-body">
+                <input type="hidden" name="new_component_guid_${componentCounter}" value="${guid}">
+                <div class="row">
+                    <div class="col-md-4 mb-2">
+                        <label class="form-label">Component Name</label>
+                        <input type="text" class="form-control" name="new_component_name_${componentCounter}" placeholder="Component Name" required>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <label class="form-label">Component Type</label>
+                        <select class="form-select" name="new_component_type_${componentCounter}" required>
+                            <option value="">Select Type</option>
+                            <option value="webapp">Web App</option>
+                            <option value="website">Website</option>
+                            <option value="service">Service</option>
+                            <option value="api">API</option>
+                            <option value="scheduler">Scheduler</option>
+                            <option value="desktop">Desktop</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <label class="form-label">Framework</label>
+                        <select class="form-select" name="new_component_framework_${componentCounter}" required>
+                            <option value="">Select Framework</option>
+                            <option value="netframework">.NET Framework</option>
+                            <option value="netcore">.NET Core</option>
+                            <option value="react">React</option>
+                            <option value="angular">Angular</option>
+                            <option value="vue">Vue.js</option>
+                            <option value="python">Python</option>
+                            <option value="static">Static HTML</option>
+                        </select>
+                    </div>
+                    <div class="col-12 mb-2">
+                        <label class="form-label">Artifact Source URL</label>
+                        <input type="text" class="form-control" name="new_component_artifact_${componentCounter}" placeholder="https://artifactory.company.com/repo/component">
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const container = document.getElementById('componentsContainer');
+    const noMessage = document.getElementById('noComponentsMessage');
+    if (noMessage) {
+        noMessage.style.display = 'none';
+    }
+    
+    container.insertAdjacentHTML('beforeend', componentHtml);
+}
+
+function removeNewComponent(button) {
+    button.closest('.component-card').remove();
+    checkEmptyComponents();
+}
+
+function removeComponent(componentId) {
+    if (confirm('Are you sure you want to remove this component?')) {
+        const componentCard = document.querySelector(`[data-component-id="${componentId}"]`);
+        if (componentCard) {
+            // Add hidden input to mark for deletion
+            const deleteInput = document.createElement('input');
+            deleteInput.type = 'hidden';
+            deleteInput.name = 'delete_components';
+            deleteInput.value = componentId;
+            document.getElementById('editProjectForm').appendChild(deleteInput);
+            
+            componentCard.remove();
+            checkEmptyComponents();
+        }
+    }
+}
+
+function checkEmptyComponents() {
+    const components = document.querySelectorAll('.component-card');
+    const noMessage = document.getElementById('noComponentsMessage');
+    
+    if (components.length === 0 && !noMessage) {
+        const container = document.getElementById('componentsContainer');
+        container.innerHTML = `
+            <div class="text-center py-4 text-muted" id="noComponentsMessage">
+                <i class="fas fa-cubes fa-2x mb-2"></i>
+                <p>No components configured. Click "Add Component" to get started.</p>
+            </div>
+        `;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Convert region inputs to uppercase
+    document.querySelectorAll('input[name^="region_"]').forEach(function(input) {
+        input.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+    });
+    
+    // Show/hide credential fields based on artifact source type
+    function toggleCredentialFields() {
+        const sourceType = document.getElementById('artifact_source_type').value;
+        const usernameGroup = document.getElementById('artifact_username_group');
+        const passwordGroup = document.getElementById('artifact_password_group');
+        
+        if (sourceType === 'jfrog') {
+            usernameGroup.style.display = 'block';
+            passwordGroup.style.display = 'block';
+        } else if (sourceType === 'unc') {
+            usernameGroup.style.display = 'block';
+            passwordGroup.style.display = 'block';
+        } else {
+            usernameGroup.style.display = 'none';
+            passwordGroup.style.display = 'none';
+        }
+    }
+    
+    document.getElementById('artifact_source_type').addEventListener('change', toggleCredentialFields);
+    toggleCredentialFields(); // Initial call
+    
+    // Handle environment checkbox changes
+    document.querySelectorAll('input[name="environments"]').forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            const envBody = document.getElementById('servers_' + this.value);
+            if (this.checked) {
+                envBody.style.display = 'block';
+            } else {
+                envBody.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

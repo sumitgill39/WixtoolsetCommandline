@@ -1,0 +1,247 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}Project Dashboard - MSI Factory{% endblock %}
+{% block page_title %}Project Dashboard{% endblock %}
+
+{% block content %}
+<!-- Quick Stats -->\
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-0">Total Projects</h6>
+                        <h3 class="mb-0">{{ projects|length }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-folder fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-0">Active Projects</h6>
+                        <h3 class="mb-0">{{ active_projects_count }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-0">Recent Builds</h6>
+                        <h3 class="mb-0">{{ recent_builds_count }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-rocket fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-0">Your Access</h6>
+                        <h3 class="mb-0">{{ user_project_count }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-key fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if projects %}
+<!-- Project Cards -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-folder-open me-2"></i>Your Projects</h5>
+                    <div class="input-group" style="width: 300px;">
+                        <input type="text" class="form-control" id="projectSearch" placeholder="Search projects...">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row" id="projectGrid">
+                    {% for project in projects %}
+                    <div class="col-lg-4 col-md-6 mb-4 project-card" data-project-name="{{ project.project_name.lower() }}" data-project-key="{{ project.project_key.lower() }}">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header border-0 bg-transparent">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="project-icon" style="width: 50px; height: 50px; background: linear-gradient(135deg, {{ project.color_primary }}, {{ project.color_secondary }}); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 1.2rem;">
+                                        {{ project.project_key[:2] }}
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-link btn-sm text-muted" data-bs-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="{{ url_for('project_detail', project_id=project.project_id) }}">
+                                                <i class="fas fa-eye me-2"></i>View Details
+                                            </a></li>
+                                            <li><a class="dropdown-item" href="{{ url_for('generate_msi', app_key=project.project_key) }}">
+                                                <i class="fas fa-rocket me-2"></i>Generate MSI
+                                            </a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" href="{{ url_for('project_settings', project_id=project.project_id) }}">
+                                                <i class="fas fa-cog me-2"></i>Settings
+                                            </a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body pt-0">
+                                <h6 class="card-title">{{ project.project_name }}</h6>
+                                <p class="card-text text-muted small mb-3">{{ project.description }}</p>
+                                
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <small class="text-muted">Project Key</small>
+                                        <span class="badge bg-primary">{{ project.project_key }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <small class="text-muted">Type</small>
+                                        <span class="badge bg-secondary">{{ project.project_type }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <small class="text-muted">Status</small>
+                                        <span class="badge bg-{{ 'success' if project.status == 'active' else 'warning' }}">{{ project.status.title() }}</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">Owner</small>
+                                        <small><i class="fas fa-user me-1"></i>{{ project.owner_team }}</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <a href="{{ url_for('generate_msi', app_key=project.project_key) }}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-rocket me-1"></i>Generate MSI
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- No Projects -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <div class="text-muted mb-3" style="font-size: 4rem;">
+                    <i class="fas fa-folder-open"></i>
+                </div>
+                <h5 class="mb-3">No Projects Available</h5>
+                <p class="text-muted mb-4">You don't have access to any projects yet. Contact your administrator to request access to specific projects.</p>
+                {% if session.role == 'admin' %}
+                <div class="d-flex gap-2 justify-content-center">
+                    <a href="{{ url_for('project_management') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Add New Project
+                    </a>
+                    <a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">
+                        <i class="fas fa-users me-1"></i>Manage Users
+                    </a>
+                </div>
+                {% else %}
+                <a href="{{ url_for('logout') }}" class="btn btn-secondary">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout and Request Access
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_activities %}
+                <div class="list-group list-group-flush">
+                    {% for activity in recent_activities %}
+                    <div class="list-group-item border-0 px-0">
+                        <div class="d-flex align-items-center">
+                            <div class="activity-icon me-3" style="width: 40px; height: 40px; background: {{ activity.color }}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                                <i class="fas {{ activity.icon }}"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">{{ activity.title }}</h6>
+                                        <p class="mb-0 text-muted small">{{ activity.description }}</p>
+                                    </div>
+                                    <small class="text-muted">{{ activity.timestamp }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <div class="text-muted mb-3" style="font-size: 2rem;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h6 class="mb-2">No Recent Activity</h6>
+                    <p class="text-muted small">Your project activities will appear here once you start generating MSI packages.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('projectSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const projectCards = document.querySelectorAll('.project-card');
+            
+            projectCards.forEach(card => {
+                const projectName = card.getAttribute('data-project-name');
+                const projectKey = card.getAttribute('data-project-key');
+                
+                if (projectName.includes(searchTerm) || projectKey.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

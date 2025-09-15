@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - MSI Factory{% endblock %}
+
+{% block content %}
+<!-- Welcome Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-1"><i class="fas fa-home me-2"></i>Welcome, {{ session.first_name }}</h4>
+                        <small class="text-light">Ready to generate MSI packages for your applications</small>
+                    </div>
+                    {% if session.role == 'admin' %}
+                    <a href="{{ url_for('admin_panel') }}" class="btn btn-light btn-sm">
+                        <i class="fas fa-cog me-1"></i>Admin Panel
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Applications Section -->
+{% if applications %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-apps me-2"></i>Available Applications</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for app in applications %}
+                    <div class="col-lg-6 col-xl-4 mb-3">
+                        <div class="card app-card h-100">
+                            <div class="card-body text-center">
+                                <div class="app-icon mx-auto mb-3" style="background-color: var(--primary);">
+                                    {{ app.app_short_key[0:2] }}
+                                </div>
+                                <h6 class="card-title">{{ app.app_name }}</h6>
+                                <p class="card-text text-muted small">{{ app.description }}</p>
+                                <div class="mb-3">
+                                    <span class="badge badge-primary me-2">{{ app.app_short_key }}</span>
+                                    <span class="badge badge-success">{{ app.status|title }}</span>
+                                </div>
+                                <small class="text-muted d-block mb-3">
+                                    <i class="fas fa-users me-1"></i>{{ app.owner_team }}
+                                </small>
+                                <a href="{{ url_for('generate_msi', app_key=app.app_short_key) }}" class="btn btn-primary btn-sm w-100">
+                                    <i class="fas fa-rocket me-1"></i>Generate MSI
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <div class="text-warning mb-3" style="font-size: 3rem;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h5 class="mb-3">No Applications Available</h5>
+                <p class="text-muted mb-4">You don't have access to any applications yet. Contact your administrator to request access to specific applications.</p>
+                <a href="{{ url_for('logout') }}" class="btn btn-secondary">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout and Request Access
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-success">
+                            <div class="card-body text-center">
+                                <div class="text-success mb-3" style="font-size: 2rem;">
+                                    <i class="fas fa-history"></i>
+                                </div>
+                                <h6 class="card-title">Build History</h6>
+                                <p class="card-text text-muted small">View your MSI build history and download previous packages</p>
+                                <button class="btn btn-success btn-sm" disabled>
+                                    <i class="fas fa-eye me-1"></i>View History
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-info">
+                            <div class="card-body text-center">
+                                <div class="text-info mb-3" style="font-size: 2rem;">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <h6 class="card-title">Templates</h6>
+                                <p class="card-text text-muted small">Browse available MSI templates and configurations</p>
+                                <button class="btn btn-info btn-sm" disabled>
+                                    <i class="fas fa-search me-1"></i>Browse Templates
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-warning">
+                            <div class="card-body text-center">
+                                <div class="text-warning mb-3" style="font-size: 2rem;">
+                                    <i class="fas fa-life-ring"></i>
+                                </div>
+                                <h6 class="card-title">Support</h6>
+                                <p class="card-text text-muted small">Get help with MSI generation or report issues</p>
+                                <button class="btn btn-warning btn-sm" disabled>
+                                    <i class="fas fa-question-circle me-1"></i>Get Support
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activities -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Recent Activities</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center py-4">
+                    <div class="text-primary mb-3" style="font-size: 2.5rem;">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h6 class="mb-2">Activity Dashboard Coming Soon</h6>
+                    <p class="text-muted small">Real-time MSI generation status, build history, and activity logs will appear here.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

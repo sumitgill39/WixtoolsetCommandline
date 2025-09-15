@@ -1,0 +1,2 @@
+2025-09-14 08:29:19 | INFO     | MSI_GEN         | log_msi_generation_start | MSI Generation Started | User: admin | App: WEBAPP01 | Environments: ['DEV', 'QA', 'UAT', 'PREPROD', 'PROD', 'SIT', 'DR']
+2025-09-14 11:50:24 | INFO     | MSI_GEN         | log_msi_generation_start | MSI Generation Started | User: admin | App: DATASYNC | Environments: ['DEV', 'QA', 'UAT', 'PREPROD', 'PROD', 'SIT', 'DR']

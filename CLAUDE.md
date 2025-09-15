@@ -1,2 +1,4 @@
 - Add to Memoery : "We need to use wixtool set v6 version"
 - add to memor : do not use any java script just python.
+- to memorize : always write a python code in modrate way where user can understand the code easly.
+- you need to create a single SQL script in which you need to add the operation, like creating different tables if required. in future if you need to update the table use the same SQL query to update the create table query.

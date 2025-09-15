@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+
+{% block title %}Generate MSI - {{ app_key }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-1"><i class="fas fa-rocket me-2"></i>Generate MSI Package</h4>
+                        <small class="text-light">Application: <strong>{{ app_key }}</strong></small>
+                    </div>
+                    <a href="{{ url_for('factory_dashboard') }}" class="btn btn-light btn-sm">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Configuration Form -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Configuration</h5>
+            </div>
+            <div class="card-body">
+                <form id="msi-form" method="POST">
+                    <input type="hidden" name="app_key" value="{{ app_key }}">
+                    
+                    <!-- Component Type -->
+                    <div class="mb-4">
+                        <label for="component_type" class="form-label fw-bold">
+                            <i class="fas fa-puzzle-piece me-1"></i>Component Type
+                        </label>
+                        <select name="component_type" id="component_type" class="form-select" required>
+                            <option value="">Select Component Type</option>
+                            <option value="WebApp"><i class="fas fa-globe"></i> Web Application</option>
+                            <option value="Service"><i class="fas fa-cogs"></i> Windows Service</option>
+                            <option value="Website"><i class="fas fa-desktop"></i> Standalone Website</option>
+                        </select>
+                    </div>
+
+                    <!-- Target Environments -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-server me-1"></i>Target Environments
+                        </label>
+                        <p class="text-muted small mb-3">Select one or more environments for MSI generation</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="form-check border rounded p-3 h-100">
+                                    <input class="form-check-input" type="checkbox" name="environments" value="DEV" id="env-dev">
+                                    <label class="form-check-label w-100" for="env-dev">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-wrench text-primary me-2"></i>
+                                            <div>
+                                                <div class="fw-semibold">Development</div>
+                                                <small class="text-muted">DEV Environment</small>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="form-check border rounded p-3 h-100">
+                                    <input class="form-check-input" type="checkbox" name="environments" value="QA" id="env-qa">
+                                    <label class="form-check-label w-100" for="env-qa">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-flask text-warning me-2"></i>
+                                            <div>
+                                                <div class="fw-semibold">Quality Assurance</div>
+                                                <small class="text-muted">QA Environment</small>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="form-check border rounded p-3 h-100">
+                                    <input class="form-check-input" type="checkbox" name="environments" value="UAT" id="env-uat">
+                                    <label class="form-check-label w-100" for="env-uat">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-users text-info me-2"></i>
+                                            <div>
+                                                <div class="fw-semibold">User Acceptance</div>
+                                                <small class="text-muted">UAT Environment</small>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="form-check border rounded p-3 h-100">
+                                    <input class="form-check-input" type="checkbox" name="environments" value="PREPROD" id="env-preprod">
+                                    <label class="form-check-label w-100" for="env-preprod">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-rocket text-secondary me-2"></i>
+                                            <div>
+                                                <div class="fw-semibold">Pre-Production</div>
+                                                <small class="text-muted">PREPROD Environment</small>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="form-check border rounded p-3 h-100">
+                                    <input class="form-check-input" type="checkbox" name="environments" value="PROD" id="env-prod">
+                                    <label class="form-check-label w-100" for="env-prod">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-industry text-danger me-2"></i>
+                                            <div>
+                                                <div class="fw-semibold">Production</div>
+                                                <small class="text-muted">PROD Environment</small>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="form-check border rounded p-3 h-100">
+                                    <input class="form-check-input" type="checkbox" name="environments" value="SIT" id="env-sit">
+                                    <label class="form-check-label w-100" for="env-sit">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-link text-success me-2"></i>
+                                            <div>
+                                                <div class="fw-semibold">Integration Testing</div>
+                                                <small class="text-muted">SIT Environment</small>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="form-check border rounded p-3 h-100">
+                                    <input class="form-check-input" type="checkbox" name="environments" value="DR" id="env-dr">
+                                    <label class="form-check-label w-100" for="env-dr">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-shield-alt text-dark me-2"></i>
+                                            <div>
+                                                <div class="fw-semibold">Disaster Recovery</div>
+                                                <small class="text-muted">DR Environment</small>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if config %}
+                    <!-- Configuration Preview -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-eye me-1"></i>Configuration Preview
+                        </label>
+                        <div class="border rounded p-3" style="background-color: #f8f9fa; max-height: 300px; overflow-y: auto;">
+                            <pre class="mb-0"><code>{{ config | tojson(indent=2) }}</code></pre>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Form Actions -->
+                    <div class="border-top pt-3 mt-4">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary flex-fill">
+                                <i class="fas fa-rocket me-1"></i>Generate MSI Packages
+                            </button>
+                            <button type="reset" class="btn btn-secondary">
+                                <i class="fas fa-undo me-1"></i>Reset
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Generation Status -->
+<div class="row mb-4" id="generation-status" style="display: none;">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-cogs me-2"></i>Generation Status</h5>
+            </div>
+            <div class="card-body">
+                <div id="status-content" class="text-center p-4 mb-3 bg-light rounded">
+                    <div class="text-primary mb-3" style="font-size: 2rem;">
+                        <i class="fas fa-cog fa-spin"></i>
+                    </div>
+                    <h6 class="mb-2">Initializing MSI generation...</h6>
+                    <p class="text-muted small mb-0">Please wait while we prepare your MSI packages</p>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="progress">
+                        <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%">
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="progress-text" class="text-center text-muted small">
+                    0% Complete
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+// Enhanced form interactions with Bootstrap
+document.addEventListener('DOMContentLoaded', function() {
+    // Add interactive styling for environment checkboxes
+    document.querySelectorAll('input[name="environments"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const checkDiv = this.closest('.form-check');
+            if (this.checked) {
+                checkDiv.classList.add('border-primary', 'bg-light');
+                checkDiv.classList.remove('border');
+            } else {
+                checkDiv.classList.remove('border-primary', 'bg-light');
+                checkDiv.classList.add('border');
+            }
+        });
+    });
+
+    // Form submission handler
+    document.getElementById('msi-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const statusSection = document.getElementById('generation-status');
+        const statusContent = document.getElementById('status-content');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        
+        // Form validation
+        const componentType = formData.get('component_type');
+        const environments = formData.getAll('environments');
+        
+        if (!componentType) {
+            // Bootstrap alert
+            const alertHtml = `
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Please select a component type
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>`;
+            document.querySelector('.container').insertAdjacentHTML('afterbegin', alertHtml);
+            return;
+        }
+        
+        if (environments.length === 0) {
+            const alertHtml = `
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Please select at least one environment
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>`;
+            document.querySelector('.container').insertAdjacentHTML('afterbegin', alertHtml);
+            return;
+        }
+        
+        // Show status section
+        statusSection.style.display = 'block';
+        statusSection.scrollIntoView({ behavior: 'smooth' });
+        
+        // Update status with Bootstrap components
+        statusContent.innerHTML = `
+            <div class="d-flex align-items-center">
+                <div class="text-primary me-3" style="font-size: 2rem;">
+                    <i class="fas fa-cog fa-spin"></i>
+                </div>
+                <div class="text-start">
+                    <h6 class="mb-1">Submitting MSI generation request...</h6>
+                    <small class="text-muted">Processing ${environments.length} environment(s) for ${componentType}</small>
+                </div>
+            </div>
+        `;
+        
+        // Animate progress bar
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress > 90) progress = 90;
+            progressBar.style.width = progress + '%';
+            progressText.textContent = Math.round(progress) + '% Complete';
+        }, 200);
+        
+        // Submit form
+        fetch(this.action || window.location.href, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            clearInterval(progressInterval);
+            progressBar.style.width = '100%';
+            progressBar.classList.remove('progress-bar-striped', 'progress-bar-animated');
+            progressBar.classList.add('bg-success');
+            progressText.textContent = '100% Complete';
+            
+            statusContent.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <div class="text-success me-3" style="font-size: 2rem;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="text-start">
+                        <h6 class="mb-1 text-success">MSI Generation Queued Successfully</h6>
+                        <div class="small text-muted">
+                            <div><strong>Job ID:</strong> ${data.job_id}</div>
+                            <div><strong>Status:</strong> ${data.status}</div>
+                            <div>${data.message}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        })
+        .catch(error => {
+            clearInterval(progressInterval);
+            progressBar.style.width = '0%';
+            progressBar.classList.remove('progress-bar-striped', 'progress-bar-animated');
+            progressBar.classList.add('bg-danger');
+            progressText.textContent = 'Failed';
+            
+            statusContent.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <div class="text-danger me-3" style="font-size: 2rem;">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="text-start">
+                        <h6 class="mb-1 text-danger">Generation Failed</h6>
+                        <small class="text-muted">Error: ${error.message}</small>
+                    </div>
+                </div>
+            `;
+        });
+    });
+});
+</script>
+{% endblock %}

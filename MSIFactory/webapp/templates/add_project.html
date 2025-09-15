@@ -1,0 +1,529 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}Add New Project - MSI Factory{% endblock %}
+{% block page_title %}Add New Project{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-plus me-2"></i>Add New Project</h5>
+                    <a href="{{ url_for('project_management') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Projects
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('add_project') }}" id="addProjectForm" onsubmit="return validateAndSubmit()">
+                    <!-- Project Basic Information -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-info-circle me-2"></i>Basic Information</h6>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="project_name" class="form-label">Project Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="project_name" name="project_name" required>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="project_key" class="form-label">Project Short Key <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="project_key" name="project_key" required pattern="[A-Z0-9]{2,10}" title="2-10 uppercase letters and numbers only" style="text-transform: uppercase;">
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="project_guid" class="form-label">Project UUID/GUID <span class="text-muted">(Auto-generated)</span></label>
+                            <div class="input-group">
+                                <input type="text" class="form-control bg-light" id="project_guid" name="project_guid" readonly>
+                                <button type="button" class="btn btn-outline-secondary" onclick="generateNewGuid()">
+                                    <i class="fas fa-sync-alt"></i> Regenerate
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Describe the project purpose and scope..."></textarea>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="project_type" class="form-label">Project Type <span class="text-danger">*</span></label>
+                            <select class="form-select" id="project_type" name="project_type" required>
+                                <option value="">Select Project Type</option>
+                                <option value="WebApp">Web Application</option>
+                                <option value="Service">Windows Service</option>
+                                <option value="Website">Standalone Website</option>
+                                <option value="Desktop">Desktop Application</option>
+                                <option value="API">API Service</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="owner_team" class="form-label">Owner Team <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="owner_team" name="owner_team" required placeholder="e.g., Development Team, DevOps Team">
+                        </div>
+                    </div>
+
+                    <!-- Components Section -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-cubes me-2"></i>Components 
+                                <button type="button" class="btn btn-sm btn-success ms-2" onclick="addNewComponent()">
+                                    <i class="fas fa-plus"></i> Add Component
+                                </button>
+                            </h6>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div id="componentsContainer">
+                                <div class="text-center py-4 text-muted" id="noComponentsMessage">
+                                    <i class="fas fa-cubes fa-2x mb-2"></i>
+                                    <p>No components added yet. Click "Add Component" to define project components.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Project Servers Configuration -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-server me-2"></i>Environment Configuration
+                                <button type="button" class="btn btn-sm btn-primary ms-2" onclick="showAddEnvironmentModal()">
+                                    <i class="fas fa-plus"></i> Add Environment
+                                </button>
+                                <small class="text-muted ms-2">(e.g., DEV1, DEV2, QA1, QA2, PROD_USA, PROD_EMEA, etc.)</small>
+                            </h6>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <div id="serverEnvironments">
+                                <!-- Environments will be added dynamically here -->
+                            </div>
+                            
+                            <div class="alert alert-info mt-3" id="noEnvironmentsAlert">
+                                <i class="fas fa-info-circle me-2"></i>
+                                No environments configured. Click "Add Environment" to add DEV, QA, UAT, PROD or custom environments.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Artifact Configuration -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-archive me-2"></i>Artifact Configuration</h6>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="artifact_source_type" class="form-label">Artifact Source Type <span class="text-danger">*</span></label>
+                            <select class="form-select" id="artifact_source_type" name="artifact_source_type" required>
+                                <option value="">Select Source Type</option>
+                                <option value="jfrog">JFrog Artifactory</option>
+                                <option value="unc">UNC Network Path</option>
+                                <option value="http">HTTP/HTTPS URL</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-12 mb-3">
+                            <label for="artifact_url" class="form-label">Artifact URL/Path <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="artifact_url" name="artifact_url" required placeholder="https://artifactory.company.com/repo/ or \\server\share\artifacts">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3" id="artifact_username_group">
+                            <label for="artifact_username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="artifact_username" name="artifact_username" placeholder="Artifact repository username">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3" id="artifact_password_group">
+                            <label for="artifact_password" class="form-label">Password/Token</label>
+                            <input type="password" class="form-control" id="artifact_password" name="artifact_password" placeholder="Password or API token">
+                        </div>
+                    </div>
+
+                    <!-- Project Styling -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-palette me-2"></i>Project Styling</h6>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="color_primary" class="form-label">Primary Color</label>
+                            <input type="color" class="form-control form-control-color" id="color_primary" name="color_primary" value="#2c3e50">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="color_secondary" class="form-label">Secondary Color</label>
+                            <input type="color" class="form-control form-control-color" id="color_secondary" name="color_secondary" value="#3498db">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="status" class="form-label">Initial Status</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="maintenance">Maintenance</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="{{ url_for('project_management') }}" class="btn btn-secondary">
+                                    <i class="fas fa-times me-1"></i>Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Create Project
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Environment Modal -->
+<div class="modal fade" id="addEnvironmentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Add Environment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="newEnvName" class="form-label">Environment Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="newEnvName" placeholder="e.g., DEV1, QA2, PROD_USA" style="text-transform: uppercase;">
+                    <small class="text-muted">Examples: DEV1, DEV2, QA1, QA2, UAT1, PREPROD, PROD_USA, PROD_EMEA, PROD_APAC, SIMULATION</small>
+                </div>
+                <div class="mb-3">
+                    <label for="newEnvDescription" class="form-label">Description</label>
+                    <input type="text" class="form-control" id="newEnvDescription" placeholder="e.g., Development Environment #1">
+                </div>
+                <div class="mb-3">
+                    <label for="newEnvServers" class="form-label">Server Names (one per line)</label>
+                    <textarea class="form-control" id="newEnvServers" rows="3" placeholder="server01.company.com&#10;server02.company.com"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="newEnvRegion" class="form-label">Region</label>
+                    <input type="text" class="form-control" id="newEnvRegion" placeholder="US-EAST" style="text-transform: uppercase;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="addEnvironment()">Add Environment</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let componentCounter = 0;
+let environmentCounter = 0;
+let environments = [];
+
+function generateGuid() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+function generateNewGuid() {
+    document.getElementById('project_guid').value = generateGuid();
+}
+
+// Component Management Functions
+function addNewComponent() {
+    componentCounter++;
+    const guid = generateGuid();
+    
+    const componentHtml = `
+        <div class="card border-light mb-3 component-card" data-component-id="new_${componentCounter}">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>New Component ${componentCounter}</strong>
+                    <span class="badge bg-success ms-2">NEW</span>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeComponent('new_${componentCounter}')">
+                    <i class="fas fa-trash"></i> Remove
+                </button>
+            </div>
+            <div class="card-body">
+                <input type="hidden" name="component_guid_${componentCounter}" value="${guid}">
+                <div class="row">
+                    <div class="col-md-4 mb-2">
+                        <label class="form-label">Component Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="component_name_${componentCounter}" placeholder="e.g., Customer Portal API" required>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <label class="form-label">Component Type <span class="text-danger">*</span></label>
+                        <select class="form-select" name="component_type_${componentCounter}" required>
+                            <option value="">Select Type</option>
+                            <option value="webapp">Web Application</option>
+                            <option value="website">Website</option>
+                            <option value="service">Windows Service</option>
+                            <option value="api">API</option>
+                            <option value="scheduler">Task Scheduler</option>
+                            <option value="desktop">Desktop App</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <label class="form-label">Framework <span class="text-danger">*</span></label>
+                        <select class="form-select" name="component_framework_${componentCounter}" required>
+                            <option value="">Select Framework</option>
+                            <option value="netframework">.NET Framework</option>
+                            <option value="netcore">.NET Core / .NET 5+</option>
+                            <option value="react">React</option>
+                            <option value="angular">Angular</option>
+                            <option value="vue">Vue.js</option>
+                            <option value="python">Python</option>
+                            <option value="static">Static HTML/JS</option>
+                        </select>
+                    </div>
+                    <div class="col-12 mb-2">
+                        <label class="form-label">Component Artifact URL/Path</label>
+                        <input type="text" class="form-control" name="component_artifact_${componentCounter}" 
+                               placeholder="https://artifactory.company.com/repo/component or \\\\server\\share\\component">
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const container = document.getElementById('componentsContainer');
+    const noMessage = document.getElementById('noComponentsMessage');
+    if (noMessage) {
+        noMessage.style.display = 'none';
+    }
+    
+    container.insertAdjacentHTML('beforeend', componentHtml);
+}
+
+function removeComponent(componentId) {
+    const componentCard = document.querySelector(`[data-component-id="${componentId}"]`);
+    if (componentCard) {
+        componentCard.remove();
+        checkEmptyComponents();
+    }
+}
+
+function checkEmptyComponents() {
+    const components = document.querySelectorAll('.component-card');
+    const container = document.getElementById('componentsContainer');
+    
+    if (components.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-4 text-muted" id="noComponentsMessage">
+                <i class="fas fa-cubes fa-2x mb-2"></i>
+                <p>No components added yet. Click "Add Component" to define project components.</p>
+            </div>
+        `;
+    }
+}
+
+// Environment Management Functions
+function showAddEnvironmentModal() {
+    const modal = new bootstrap.Modal(document.getElementById('addEnvironmentModal'));
+    modal.show();
+}
+
+function addEnvironment() {
+    const envName = document.getElementById('newEnvName').value.toUpperCase().trim();
+    const envDescription = document.getElementById('newEnvDescription').value.trim();
+    const envServers = document.getElementById('newEnvServers').value.trim();
+    const envRegion = document.getElementById('newEnvRegion').value.toUpperCase().trim();
+    
+    if (!envName) {
+        alert('Environment name is required');
+        return;
+    }
+    
+    // Check if environment already exists
+    if (environments.includes(envName)) {
+        alert('Environment ' + envName + ' already exists');
+        return;
+    }
+    
+    environments.push(envName);
+    environmentCounter++;
+    
+    const envHtml = `
+        <div class="card border-light mb-3 environment-card" data-env-name="${envName}">
+            <div class="card-header bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="env_${envName}" name="environments" value="${envName}" checked>
+                        <label class="form-check-label fw-semibold" for="env_${envName}">
+                            ${envName} - ${envDescription || envName + ' Environment'}
+                        </label>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeEnvironment('${envName}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body" id="servers_${envName}">
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">Server Names</label>
+                        <textarea class="form-control" name="servers_${envName}" rows="3" 
+                                  placeholder="${envName.toLowerCase()}-server01.company.com">${envServers}</textarea>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">Region</label>
+                        <input type="text" class="form-control region-input" name="region_${envName}" 
+                               value="${envRegion}" placeholder="US-EAST" style="text-transform: uppercase;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const container = document.getElementById('serverEnvironments');
+    container.insertAdjacentHTML('beforeend', envHtml);
+    
+    // Hide no environments alert
+    document.getElementById('noEnvironmentsAlert').style.display = 'none';
+    
+    // Add uppercase listener to new region input
+    document.querySelector(`input[name="region_${envName}"]`).addEventListener('input', function() {
+        this.value = this.value.toUpperCase();
+    });
+    
+    // Clear modal and close
+    document.getElementById('newEnvName').value = '';
+    document.getElementById('newEnvDescription').value = '';
+    document.getElementById('newEnvServers').value = '';
+    document.getElementById('newEnvRegion').value = '';
+    
+    const modal = bootstrap.Modal.getInstance(document.getElementById('addEnvironmentModal'));
+    modal.hide();
+}
+
+function removeEnvironment(envName) {
+    if (confirm('Are you sure you want to remove the ' + envName + ' environment?')) {
+        const envCard = document.querySelector(`[data-env-name="${envName}"]`);
+        if (envCard) {
+            envCard.remove();
+            environments = environments.filter(e => e !== envName);
+            
+            // Show alert if no environments
+            if (environments.length === 0) {
+                document.getElementById('noEnvironmentsAlert').style.display = 'block';
+            }
+        }
+    }
+}
+
+// Add some default environments on load
+function addDefaultEnvironments() {
+    const defaults = [
+        { name: 'DEV1', desc: 'Development Environment #1', servers: 'dev1-server01.company.com\ndev1-server02.company.com', region: 'US-EAST' },
+        { name: 'QA1', desc: 'Quality Assurance Environment #1', servers: 'qa1-server01.company.com', region: 'US-EAST' },
+        { name: 'UAT1', desc: 'User Acceptance Testing #1', servers: 'uat1-server01.company.com', region: 'US-WEST' },
+        { name: 'PROD_USA', desc: 'Production - United States', servers: 'prod-usa-01.company.com\nprod-usa-02.company.com', region: 'US-EAST' }
+    ];
+    
+    defaults.forEach(env => {
+        document.getElementById('newEnvName').value = env.name;
+        document.getElementById('newEnvDescription').value = env.desc;
+        document.getElementById('newEnvServers').value = env.servers;
+        document.getElementById('newEnvRegion').value = env.region;
+        addEnvironment();
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Generate initial GUID
+    generateNewGuid();
+    
+    // Add default environments - COMMENTED OUT FOR TESTING
+    addDefaultEnvironments();
+    
+    // Auto-generate project key from project name
+    document.getElementById('project_name').addEventListener('input', function() {
+        const projectName = this.value.toUpperCase();
+        const projectKey = projectName.replace(/[^A-Z0-9]/g, '').substring(0, 10);
+        document.getElementById('project_key').value = projectKey;
+    });
+    
+    // Convert project key to uppercase
+    document.getElementById('project_key').addEventListener('input', function() {
+        this.value = this.value.toUpperCase();
+    });
+    
+    // Convert environment name to uppercase in modal
+    document.getElementById('newEnvName').addEventListener('input', function() {
+        this.value = this.value.toUpperCase();
+    });
+    
+    // Convert regions to uppercase
+    document.getElementById('newEnvRegion').addEventListener('input', function() {
+        this.value = this.value.toUpperCase();
+    });
+    
+    // Show/hide credential fields based on artifact source type
+    document.getElementById('artifact_source_type').addEventListener('change', function() {
+        const usernameGroup = document.getElementById('artifact_username_group');
+        const passwordGroup = document.getElementById('artifact_password_group');
+        const urlField = document.getElementById('artifact_url');
+        
+        if (this.value === 'jfrog') {
+            usernameGroup.style.display = 'block';
+            passwordGroup.style.display = 'block';
+            urlField.placeholder = 'https://artifactory.company.com/artifactory/repo-name/';
+            document.getElementById('artifact_username').required = true;
+            document.getElementById('artifact_password').required = true;
+        } else if (this.value === 'unc') {
+            usernameGroup.style.display = 'block';
+            passwordGroup.style.display = 'block';
+            urlField.placeholder = '\\\\server\\share\\artifacts\\project-name';
+            document.getElementById('artifact_username').required = false;
+            document.getElementById('artifact_password').required = false;
+        } else if (this.value === 'http') {
+            usernameGroup.style.display = 'none';
+            passwordGroup.style.display = 'none';
+            urlField.placeholder = 'https://releases.company.com/artifacts/';
+            document.getElementById('artifact_username').required = false;
+            document.getElementById('artifact_password').required = false;
+        } else {
+            usernameGroup.style.display = 'none';
+            passwordGroup.style.display = 'none';
+            urlField.placeholder = '';
+            document.getElementById('artifact_username').required = false;
+            document.getElementById('artifact_password').required = false;
+        }
+    });
+});
+
+function validateAndSubmit() {
+    console.log('validateAndSubmit called!');
+    
+    // Debug: Log form data before submission
+    const formData = new FormData(document.getElementById('addProjectForm'));
+    console.log('Form data being submitted:');
+    for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+    }
+    
+    // Check if we have at least basic required fields
+    const projectName = document.getElementById('project_name').value;
+    const projectKey = document.getElementById('project_key').value;
+    
+    if (!projectName || !projectKey) {
+        alert('Project name and key are required');
+        return false;
+    }
+    
+    console.log('Form validation passed, submitting...');
+    return true; // Allow form submission
+}
+</script>
+{% endblock %}

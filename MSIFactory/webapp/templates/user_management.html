@@ -1,0 +1,395 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}User Management - MSI Factory{% endblock %}
+{% block page_title %}User Management{% endblock %}
+
+{% block content %}
+<!-- User Statistics -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-0">Total Users</h6>
+                        <h3 class="mb-0">{{ all_users|length }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-users fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-0">Active Users</h6>
+                        <h3 class="mb-0">{{ active_users_count }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-user-check fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-0">Pending Requests</h6>
+                        <h3 class="mb-0">{{ pending_requests_count }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-clock fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-0">Admin Users</h6>
+                        <h3 class="mb-0">{{ admin_users_count }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-user-shield fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Users Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-users me-2"></i>User Management</h5>
+                    <div class="input-group" style="width: 300px;">
+                        <input type="text" class="form-control" id="userTableSearch" placeholder="Search users...">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if all_users %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Projects Access</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            {% for user in all_users %}
+                            <tr data-username="{{ user.username.lower() }}" data-email="{{ user.email.lower() }}" data-team="{{ user.get('team', '').lower() }}">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar me-3" style="width: 40px; height: 40px; background: linear-gradient(135deg, #3498db, #2c3e50); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.9rem;">
+                                            {{ user.first_name[0] }}{{ user.last_name[0] }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold">{{ user.first_name }} {{ user.last_name }}</div>
+                                            <small class="text-muted">{{ user.username }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'danger' if user.role == 'admin' else 'primary' }}">
+                                        {{ user.role.title() }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if user.status == 'approved' else 'warning' }}">
+                                        {{ user.status.title() }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        {% if user.approved_apps and '*' in user.approved_apps %}
+                                            <span class="badge bg-danger">All Projects</span>
+                                        {% elif user.approved_apps %}
+                                            <span class="badge bg-secondary">{{ user.approved_apps|length }} Projects</span>
+                                            <button class="btn btn-link btn-sm p-0 ms-1" onclick="showUserProjects('{{ user.username }}')" title="View Projects">
+                                                <i class="fas fa-eye text-primary"></i>
+                                            </button>
+                                        {% else %}
+                                            <span class="badge bg-light text-dark">No Access</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" onclick="editUserProjects('{{ user.username }}')" title="Edit Projects">
+                                            <i class="fas fa-project-diagram"></i>
+                                        </button>
+                                        <button class="btn btn-outline-info" onclick="viewUserDetails('{{ user.username }}')" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        {% if user.role != 'admin' %}
+                                        <button class="btn btn-outline-warning" onclick="toggleUserStatus('{{ user.username }}')" title="Toggle Status">
+                                            <i class="fas fa-toggle-{{ 'on' if user.status == 'approved' else 'off' }}"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <div class="text-muted mb-3" style="font-size: 3rem;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h6 class="mb-3">No Users Found</h6>
+                    <p class="text-muted">Users will appear here once they request access to the system.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Projects Modal -->
+<div class="modal fade" id="editUserProjectsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-project-diagram me-2"></i>Assign Projects to User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('update_user_projects') }}">
+                <input type="hidden" id="edit_username" name="username">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="user-avatar me-3" id="modal_user_avatar" style="width: 50px; height: 50px; background: linear-gradient(135deg, #3498db, #2c3e50); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                            </div>
+                            <div>
+                                <h6 class="mb-0" id="modal_user_name"></h6>
+                                <small class="text-muted" id="modal_user_email"></small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="all_projects_access" name="all_projects_access" onchange="toggleAllProjectsAccess()">
+                            <label class="form-check-label" for="all_projects_access">
+                                <strong>Grant access to all projects (Admin-level access)</strong>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div id="individual_projects_section">
+                        <label class="form-label fw-bold">Select Individual Projects:</label>
+                        <div class="row" id="projects_checkboxes">
+                            {% for project in all_projects %}
+                            <div class="col-md-6 mb-2">
+                                <div class="form-check border rounded p-2">
+                                    <input class="form-check-input" type="checkbox" name="project_keys" value="{{ project.project_key }}" id="project_{{ project.project_key }}">
+                                    <label class="form-check-label w-100" for="project_{{ project.project_key }}">
+                                        <div class="d-flex align-items-center">
+                                            <div class="project-icon me-2" style="width: 25px; height: 25px; background: linear-gradient(135deg, {{ project.color_primary }}, {{ project.color_secondary }}); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.7rem;">
+                                                {{ project.project_key[:2] }}
+                                            </div>
+                                            <div>
+                                                <div class="fw-semibold small">{{ project.project_name }}</div>
+                                                <small class="text-muted">{{ project.project_key }}</small>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Project Access</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- View User Projects Modal -->
+<div class="modal fade" id="viewUserProjectsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-eye me-2"></i>User Project Access</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="view_user_projects_content">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('userTableSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#userTableBody tr');
+            
+            rows.forEach(row => {
+                const username = row.getAttribute('data-username');
+                const email = row.getAttribute('data-email');
+                const team = row.getAttribute('data-team');
+                
+                if (username.includes(searchTerm) || email.includes(searchTerm) || team.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+
+function toggleAllProjectsAccess() {
+    const allProjectsCheckbox = document.getElementById('all_projects_access');
+    const individualProjectsSection = document.getElementById('individual_projects_section');
+    const projectCheckboxes = document.querySelectorAll('input[name="project_keys"]');
+    
+    if (allProjectsCheckbox.checked) {
+        individualProjectsSection.style.opacity = '0.5';
+        individualProjectsSection.style.pointerEvents = 'none';
+        projectCheckboxes.forEach(cb => cb.checked = false);
+    } else {
+        individualProjectsSection.style.opacity = '1';
+        individualProjectsSection.style.pointerEvents = 'auto';
+    }
+}
+
+function editUserProjects(username) {
+    // Get user data
+    const userRow = document.querySelector(`tr[data-username="${username.toLowerCase()}"]`);
+    if (!userRow) return;
+    
+    const userCells = userRow.querySelectorAll('td');
+    const userName = userCells[0].querySelector('.fw-semibold').textContent;
+    const userEmail = userCells[1].textContent;
+    const userInitials = userCells[0].querySelector('.user-avatar').textContent;
+    
+    // Populate modal
+    document.getElementById('edit_username').value = username;
+    document.getElementById('modal_user_name').textContent = userName;
+    document.getElementById('modal_user_email').textContent = userEmail;
+    document.getElementById('modal_user_avatar').textContent = userInitials;
+    
+    // Reset form
+    document.getElementById('all_projects_access').checked = false;
+    document.querySelectorAll('input[name="project_keys"]').forEach(cb => cb.checked = false);
+    toggleAllProjectsAccess();
+    
+    // Load current user projects via AJAX (simplified for demo)
+    fetch(`/api/user-projects/${username}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.all_projects) {
+                document.getElementById('all_projects_access').checked = true;
+                toggleAllProjectsAccess();
+            } else if (data.projects) {
+                data.projects.forEach(projectKey => {
+                    const checkbox = document.getElementById(`project_${projectKey}`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+        })
+        .catch(error => console.error('Error loading user projects:', error));
+    
+    const modal = new bootstrap.Modal(document.getElementById('editUserProjectsModal'));
+    modal.show();
+}
+
+function showUserProjects(username) {
+    fetch(`/api/user-projects/${username}`)
+        .then(response => response.json())
+        .then(data => {
+            let content = `<div class="mb-3"><strong>User:</strong> ${username}</div>`;
+            
+            if (data.all_projects) {
+                content += '<div class="alert alert-info"><i class="fas fa-shield-alt me-2"></i>This user has access to all projects</div>';
+            } else if (data.projects && data.projects.length > 0) {
+                content += '<div class="list-group">';
+                data.project_details.forEach(project => {
+                    content += `
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <div class="project-icon me-3" style="width: 30px; height: 30px; background: linear-gradient(135deg, ${project.color_primary}, ${project.color_secondary}); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.8rem;">
+                                    ${project.project_key.substring(0, 2)}
+                                </div>
+                                <div>
+                                    <div class="fw-semibold">${project.project_name}</div>
+                                    <small class="text-muted">${project.project_key} - ${project.owner_team}</small>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                content += '</div>';
+            } else {
+                content += '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle me-2"></i>No project access assigned</div>';
+            }
+            
+            document.getElementById('view_user_projects_content').innerHTML = content;
+        })
+        .catch(error => {
+            document.getElementById('view_user_projects_content').innerHTML = '<div class="alert alert-danger">Error loading user projects</div>';
+        });
+    
+    const modal = new bootstrap.Modal(document.getElementById('viewUserProjectsModal'));
+    modal.show();
+}
+
+function viewUserDetails(username) {
+    alert(`View details for user: ${username}\n(This would show detailed user information)`);
+}
+
+function toggleUserStatus(username) {
+    if (confirm(`Toggle status for user: ${username}?`)) {
+        fetch(`/api/toggle-user-status/${username}`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Error toggling user status');
+        });
+    }
+}
+</script>
+{% endblock %}

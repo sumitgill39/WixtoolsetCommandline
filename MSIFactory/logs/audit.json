@@ -1,0 +1,530 @@
+[
+  {
+    "timestamp": "2025-09-14T08:01:52.355213",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T08:01:52.354586"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T08:04:39.071453",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T08:04:39.071396"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T08:04:41.784086",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T08:04:41.783995"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T08:16:31.863691",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T08:16:31.863634"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T08:16:34.967870",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T08:16:34.967805"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T08:19:40.932860",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T08:19:40.932788"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T08:19:44.739715",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T08:19:44.739543"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T08:23:12.536164",
+    "category": "AUTH",
+    "action": "LOGIN_SUCCESS",
+    "data": {
+      "username": "admin",
+      "ip_address": "127.0.0.1",
+      "timestamp": "2025-09-14T08:23:12.536057"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T08:25:01.374236",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T08:25:01.373913"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T08:25:02.100489",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T08:25:02.100289"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T08:29:19.759482",
+    "category": "MSI_GEN",
+    "action": "START",
+    "data": {
+      "job_id": "JOB_WEBAPP01_20250914_082919",
+      "username": "admin",
+      "app_key": "WEBAPP01",
+      "environments": [
+        "DEV",
+        "QA",
+        "UAT",
+        "PREPROD",
+        "PROD",
+        "SIT",
+        "DR"
+      ],
+      "start_time": "2025-09-14T08:29:19.759438"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T08:31:23.772281",
+    "category": "AUTH",
+    "action": "LOGOUT",
+    "data": {
+      "username": "admin"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T08:31:28.246235",
+    "category": "AUTH",
+    "action": "LOGIN_SUCCESS",
+    "data": {
+      "username": "admin",
+      "ip_address": "127.0.0.1",
+      "timestamp": "2025-09-14T08:31:28.246118"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T08:45:15.441859",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T08:45:15.441799"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T08:45:16.035121",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T08:45:16.035098"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T08:45:20.107849",
+    "category": "AUTH",
+    "action": "LOGOUT",
+    "data": {
+      "username": "admin"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T08:45:25.209484",
+    "category": "AUTH",
+    "action": "LOGIN_SUCCESS",
+    "data": {
+      "username": "admin",
+      "ip_address": "127.0.0.1",
+      "timestamp": "2025-09-14T08:45:25.209372"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T09:48:20.555893",
+    "category": "AUTH",
+    "action": "LOGOUT",
+    "data": {
+      "username": "admin"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T09:54:34.797442",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T09:54:34.797395"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T09:54:35.641665",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T09:54:35.641636"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T11:24:02.206738",
+    "category": "AUTH",
+    "action": "LOGIN_SUCCESS",
+    "data": {
+      "username": "admin",
+      "ip_address": "127.0.0.1",
+      "timestamp": "2025-09-14T11:24:02.206563"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T11:50:24.760096",
+    "category": "MSI_GEN",
+    "action": "START",
+    "data": {
+      "job_id": "JOB_DATASYNC_20250914_115024",
+      "username": "admin",
+      "app_key": "DATASYNC",
+      "environments": [
+        "DEV",
+        "QA",
+        "UAT",
+        "PREPROD",
+        "PROD",
+        "SIT",
+        "DR"
+      ],
+      "start_time": "2025-09-14T11:50:24.759951"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T12:00:28.950897",
+    "category": "AUTH",
+    "action": "LOGOUT",
+    "data": {
+      "username": "admin"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T12:39:47.398460",
+    "category": "AUTH",
+    "action": "LOGIN_SUCCESS",
+    "data": {
+      "username": "admin",
+      "ip_address": "127.0.0.1",
+      "timestamp": "2025-09-14T12:39:47.398288"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T12:52:56.830335",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T12:52:56.830259"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T12:53:51.974859",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T12:53:51.974498"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T12:54:25.289843",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T12:54:25.289746"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T12:55:07.097587",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T12:55:07.097525"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T12:55:49.549510",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T12:55:49.549373"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T12:56:12.810510",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T12:56:12.810443"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T12:57:07.358483",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T12:57:07.358426"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T12:57:08.360147",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T12:57:08.360089"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T13:15:57.037998",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T13:15:57.037783"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T13:16:27.461615",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T13:16:27.461517"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T13:17:34.376058",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T13:17:34.376007"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T13:17:35.170895",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T13:17:35.170870"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T15:30:01.127406",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T15:30:01.126149"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T15:30:08.364918",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T15:30:08.364838"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T15:40:19.055262",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T15:40:19.052643"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T15:41:15.506854",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T15:41:15.506329"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T16:21:23.061544",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T16:21:23.061507"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T16:21:26.796528",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T16:21:26.796187"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T16:22:41.537081",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T16:22:41.537046"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T16:22:42.363107",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T16:22:42.363072"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T16:23:15.050643",
+    "category": "AUTH",
+    "action": "LOGIN_SUCCESS",
+    "data": {
+      "username": "admin",
+      "ip_address": "127.0.0.1",
+      "timestamp": "2025-09-14T16:23:15.050504"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T16:26:55.879155",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T16:26:55.878223"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T16:26:56.683342",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T16:26:56.680184"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T16:30:26.242198",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T16:30:26.242119"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T16:30:26.458007",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T16:30:26.457963"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T16:32:37.834029",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T16:32:37.833831"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T16:33:36.083110",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T16:33:36.083016"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T16:36:21.891311",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T16:36:21.891224"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T16:36:23.387699",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T16:36:23.387403"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T16:53:54.500889",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T16:53:54.500814"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T16:53:55.439517",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T16:53:55.439449"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T16:59:25.994777",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T16:59:25.994735"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T16:59:26.910333",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T16:59:26.910290"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T17:00:19.222261",
+    "category": "AUTH",
+    "action": "LOGIN_SUCCESS",
+    "data": {
+      "username": "admin",
+      "ip_address": "127.0.0.1",
+      "timestamp": "2025-09-14T17:00:19.222103"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T17:06:59.137476",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T17:06:59.137424"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T17:10:19.056214",
+    "category": "SYSTEM",
+    "action": "STARTUP",
+    "data": {
+      "timestamp": "2025-09-14T17:10:19.055866"
+    }
+  },
+  {
+    "timestamp": "2025-09-14T17:11:02.196178",
+    "category": "AUTH",
+    "action": "LOGIN_SUCCESS",
+    "data": {
+      "username": "admin",
+      "ip_address": "127.0.0.1",
+      "timestamp": "2025-09-14T17:11:02.195934"
+    }
+  }
+]

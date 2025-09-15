@@ -1,0 +1,224 @@
+2025-09-14 08:01:52 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 08:01:52 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 08:01:52 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 08:04:39 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 08:04:39 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 08:04:39 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 08:04:41 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 08:04:41 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 08:04:41 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 08:16:31 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 08:16:31 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 08:16:31 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 08:16:34 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 08:16:35 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 08:16:35 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 08:19:40 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 08:19:41 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 08:19:41 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 08:19:44 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 08:19:44 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 08:19:44 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 08:23:12 | INFO     | SYSTEM          | log_system_event     | System Event: USER_SESSION_START | Details: User: admin, Role: admin
+2025-09-14 08:25:01 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 08:25:01 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 08:25:01 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 08:25:02 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 08:25:02 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 08:25:02 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 08:29:19 | INFO     | SYSTEM          | log_system_event     | System Event: MSI_REQUEST | Details: User: admin, App: WEBAPP01, Envs: ['DEV', 'QA', 'UAT', 'PREPROD', 'PROD', 'SIT', 'DR']
+2025-09-14 08:31:23 | INFO     | SYSTEM          | log_system_event     | System Event: USER_SESSION_END | Details: User: admin
+2025-09-14 08:31:28 | INFO     | SYSTEM          | log_system_event     | System Event: USER_SESSION_START | Details: User: admin, Role: admin
+2025-09-14 08:45:15 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 08:45:15 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 08:45:15 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 08:45:16 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 08:45:16 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 08:45:16 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 08:45:20 | INFO     | SYSTEM          | log_system_event     | System Event: USER_SESSION_END | Details: User: admin
+2025-09-14 08:45:25 | INFO     | SYSTEM          | log_system_event     | System Event: USER_SESSION_START | Details: User: admin, Role: admin
+2025-09-14 09:48:20 | INFO     | SYSTEM          | log_system_event     | System Event: USER_SESSION_END | Details: User: admin
+2025-09-14 09:54:34 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 09:54:34 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 09:54:34 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 09:54:35 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 09:54:35 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 09:54:35 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 11:24:02 | INFO     | SYSTEM          | log_system_event     | System Event: USER_SESSION_START | Details: User: admin, Role: admin
+2025-09-14 11:50:24 | INFO     | SYSTEM          | log_system_event     | System Event: MSI_REQUEST | Details: User: admin, App: DATASYNC, Envs: ['DEV', 'QA', 'UAT', 'PREPROD', 'PROD', 'SIT', 'DR']
+2025-09-14 12:00:29 | INFO     | SYSTEM          | log_system_event     | System Event: USER_SESSION_END | Details: User: admin
+2025-09-14 12:39:47 | INFO     | SYSTEM          | log_system_event     | System Event: USER_SESSION_START | Details: User: admin, Role: admin
+2025-09-14 12:52:56 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 12:52:56 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 12:52:56 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 12:53:51 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 12:53:52 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 12:53:52 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 12:54:25 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 12:54:25 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 12:54:25 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 12:55:07 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 12:55:07 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 12:55:07 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 12:55:49 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 12:55:49 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 12:55:49 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 12:56:12 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 12:56:12 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 12:56:12 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 12:57:07 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 12:57:07 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 12:57:07 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 12:57:08 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 12:57:08 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 12:57:08 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 13:15:57 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 13:15:57 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 13:15:57 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 13:16:27 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 13:16:27 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 13:16:27 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 13:17:34 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 13:17:34 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 13:17:34 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 13:17:35 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 13:17:35 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 13:17:35 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 15:30:01 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 15:30:02 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 15:30:02 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 15:30:08 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 15:30:08 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 15:30:08 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 15:40:19 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 15:40:19 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 15:40:19 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 15:41:15 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 15:41:15 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 15:41:15 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 16:21:23 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 16:21:23 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 16:21:23 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 16:21:26 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 16:21:26 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 16:21:26 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 16:22:41 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 16:22:41 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 16:22:41 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 16:22:42 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 16:22:42 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 16:22:42 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 16:23:15 | INFO     | SYSTEM          | log_system_event     | System Event: USER_SESSION_START | Details: User: admin, Role: admin
+2025-09-14 16:26:55 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 16:26:56 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 16:26:56 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 16:26:56 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 16:26:57 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 16:26:57 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 16:30:26 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 16:30:26 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 16:30:26 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 16:30:26 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 16:30:26 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 16:30:26 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 16:32:37 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 16:32:38 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 16:32:38 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 16:33:36 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 16:33:36 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 16:33:36 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 16:36:21 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 16:36:21 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 16:36:21 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 16:36:23 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 16:36:23 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 16:36:23 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 16:53:54 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 16:53:54 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 16:53:54 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 16:53:55 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 16:53:55 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 16:53:55 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 16:59:25 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 16:59:26 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 16:59:26 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 16:59:26 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 16:59:26 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 16:59:26 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 17:00:19 | INFO     | SYSTEM          | log_system_event     | System Event: USER_SESSION_START | Details: User: admin, Role: admin
+2025-09-14 17:06:59 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 17:06:59 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 17:06:59 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 17:10:19 | INFO     | SYSTEM          | log_system_start     | MSI Factory system started
+2025-09-14 17:10:19 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: System directories created
+2025-09-14 17:10:19 | INFO     | SYSTEM          | log_system_event     | System Event: INITIALIZATION | Details: Authentication system loaded
+2025-09-14 17:11:03 | INFO     | SYSTEM          | log_system_event     | System Event: USER_SESSION_START | Details: User: admin, Role: admin
+2025-09-14 21:35:33 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-14 21:35:33 | SYSTEM | INITIALIZATION | System directories created
+2025-09-14 21:35:33 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-14 21:35:47 | SYSTEM | USER_SESSION_START | User: admin, Role: admin
+2025-09-14 23:28:20 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-14 23:28:20 | SYSTEM | INITIALIZATION | System directories created
+2025-09-14 23:28:20 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-14 23:28:39 | SYSTEM | USER_SESSION_START | User: admin, Role: admin
+2025-09-14 23:56:26 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-14 23:56:26 | SYSTEM | INITIALIZATION | System directories created
+2025-09-14 23:56:26 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-14 23:56:44 | SYSTEM | USER_SESSION_START | User: admin, Role: admin
+2025-09-15 00:14:04 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-15 00:14:04 | SYSTEM | INITIALIZATION | System directories created
+2025-09-15 00:14:04 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-15 00:14:14 | SYSTEM | USER_SESSION_START | User: admin, Role: admin
+2025-09-15 00:42:09 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-15 00:42:09 | SYSTEM | INITIALIZATION | System directories created
+2025-09-15 00:42:09 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-15 00:42:15 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-15 00:42:15 | SYSTEM | INITIALIZATION | System directories created
+2025-09-15 00:42:15 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-15 08:37:10 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-15 08:37:10 | SYSTEM | INITIALIZATION | System directories created
+2025-09-15 08:37:10 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-15 08:37:37 | SYSTEM | USER_SESSION_START | User: john.doe, Role: user
+2025-09-15 08:39:01 | SYSTEM | USER_SESSION_END | User: john.doe
+2025-09-15 08:39:08 | SYSTEM | USER_SESSION_START | User: admin, Role: admin
+2025-09-15 08:46:20 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-15 08:46:20 | SYSTEM | INITIALIZATION | System directories created
+2025-09-15 08:46:20 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-15 08:46:22 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-15 08:46:22 | SYSTEM | INITIALIZATION | System directories created
+2025-09-15 08:46:22 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-15 09:07:58 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-15 09:07:58 | SYSTEM | INITIALIZATION | System directories created
+2025-09-15 09:07:58 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-15 09:09:09 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-15 09:09:09 | SYSTEM | INITIALIZATION | System directories created
+2025-09-15 09:09:09 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-15 09:09:55 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-15 09:09:55 | SYSTEM | INITIALIZATION | System directories created
+2025-09-15 09:09:55 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-15 09:09:56 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-15 09:09:56 | SYSTEM | INITIALIZATION | System directories created
+2025-09-15 09:09:56 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-15 09:10:46 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-15 09:10:46 | SYSTEM | INITIALIZATION | System directories created
+2025-09-15 09:10:46 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-15 09:10:57 | SYSTEM | USER_SESSION_START | User: admin, Role: admin
+2025-09-15 09:17:33 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-15 09:17:33 | SYSTEM | INITIALIZATION | System directories created
+2025-09-15 09:17:33 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-15 09:17:36 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-15 09:17:36 | SYSTEM | INITIALIZATION | System directories created
+2025-09-15 09:17:36 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-15 09:21:42 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-15 09:21:42 | SYSTEM | INITIALIZATION | System directories created
+2025-09-15 09:21:42 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-15 09:22:27 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-15 09:22:27 | SYSTEM | INITIALIZATION | System directories created
+2025-09-15 09:22:27 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-15 09:22:30 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-15 09:22:30 | SYSTEM | INITIALIZATION | System directories created
+2025-09-15 09:22:30 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-15 09:23:35 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-15 09:23:35 | SYSTEM | INITIALIZATION | System directories created
+2025-09-15 09:23:35 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-15 09:23:50 | SYSTEM | USER_SESSION_START | User: admin, Role: admin

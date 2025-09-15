@@ -1,0 +1,61 @@
+{
+  "projects": [
+    {
+      "project_id": 1,
+      "project_name": "Customer Portal Web Application",
+      "project_key": "WEBAPP01",
+      "description": "Customer-facing web portal for service requests and account management",
+      "project_type": "WebApp",
+      "owner_team": "Customer Experience Team",
+      "status": "active",
+      "color_primary": "#2c3e50",
+      "color_secondary": "#3498db",
+      "created_date": "2024-08-15",
+      "created_by": "admin",
+      "environments": [
+        "DEV",
+        "QA",
+        "UAT",
+        "PROD"
+      ]
+    },
+    {
+      "project_id": 2,
+      "project_name": "Employee Portal Website",
+      "project_key": "PORTAL",
+      "description": "Internal employee self-service portal for HR and IT services",
+      "project_type": "Website",
+      "owner_team": "HR Technology",
+      "status": "active",
+      "color_primary": "#27ae60",
+      "color_secondary": "#2ecc71",
+      "created_date": "2024-08-20",
+      "created_by": "admin",
+      "environments": [
+        "DEV",
+        "QA",
+        "PROD"
+      ]
+    },
+    {
+      "project_id": 3,
+      "project_name": "Data Synchronization Service",
+      "project_key": "DATASYNC",
+      "description": "Background service for synchronizing data between systems",
+      "project_type": "Service",
+      "owner_team": "Integration Team",
+      "status": "active",
+      "color_primary": "#e74c3c",
+      "color_secondary": "#c0392b",
+      "created_date": "2024-09-01",
+      "created_by": "admin",
+      "environments": [
+        "DEV",
+        "QA",
+        "UAT",
+        "PREPROD",
+        "PROD"
+      ]
+    }
+  ]
+}

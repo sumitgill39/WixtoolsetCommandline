@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - MSI Factory{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header">
+        <h1>Admin Panel</h1>
+        <a href="{{ url_for('factory_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+
+    <div class="stats-section">
+        <h2>System Statistics</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total_users }}</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.pending_requests }}</div>
+                <div class="stat-label">Pending Requests</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total_applications }}</div>
+                <div class="stat-label">Applications</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.msi_generated_today }}</div>
+                <div class="stat-label">MSIs Generated Today</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="requests-section">
+        <h2>Pending Access Requests</h2>
+        {% if requests %}
+            <div class="requests-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Application</th>
+                            <th>Reason</th>
+                            <th>Submitted</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in requests %}
+                        <tr>
+                            <td>
+                                <strong>{{ request.first_name }} {{ request.last_name }}</strong><br>
+                                <small>{{ request.username }}</small>
+                            </td>
+                            <td>{{ request.email }}</td>
+                            <td>
+                                <span class="app-key">{{ request.app_short_key }}</span>
+                            </td>
+                            <td>{{ request.reason }}</td>
+                            <td>{{ request.submitted_at }}</td>
+                            <td class="actions">
+                                <button class="btn btn-success btn-small" onclick="approveRequest('{{ request.id }}')">
+                                    Approve
+                                </button>
+                                <button class="btn btn-danger btn-small" onclick="denyRequest('{{ request.id }}')">
+                                    Deny
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="no-requests">
+                <p>No pending access requests</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="management-section">
+        <h2>System Management</h2>
+        <div class="management-grid">
+            <div class="management-card">
+                <h3>User Management</h3>
+                <p>Manage user accounts and permissions</p>
+                <button class="btn btn-primary">Manage Users</button>
+            </div>
+            <div class="management-card">
+                <h3>Application Registry</h3>
+                <p>Add, edit, or remove applications</p>
+                <button class="btn btn-primary">Manage Applications</button>
+            </div>
+            <div class="management-card">
+                <h3>System Logs</h3>
+                <p>View system activity and audit logs</p>
+                <button class="btn btn-primary">View Logs</button>
+            </div>
+            <div class="management-card">
+                <h3>Configuration</h3>
+                <p>System settings and configurations</p>
+                <button class="btn btn-primary">Settings</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.stats-section {
+    margin-bottom: 40px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.stat-number {
+    font-size: 36px;
+    font-weight: bold;
+    color: #2196f3;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 14px;
+}
+
+.requests-section {
+    margin-bottom: 40px;
+}
+
+.requests-table {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.requests-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.requests-table th,
+.requests-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.requests-table th {
+    background: #f8f9fa;
+    font-weight: bold;
+    color: #333;
+}
+
+.requests-table tr:hover {
+    background: #f8f9fa;
+}
+
+.app-key {
+    background: #e3f2fd;
+    color: #1565c0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.actions {
+    white-space: nowrap;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 12px;
+    margin-right: 5px;
+}
+
+.btn-success {
+    background: #4caf50;
+    border: 1px solid #4caf50;
+}
+
+.btn-success:hover {
+    background: #45a049;
+}
+
+.btn-danger {
+    background: #f44336;
+    border: 1px solid #f44336;
+}
+
+.btn-danger:hover {
+    background: #da190b;
+}
+
+.no-requests {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.management-section {
+    margin-bottom: 40px;
+}
+
+.management-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.management-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid #ddd;
+}
+
+.management-card h3 {
+    margin: 0 0 10px 0;
+    color: #333;
+}
+
+.management-card p {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #eee;
+}
+</style>
+
+<script>
+function approveRequest(requestId) {
+    if (confirm('Approve this access request?')) {
+        // In real implementation, this would make an API call
+        fetch(`/api/approve-request/${requestId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error approving request: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Error approving request: ' + error.message);
+        });
+    }
+}
+
+function denyRequest(requestId) {
+    if (confirm('Deny this access request?')) {
+        // In real implementation, this would make an API call
+        fetch(`/api/deny-request/${requestId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error denying request: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Error denying request: ' + error.message);
+        });
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,67 @@
+# MSI Factory Python Requirements
+# Core web framework and database dependencies
+
+# Flask and related extensions
+Flask==2.3.3
+Flask-SQLAlchemy==3.0.5
+Flask-Session==0.5.0
+
+# SQLAlchemy and database drivers
+SQLAlchemy==2.0.21
+pyodbc==4.0.39
+
+# Environment and configuration
+python-dotenv==1.0.0
+
+# Date and time utilities
+python-dateutil==2.8.2
+
+# JSON handling (built-in, but listed for documentation)
+# json - built-in Python module
+
+# Logging utilities
+colorlog==6.7.0
+
+# Security and authentication
+bcrypt==4.0.1
+cryptography==41.0.4
+
+# HTTP requests (for external integrations)
+requests==2.31.0
+
+# File handling and utilities
+pathlib2==2.3.7.post1
+
+# Development and testing (optional)
+pytest==7.4.2
+pytest-flask==1.2.0
+pytest-cov==4.1.0
+
+# Email support (optional)
+Flask-Mail==0.9.1
+
+# Background task processing (optional)
+celery==5.3.1
+redis==4.6.0
+
+# Backup and compression utilities
+zipfile38==0.0.3
+
+# System monitoring and metrics (optional)
+psutil==5.9.5
+
+# Excel/CSV export utilities (optional)
+pandas==2.1.1
+openpyxl==3.1.2
+
+# API documentation (optional)
+flask-restx==1.2.0
+
+# Production WSGI server (optional)
+gunicorn==21.2.0
+waitress==2.1.2
+
+# Development tools (optional)
+flask-debugtoolbar==0.13.1
+black==23.7.0
+flake8==6.1.0

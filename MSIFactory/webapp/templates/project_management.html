@@ -1,0 +1,314 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}Project Management - MSI Factory{% endblock %}
+{% block page_title %}Project Management{% endblock %}
+
+{% block content %}
+<!-- Page Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Project Management</h5>
+                    <a href="{{ url_for('add_project_page') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Add New Project
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Projects Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">All Projects</h6>
+                    <div class="input-group" style="width: 300px;">
+                        <input type="text" class="form-control" id="projectTableSearch" placeholder="Search projects...">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if all_projects %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Project</th>
+                                <th>Key</th>
+                                <th>Type</th>
+                                <th>Owner Team</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projectTableBody">
+                            {% for project in all_projects %}
+                            <tr data-project-name="{{ project.project_name.lower() }}" data-project-key="{{ project.project_key.lower() }}" data-project-team="{{ project.owner_team.lower() }}">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="project-icon me-2" style="width: 30px; height: 30px; background: linear-gradient(135deg, {{ project.color_primary }}, {{ project.color_secondary }}); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.8rem;">
+                                            {{ project.project_key[:2] }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold">{{ project.project_name }}</div>
+                                            <small class="text-muted">{{ project.description[:50] }}{% if project.description|length > 50 %}...{% endif %}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-primary">{{ project.project_key }}</span></td>
+                                <td><span class="badge bg-secondary">{{ project.project_type }}</span></td>
+                                <td>{{ project.owner_team }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if project.status == 'active' else 'warning' }}">
+                                        {{ project.status.title() }}
+                                    </span>
+                                </td>
+                                <td>{{ project.created_date }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary" onclick="editProject({{ project.project_id }})">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-outline-info" onclick="viewProject({{ project.project_id }})">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger" onclick="deleteProject({{ project.project_id }})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <div class="text-muted mb-3" style="font-size: 3rem;">
+                        <i class="fas fa-folder-plus"></i>
+                    </div>
+                    <h6 class="mb-3">No Projects Created</h6>
+                    <p class="text-muted mb-4">Start by adding your first project to the system.</p>
+                    <a href="{{ url_for('add_project_page') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Add First Project
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Project Modal -->
+<div class="modal fade" id="addProjectModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Add New Project</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_project') }}">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label for="project_name" class="form-label">Project Name</label>
+                            <input type="text" class="form-control" id="project_name" name="project_name" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="project_key" class="form-label">Project Key</label>
+                            <input type="text" class="form-control" id="project_key" name="project_key" required pattern="[A-Z0-9]{2,10}" title="2-10 uppercase letters and numbers only">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="project_type" class="form-label">Project Type</label>
+                            <select class="form-select" id="project_type" name="project_type" required>
+                                <option value="">Select Type</option>
+                                <option value="WebApp">Web Application</option>
+                                <option value="Service">Windows Service</option>
+                                <option value="Website">Standalone Website</option>
+                                <option value="Desktop">Desktop Application</option>
+                                <option value="API">API Service</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="owner_team" class="form-label">Owner Team</label>
+                            <input type="text" class="form-control" id="owner_team" name="owner_team" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="color_primary" class="form-label">Primary Color</label>
+                            <input type="color" class="form-control form-control-color" id="color_primary" name="color_primary" value="#2c3e50">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="color_secondary" class="form-label">Secondary Color</label>
+                            <input type="color" class="form-control form-control-color" id="color_secondary" name="color_secondary" value="#3498db">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Project Modal -->
+<div class="modal fade" id="editProjectModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Project</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('edit_project') }}">
+                <input type="hidden" id="edit_project_id" name="project_id">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label for="edit_project_name" class="form-label">Project Name</label>
+                            <input type="text" class="form-control" id="edit_project_name" name="project_name" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="edit_project_key" class="form-label">Project Key</label>
+                            <input type="text" class="form-control" id="edit_project_key" name="project_key" required pattern="[A-Z0-9]{2,10}" title="2-10 uppercase letters and numbers only">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="edit_description" class="form-label">Description</label>
+                        <textarea class="form-control" id="edit_description" name="description" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_project_type" class="form-label">Project Type</label>
+                            <select class="form-select" id="edit_project_type" name="project_type" required>
+                                <option value="">Select Type</option>
+                                <option value="WebApp">Web Application</option>
+                                <option value="Service">Windows Service</option>
+                                <option value="Website">Standalone Website</option>
+                                <option value="Desktop">Desktop Application</option>
+                                <option value="API">API Service</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_owner_team" class="form-label">Owner Team</label>
+                            <input type="text" class="form-control" id="edit_owner_team" name="owner_team" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_color_primary" class="form-label">Primary Color</label>
+                            <input type="color" class="form-control form-control-color" id="edit_color_primary" name="color_primary">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_color_secondary" class="form-label">Secondary Color</label>
+                            <input type="color" class="form-control form-control-color" id="edit_color_secondary" name="color_secondary">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="edit_status" class="form-label">Status</label>
+                        <select class="form-select" id="edit_status" name="status" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('projectTableSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#projectTableBody tr');
+            
+            rows.forEach(row => {
+                const projectName = row.getAttribute('data-project-name');
+                const projectKey = row.getAttribute('data-project-key');
+                const projectTeam = row.getAttribute('data-project-team');
+                
+                if (projectName.includes(searchTerm) || projectKey.includes(searchTerm) || projectTeam.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+    
+    // Auto-generate project key from project name
+    document.getElementById('project_name').addEventListener('input', function() {
+        const projectName = this.value.toUpperCase();
+        const projectKey = projectName.replace(/[^A-Z0-9]/g, '').substring(0, 10);
+        document.getElementById('project_key').value = projectKey;
+    });
+});
+
+function editProject(projectId) {
+    // This would fetch project data via AJAX in a real implementation
+    const editModal = new bootstrap.Modal(document.getElementById('editProjectModal'));
+    document.getElementById('edit_project_id').value = projectId;
+    editModal.show();
+}
+
+function viewProject(projectId) {
+    window.location.href = `/project/${projectId}`;
+}
+
+function deleteProject(projectId) {
+    if (confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url_for("delete_project") }}';
+        
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'project_id';
+        input.value = projectId;
+        
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+{% endblock %}
