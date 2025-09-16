@@ -103,6 +103,11 @@
                                             <li><a class="dropdown-item" href="{{ url_for('generate_msi', app_key=project.project_key) }}">
                                                 <i class="fas fa-rocket me-2"></i>Generate MSI
                                             </a></li>
+                                            {% if session.role == 'admin' %}
+                                            <li><a class="dropdown-item" href="{{ url_for('component_configuration') }}">
+                                                <i class="fas fa-cogs me-2"></i>Component Config
+                                            </a></li>
+                                            {% endif %}
                                             <li><hr class="dropdown-divider"></li>
                                             <li><a class="dropdown-item" href="{{ url_for('project_settings', project_id=project.project_id) }}">
                                                 <i class="fas fa-cog me-2"></i>Settings

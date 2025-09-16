@@ -32,6 +32,104 @@ app.secret_key = 'msi_factory_main_secret_key_change_in_production'
 auth_system = SimpleAuth()
 logger = get_logger()
 
+def get_detailed_projects():
+    """Get detailed project information including artifacts, environments, and components"""
+    try:
+        import pyodbc
+        
+        # Connection string
+        conn_str = (
+            "DRIVER={ODBC Driver 17 for SQL Server};"
+            "SERVER=SUMEETGILL7E47\\MSSQLSERVER01;"
+            "DATABASE=MSIFactory;"
+            "Trusted_Connection=yes;"
+        )
+        
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+        
+        # Get all projects with artifact details
+        projects_sql = """
+            SELECT project_id, project_name, project_key, description, project_type, 
+                   owner_team, status, color_primary, color_secondary, created_date, created_by,
+                   artifact_source_type, artifact_url, artifact_username, artifact_password
+            FROM projects 
+            WHERE is_active = 1
+            ORDER BY created_date DESC
+        """
+        
+        cursor.execute(projects_sql)
+        projects = cursor.fetchall()
+        
+        detailed_projects = []
+        
+        for project in projects:
+            project_id = project[0]
+            
+            # Get environments for this project
+            env_sql = """
+                SELECT environment_name, environment_description, servers, region
+                FROM project_environments 
+                WHERE project_id = ? AND is_active = 1
+            """
+            cursor.execute(env_sql, (project_id,))
+            environments = cursor.fetchall()
+            
+            # Get components for this project
+            comp_sql = """
+                SELECT component_name, component_type, framework, artifact_source
+                FROM components 
+                WHERE project_id = ?
+            """
+            cursor.execute(comp_sql, (project_id,))
+            components = cursor.fetchall()
+            
+            # Build project dictionary
+            project_dict = {
+                'project_id': project[0],
+                'project_name': project[1],
+                'project_key': project[2],
+                'description': project[3],
+                'project_type': project[4],
+                'owner_team': project[5],
+                'status': project[6],
+                'color_primary': project[7],
+                'color_secondary': project[8],
+                'created_date': project[9].strftime('%Y-%m-%d') if project[9] else None,
+                'created_by': project[10],
+                'artifact_source_type': project[11],
+                'artifact_url': project[12],
+                'artifact_username': project[13],
+                'artifact_password': '***' if project[14] else None,
+                'environments': [
+                    {
+                        'name': env[0],
+                        'description': env[1],
+                        'servers': env[2] if env[2] else 'Not specified',
+                        'region': env[3] if env[3] else 'Not specified'
+                    }
+                    for env in environments
+                ],
+                'components': [
+                    {
+                        'name': comp[0],
+                        'type': comp[1],
+                        'framework': comp[2],
+                        'artifact_source': comp[3]
+                    }
+                    for comp in components
+                ]
+            }
+            
+            detailed_projects.append(project_dict)
+        
+        conn.close()
+        return detailed_projects
+        
+    except Exception as e:
+        print(f"[ERROR] Failed to get detailed projects: {e}")
+        return auth_system.get_all_projects()  # Fallback to basic method
+
 @app.route('/')
 def home():
     """Main entry point - redirect based on login status"""
@@ -222,11 +320,12 @@ def project_management():
         flash('Admin access required', 'error')
         return redirect(url_for('login'))
     
-    all_projects = auth_system.get_all_projects()
+    # Get detailed project information including artifacts, environments, and components
+    detailed_projects = get_detailed_projects()
     username = session.get('username')
     projects = auth_system.get_user_projects(username)
     
-    return render_template('project_management.html', all_projects=all_projects, projects=projects)
+    return render_template('project_management.html', all_projects=detailed_projects, projects=projects)
 
 @app.route('/add-project-page')
 def add_project_page():
@@ -576,6 +675,279 @@ def api_generate_msi():
         'status': 'queued',
         'message': f'MSI generation queued for {len(environments)} environments'
     })
+
+@app.route('/component-configuration')
+def component_configuration():
+    """Component MSI Configuration Management page"""
+    if 'username' not in session or session.get('role') != 'admin':
+        flash('Admin access required', 'error')
+        return redirect(url_for('login'))
+    
+    try:
+        import pyodbc
+        
+        # Connection string
+        conn_str = (
+            "DRIVER={ODBC Driver 17 for SQL Server};"
+            "SERVER=SUMEETGILL7E47\\MSSQLSERVER01;"
+            "DATABASE=MSIFactory;"
+            "Trusted_Connection=yes;"
+        )
+        
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+        
+        # Get all components with their MSI configurations
+        components_sql = """
+            SELECT 
+                c.component_id,
+                c.component_name,
+                c.component_type,
+                c.framework,
+                p.project_name,
+                p.project_key,
+                mc.config_id,
+                mc.unique_id,
+                mc.app_name,
+                mc.app_version,
+                mc.manufacturer,
+                mc.upgrade_code,
+                mc.install_folder,
+                mc.target_server,
+                mc.target_environment,
+                mc.iis_website_name,
+                mc.iis_app_pool_name,
+                mc.service_name,
+                mc.auto_increment_version
+            FROM components c
+            INNER JOIN projects p ON c.project_id = p.project_id
+            LEFT JOIN msi_configurations mc ON c.component_id = mc.component_id
+            ORDER BY p.project_name, c.component_name
+        """
+        
+        cursor.execute(components_sql)
+        components = cursor.fetchall()
+        
+        # Get available environments
+        environments_sql = """
+            SELECT DISTINCT environment_name 
+            FROM project_environments 
+            WHERE is_active = 1
+            ORDER BY environment_name
+        """
+        cursor.execute(environments_sql)
+        environments = [row[0] for row in cursor.fetchall()]
+        
+        conn.close()
+        
+        # Transform to dictionary format
+        components_list = []
+        for row in components:
+            component_dict = {
+                'component_id': row[0],
+                'component_name': row[1],
+                'component_type': row[2],
+                'framework': row[3],
+                'project_name': row[4],
+                'project_key': row[5],
+                'config_id': row[6],
+                'unique_id': str(row[7]) if row[7] else None,
+                'app_name': row[8],
+                'app_version': row[9],
+                'manufacturer': row[10],
+                'upgrade_code': row[11],
+                'install_folder': row[12],
+                'target_server': row[13],
+                'target_environment': row[14],
+                'iis_website_name': row[15],
+                'iis_app_pool_name': row[16],
+                'service_name': row[17],
+                'auto_increment_version': bool(row[18]) if row[18] is not None else True
+            }
+            components_list.append(component_dict)
+        
+        return render_template('component_configuration.html', 
+                             components=components_list, 
+                             environments=environments)
+        
+    except Exception as e:
+        print(f"[ERROR] Failed to load component configurations: {e}")
+        flash(f"Error loading component configurations: {str(e)}", 'error')
+        return redirect(url_for('project_management'))
+
+@app.route('/save-msi-config', methods=['POST'])
+def save_msi_config():
+    """Save MSI configuration for a component"""
+    if 'username' not in session or session.get('role') != 'admin':
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    try:
+        import pyodbc
+        
+        component_id = request.form.get('component_id')
+        
+        # Connection string
+        conn_str = (
+            "DRIVER={ODBC Driver 17 for SQL Server};"
+            "SERVER=SUMEETGILL7E47\\MSSQLSERVER01;"
+            "DATABASE=MSIFactory;"
+            "Trusted_Connection=yes;"
+        )
+        
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+        
+        # Check if configuration exists
+        cursor.execute("SELECT config_id FROM msi_configurations WHERE component_id = ?", (component_id,))
+        existing_config = cursor.fetchone()
+        
+        if existing_config:
+            # Update existing configuration
+            update_sql = """
+                UPDATE msi_configurations SET
+                    app_name = ?,
+                    app_version = ?,
+                    manufacturer = ?,
+                    upgrade_code = ?,
+                    install_folder = ?,
+                    target_server = ?,
+                    target_environment = ?,
+                    auto_increment_version = ?,
+                    iis_website_name = ?,
+                    iis_app_pool_name = ?,
+                    app_pool_dotnet_version = ?,
+                    app_pool_pipeline_mode = ?,
+                    app_pool_identity = ?,
+                    app_pool_enable_32bit = ?,
+                    service_name = ?,
+                    service_display_name = ?,
+                    service_description = ?,
+                    service_start_type = ?,
+                    service_account = ?,
+                    updated_date = GETDATE(),
+                    updated_by = ?
+                WHERE component_id = ?
+            """
+            cursor.execute(update_sql, (
+                request.form.get('app_name'),
+                request.form.get('app_version'),
+                request.form.get('manufacturer'),
+                request.form.get('upgrade_code'),
+                request.form.get('install_folder'),
+                request.form.get('target_server'),
+                request.form.get('target_environment'),
+                1 if request.form.get('auto_increment_version') == 'on' else 0,
+                request.form.get('iis_website_name'),
+                request.form.get('iis_app_pool_name'),
+                request.form.get('app_pool_dotnet_version'),
+                request.form.get('app_pool_pipeline_mode'),
+                request.form.get('app_pool_identity'),
+                1 if request.form.get('app_pool_enable_32bit') == 'on' else 0,
+                request.form.get('service_name'),
+                request.form.get('service_display_name'),
+                request.form.get('service_description'),
+                request.form.get('service_start_type'),
+                request.form.get('service_account'),
+                session.get('username'),
+                component_id
+            ))
+        else:
+            # Insert new configuration
+            insert_sql = """
+                INSERT INTO msi_configurations (
+                    component_id, app_name, app_version, manufacturer, upgrade_code, 
+                    install_folder, target_server, target_environment, auto_increment_version,
+                    iis_website_name, iis_app_pool_name, app_pool_dotnet_version, 
+                    app_pool_pipeline_mode, app_pool_identity, app_pool_enable_32bit,
+                    service_name, service_display_name, service_description, 
+                    service_start_type, service_account, created_by, updated_by
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """
+            cursor.execute(insert_sql, (
+                component_id,
+                request.form.get('app_name'),
+                request.form.get('app_version'),
+                request.form.get('manufacturer'),
+                request.form.get('upgrade_code'),
+                request.form.get('install_folder'),
+                request.form.get('target_server'),
+                request.form.get('target_environment'),
+                1 if request.form.get('auto_increment_version') == 'on' else 0,
+                request.form.get('iis_website_name'),
+                request.form.get('iis_app_pool_name'),
+                request.form.get('app_pool_dotnet_version'),
+                request.form.get('app_pool_pipeline_mode'),
+                request.form.get('app_pool_identity'),
+                1 if request.form.get('app_pool_enable_32bit') == 'on' else 0,
+                request.form.get('service_name'),
+                request.form.get('service_display_name'),
+                request.form.get('service_description'),
+                request.form.get('service_start_type'),
+                request.form.get('service_account'),
+                session.get('username'),
+                session.get('username')
+            ))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': 'MSI configuration saved successfully'
+        })
+        
+    except Exception as e:
+        print(f"[ERROR] Failed to save MSI configuration: {e}")
+        return jsonify({
+            'success': False,
+            'message': f'Error saving configuration: {str(e)}'
+        }), 500
+
+@app.route('/api/get-next-version', methods=['POST'])
+def api_get_next_version():
+    """API endpoint to get next version for a component"""
+    if 'username' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+    
+    try:
+        import pyodbc
+        
+        component_id = request.json.get('component_id')
+        
+        # Connection string
+        conn_str = (
+            "DRIVER={ODBC Driver 17 for SQL Server};"
+            "SERVER=SUMEETGILL7E47\\MSSQLSERVER01;"
+            "DATABASE=MSIFactory;"
+            "Trusted_Connection=yes;"
+        )
+        
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+        
+        # Call stored procedure to get next version
+        cursor.execute("EXEC sp_GetNextVersion ?", (component_id,))
+        result = cursor.fetchone()
+        
+        conn.close()
+        
+        if result:
+            return jsonify({
+                'success': True,
+                'next_version': result[0]
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Unable to generate next version'
+            })
+        
+    except Exception as e:
+        print(f"[ERROR] Failed to get next version: {e}")
+        return jsonify({
+            'success': False,
+            'message': f'Error getting next version: {str(e)}'
+        }), 500
 
 @app.route('/logout')
 def logout():

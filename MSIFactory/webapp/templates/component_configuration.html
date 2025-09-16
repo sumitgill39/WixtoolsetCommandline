@@ -1,0 +1,535 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}Component MSI Configuration - MSI Factory{% endblock %}
+{% block page_title %}Component MSI Configuration{% endblock %}
+
+{% block content %}
+<style>
+    .components-container {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+    
+    .component-item {
+        border-bottom: 1px solid #f0f0f0;
+        padding: 25px;
+        transition: background-color 0.2s ease;
+    }
+    
+    .component-item:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .component-item:last-child {
+        border-bottom: none;
+    }
+    
+    .component-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .component-info h4 {
+        margin: 0 0 10px 0;
+        color: #2c3e50;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .component-id {
+        color: #7f8c8d;
+        font-size: 0.9rem;
+        font-weight: 400;
+    }
+    
+    .component-details {
+        margin-bottom: 10px;
+        font-size: 13px;
+        color: #495057;
+    }
+    
+    .component-details > div {
+        margin-bottom: 5px;
+    }
+    
+    .component-guid {
+        background: #f8f9fa;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 11px;
+        color: #6c757d;
+        border: 1px solid #e9ecef;
+    }
+    
+    .project-info {
+        color: #2c3e50;
+        font-weight: 500;
+    }
+    
+    .component-meta {
+        display: flex;
+        gap: 10px;
+        margin-top: 5px;
+    }
+    
+    .badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+    }
+    
+    .badge-webapp { background: #e74c3c; color: white; }
+    .badge-api { background: #f39c12; color: white; }
+    .badge-service { background: #27ae60; color: white; }
+    .badge-framework { background: #9b59b6; color: white; }
+    .badge-project { background: #3498db; color: white; }
+    .badge-configured { background: #d5f5d5; color: #27ae60; }
+    .badge-pending { background: #ffeaa7; color: #e17055; }
+    
+    .config-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    
+    .form-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 6px;
+        border-left: 4px solid #3498db;
+    }
+    
+    .form-section h6 {
+        margin: 0 0 15px 0;
+        color: #2c3e50;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+        color: #495057;
+        font-size: 13px;
+    }
+    
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 13px;
+        transition: border-color 0.2s ease;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+    }
+    
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+        width: auto;
+        margin: 0;
+    }
+    
+    .version-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .version-btn {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 11px;
+        transition: background-color 0.2s ease;
+    }
+    
+    .version-btn:hover {
+        background: #2980b9;
+    }
+    
+    .save-btn {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+    }
+    
+    .save-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+    }
+    
+    .stats-summary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-around;
+        text-align: center;
+    }
+    
+    .stat-item h3 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+    
+    .stat-item p {
+        margin: 5px 0 0 0;
+        opacity: 0.9;
+        font-size: 14px;
+    }
+</style>
+
+<!-- Summary Stats -->
+<div class="stats-summary">
+    <div class="stat-item">
+        <h3>{{ components|length }}</h3>
+        <p>Total Components</p>
+    </div>
+    <div class="stat-item">
+        <h3>{{ components|selectattr('config_id')|list|length }}</h3>
+        <p>Configured</p>
+    </div>
+    <div class="stat-item">
+        <h3>{{ (components|length) - (components|selectattr('config_id')|list|length) }}</h3>
+        <p>Pending Configuration</p>
+    </div>
+</div>
+
+<!-- Components List -->
+<div class="components-container">
+    {% for component in components %}
+    <div class="component-item">
+        <!-- Component Header -->
+        <div class="component-header">
+            <div class="component-info">
+                <h4>{{ component.component_name }} 
+                    <span class="component-id">#{{ component.component_id }}</span>
+                </h4>
+                <div class="component-details">
+                    <div class="guid-info">
+                        <strong>GUID:</strong> <code class="component-guid">{{ component.unique_id or 'Not Set' }}</code>
+                    </div>
+                    <div class="project-info">
+                        <strong>Project:</strong> {{ component.project_name }} ({{ component.project_key }})
+                    </div>
+                </div>
+                <div class="component-meta">
+                    <span class="badge badge-project">{{ component.project_name }}</span>
+                    <span class="badge badge-{{ component.component_type.lower() }}">{{ component.component_type }}</span>
+                    {% if component.framework %}
+                    <span class="badge badge-framework">{{ component.framework }}</span>
+                    {% endif %}
+                    {% if component.config_id %}
+                        <span class="badge badge-configured">✓ Configured</span>
+                    {% else %}
+                        <span class="badge badge-pending">⚠ Needs Configuration</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Configuration Form -->
+        <form id="config-form-{{ component.component_id }}" onsubmit="saveConfig(event, {{ component.component_id }})">
+            <input type="hidden" name="component_id" value="{{ component.component_id }}">
+            
+            <div class="config-form">
+                <!-- Basic MSI Configuration -->
+                <div class="form-section">
+                    <h6><i class="fas fa-box"></i> Basic MSI Settings</h6>
+                    
+                    <div class="form-group">
+                        <label for="app_name_{{ component.component_id }}">Application Name</label>
+                        <input type="text" id="app_name_{{ component.component_id }}" name="app_name" 
+                               value="{{ component.app_name or component.component_name }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="app_version_{{ component.component_id }}">Version</label>
+                        <div class="version-controls">
+                            <input type="text" id="app_version_{{ component.component_id }}" name="app_version" 
+                                   value="{{ component.app_version or '1.0.0.0' }}" required>
+                            <button type="button" class="version-btn" onclick="getNextVersion({{ component.component_id }})">
+                                <i class="fas fa-plus"></i> Auto
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="manufacturer_{{ component.component_id }}">Manufacturer</label>
+                        <input type="text" id="manufacturer_{{ component.component_id }}" name="manufacturer" 
+                               value="{{ component.manufacturer or 'Your Company' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="auto_increment_{{ component.component_id }}" name="auto_increment_version" 
+                                   {% if component.auto_increment_version %}checked{% endif %}>
+                            <label for="auto_increment_{{ component.component_id }}">Auto-increment version</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Deployment Configuration -->
+                <div class="form-section">
+                    <h6><i class="fas fa-server"></i> Deployment Settings</h6>
+                    
+                    <div class="form-group">
+                        <label for="target_server_{{ component.component_id }}">Target Server</label>
+                        <input type="text" id="target_server_{{ component.component_id }}" name="target_server" 
+                               value="{{ component.target_server or '' }}" placeholder="e.g., SERVER01">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="target_environment_{{ component.component_id }}">Environment</label>
+                        <select id="target_environment_{{ component.component_id }}" name="target_environment">
+                            <option value="">Select Environment</option>
+                            {% for env in environments %}
+                            <option value="{{ env }}" {% if component.target_environment == env %}selected{% endif %}>
+                                {{ env }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="install_folder_{{ component.component_id }}">Install Folder</label>
+                        <input type="text" id="install_folder_{{ component.component_id }}" name="install_folder" 
+                               value="{{ component.install_folder or 'C:\\Program Files\\' + (component.app_name or component.component_name) }}">
+                    </div>
+                </div>
+                
+                <!-- IIS Configuration (for WebApp/API) -->
+                {% if component.component_type.lower() in ['webapp', 'api'] %}
+                <div class="form-section">
+                    <h6><i class="fas fa-globe"></i> IIS Configuration</h6>
+                    
+                    <div class="form-group">
+                        <label for="iis_website_{{ component.component_id }}">Website Name</label>
+                        <input type="text" id="iis_website_{{ component.component_id }}" name="iis_website_name" 
+                               value="{{ component.iis_website_name or 'Default Web Site' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="iis_apppool_{{ component.component_id }}">App Pool Name</label>
+                        <input type="text" id="iis_apppool_{{ component.component_id }}" name="iis_app_pool_name" 
+                               value="{{ component.iis_app_pool_name or component.component_name + 'AppPool' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dotnet_version_{{ component.component_id }}">.NET Version</label>
+                        <select id="dotnet_version_{{ component.component_id }}" name="app_pool_dotnet_version">
+                            <option value="v4.0">v4.0</option>
+                            <option value="v2.0">v2.0</option>
+                            <option value="">No Managed Code</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pipeline_mode_{{ component.component_id }}">Pipeline Mode</label>
+                        <select id="pipeline_mode_{{ component.component_id }}" name="app_pool_pipeline_mode">
+                            <option value="Integrated">Integrated</option>
+                            <option value="Classic">Classic</option>
+                        </select>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Windows Service Configuration (for Service) -->
+                {% if component.component_type.lower() == 'service' %}
+                <div class="form-section">
+                    <h6><i class="fas fa-cog"></i> Windows Service</h6>
+                    
+                    <div class="form-group">
+                        <label for="service_name_{{ component.component_id }}">Service Name</label>
+                        <input type="text" id="service_name_{{ component.component_id }}" name="service_name" 
+                               value="{{ component.service_name or component.component_name }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="service_display_{{ component.component_id }}">Display Name</label>
+                        <input type="text" id="service_display_{{ component.component_id }}" name="service_display_name" 
+                               value="{{ component.component_name }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="service_start_type_{{ component.component_id }}">Start Type</label>
+                        <select id="service_start_type_{{ component.component_id }}" name="service_start_type">
+                            <option value="Auto">Automatic</option>
+                            <option value="Manual">Manual</option>
+                            <option value="Disabled">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Save Button -->
+            <button type="submit" class="save-btn">
+                <i class="fas fa-save"></i> Save Configuration
+            </button>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+function saveConfig(event, componentId) {
+    event.preventDefault();
+    
+    const form = document.getElementById(`config-form-${componentId}`);
+    const formData = new FormData(form);
+    
+    // Show loading state
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    submitBtn.disabled = true;
+    
+    fetch('/save-msi-config', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Configuration saved successfully!', 'success');
+        } else {
+            showNotification(data.message || 'Error saving configuration', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error saving configuration', 'error');
+    })
+    .finally(() => {
+        // Restore button state
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+}
+
+function getNextVersion(componentId) {
+    const versionInput = document.getElementById(`app_version_${componentId}`);
+    
+    fetch('/api/get-next-version', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            component_id: componentId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            versionInput.value = data.next_version;
+            showNotification('Version updated to: ' + data.next_version, 'info');
+        } else {
+            showNotification(data.message || 'Error getting next version', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error getting next version', 'error');
+    });
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 5px;
+        color: white;
+        font-weight: 500;
+        z-index: 1000;
+        animation: slideIn 0.3s ease;
+    `;
+    
+    switch(type) {
+        case 'success':
+            notification.style.background = '#27ae60';
+            break;
+        case 'error':
+            notification.style.background = '#e74c3c';
+            break;
+        case 'info':
+            notification.style.background = '#3498db';
+            break;
+        default:
+            notification.style.background = '#95a5a6';
+    }
+    
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 300);
+    }, 3000);
+}
+
+// Add CSS animations for notifications
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}
