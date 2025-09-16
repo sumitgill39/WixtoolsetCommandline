@@ -13,26 +13,64 @@
     }
     
     .component-item {
-        border-bottom: 1px solid #f0f0f0;
-        padding: 25px;
-        transition: background-color 0.2s ease;
-    }
-    
-    .component-item:hover {
-        background-color: #f8f9fa;
+        border-bottom: 1px solid #e0e0e0;
+        transition: all 0.3s ease;
     }
     
     .component-item:last-child {
         border-bottom: none;
     }
     
+    .component-item.active {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        background: #f8f9fa;
+    }
+    
     .component-header {
+        padding: 20px 25px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        user-select: none;
+        position: relative;
+    }
+    
+    .component-header:hover {
+        background-color: #f0f0f0;
+    }
+    
+    .component-header-content {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .collapse-icon {
+        font-size: 20px;
+        color: #6c757d;
+        transition: transform 0.3s ease;
+        margin-left: auto;
+        padding-left: 20px;
+    }
+    
+    .component-item.active .collapse-icon {
+        transform: rotate(180deg);
+    }
+    
+    .component-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+        padding: 0 25px;
+    }
+    
+    .component-item.active .component-content {
+        max-height: 2000px;
+        transition: max-height 0.5s ease-in;
+        padding: 0 25px 25px 25px;
+    }
+    
+    .component-info {
+        flex-grow: 1;
     }
     
     .component-info h4 {
@@ -197,6 +235,48 @@
         box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
     }
     
+    .expand-all-btn, .collapse-all-btn {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        margin: 0 5px;
+        transition: background-color 0.2s ease;
+    }
+    
+    .expand-all-btn:hover, .collapse-all-btn:hover {
+        background: #2980b9;
+    }
+    
+    .controls-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 15px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    
+    .search-box {
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        width: 300px;
+        font-size: 14px;
+    }
+    
+    .search-box:focus {
+        outline: none;
+        border-color: #3498db;
+        box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+    }
+    
     .stats-summary {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
@@ -237,40 +317,59 @@
     </div>
 </div>
 
+<!-- Controls Bar -->
+<div class="controls-bar">
+    <div>
+        <input type="text" class="search-box" id="componentSearch" placeholder="Search components..." onkeyup="filterComponents()">
+    </div>
+    <div>
+        <button class="expand-all-btn" onclick="expandAll()">
+            <i class="fas fa-chevron-down"></i> Expand All
+        </button>
+        <button class="collapse-all-btn" onclick="collapseAll()">
+            <i class="fas fa-chevron-up"></i> Collapse All
+        </button>
+    </div>
+</div>
+
 <!-- Components List -->
-<div class="components-container">
+<div class="components-container" id="componentsContainer">
     {% for component in components %}
-    <div class="component-item">
-        <!-- Component Header -->
-        <div class="component-header">
-            <div class="component-info">
-                <h4>{{ component.component_name }} 
-                    <span class="component-id">#{{ component.component_id }}</span>
-                </h4>
-                <div class="component-details">
-                    <div class="guid-info">
-                        <strong>GUID:</strong> <code class="component-guid">{{ component.unique_id or 'Not Set' }}</code>
+    <div class="component-item" data-component-id="{{ component.component_id }}" data-component-name="{{ component.component_name|lower }}" data-project="{{ component.project_name|lower }}">
+        <!-- Component Header (Clickable) -->
+        <div class="component-header" onclick="toggleComponent({{ component.component_id }})">
+            <div class="component-header-content">
+                <div class="component-info">
+                    <h4>{{ component.component_name }} 
+                        <span class="component-id">#{{ component.component_id }}</span>
+                    </h4>
+                    <div class="component-details">
+                        <div class="guid-info">
+                            <strong>GUID:</strong> <code class="component-guid">{{ component.unique_id or 'Not Set' }}</code>
+                        </div>
+                        <div class="project-info">
+                            <strong>Project:</strong> {{ component.project_name }} ({{ component.project_key }})
+                        </div>
                     </div>
-                    <div class="project-info">
-                        <strong>Project:</strong> {{ component.project_name }} ({{ component.project_key }})
+                    <div class="component-meta">
+                        <span class="badge badge-project">{{ component.project_name }}</span>
+                        <span class="badge badge-{{ component.component_type.lower() }}">{{ component.component_type }}</span>
+                        {% if component.framework %}
+                        <span class="badge badge-framework">{{ component.framework }}</span>
+                        {% endif %}
+                        {% if component.config_id %}
+                            <span class="badge badge-configured">✓ Configured</span>
+                        {% else %}
+                            <span class="badge badge-pending">⚠ Needs Configuration</span>
+                        {% endif %}
                     </div>
                 </div>
-                <div class="component-meta">
-                    <span class="badge badge-project">{{ component.project_name }}</span>
-                    <span class="badge badge-{{ component.component_type.lower() }}">{{ component.component_type }}</span>
-                    {% if component.framework %}
-                    <span class="badge badge-framework">{{ component.framework }}</span>
-                    {% endif %}
-                    {% if component.config_id %}
-                        <span class="badge badge-configured">✓ Configured</span>
-                    {% else %}
-                        <span class="badge badge-pending">⚠ Needs Configuration</span>
-                    {% endif %}
-                </div>
+                <i class="fas fa-chevron-down collapse-icon"></i>
             </div>
         </div>
         
-        <!-- Configuration Form -->
+        <!-- Configuration Form (Initially Hidden) -->
+        <div class="component-content">
         <form id="config-form-{{ component.component_id }}" onsubmit="saveConfig(event, {{ component.component_id }})">
             <input type="hidden" name="component_id" value="{{ component.component_id }}">
             
@@ -410,11 +509,106 @@
                 <i class="fas fa-save"></i> Save Configuration
             </button>
         </form>
+        </div>
     </div>
     {% endfor %}
 </div>
 
 <script>
+// Toggle individual component
+function toggleComponent(componentId) {
+    const component = document.querySelector(`[data-component-id="${componentId}"]`);
+    component.classList.toggle('active');
+    
+    // Store state in localStorage
+    const isActive = component.classList.contains('active');
+    let expandedComponents = JSON.parse(localStorage.getItem('expandedComponents') || '[]');
+    
+    if (isActive) {
+        if (!expandedComponents.includes(componentId)) {
+            expandedComponents.push(componentId);
+        }
+    } else {
+        expandedComponents = expandedComponents.filter(id => id !== componentId);
+    }
+    
+    localStorage.setItem('expandedComponents', JSON.stringify(expandedComponents));
+}
+
+// Expand all components
+function expandAll() {
+    const components = document.querySelectorAll('.component-item');
+    const componentIds = [];
+    
+    components.forEach(component => {
+        component.classList.add('active');
+        const id = parseInt(component.dataset.componentId);
+        if (id) componentIds.push(id);
+    });
+    
+    localStorage.setItem('expandedComponents', JSON.stringify(componentIds));
+}
+
+// Collapse all components
+function collapseAll() {
+    const components = document.querySelectorAll('.component-item');
+    components.forEach(component => {
+        component.classList.remove('active');
+    });
+    
+    localStorage.setItem('expandedComponents', '[]');
+}
+
+// Filter components based on search
+function filterComponents() {
+    const searchTerm = document.getElementById('componentSearch').value.toLowerCase();
+    const components = document.querySelectorAll('.component-item');
+    
+    components.forEach(component => {
+        const name = component.dataset.componentName || '';
+        const project = component.dataset.project || '';
+        const visible = name.includes(searchTerm) || project.includes(searchTerm);
+        
+        component.style.display = visible ? 'block' : 'none';
+    });
+}
+
+// Restore expanded state on page load
+function restoreExpandedState() {
+    const expandedComponents = JSON.parse(localStorage.getItem('expandedComponents') || '[]');
+    
+    expandedComponents.forEach(componentId => {
+        const component = document.querySelector(`[data-component-id="${componentId}"]`);
+        if (component) {
+            component.classList.add('active');
+        }
+    });
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    restoreExpandedState();
+    
+    // Add keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl+E to expand all
+        if (e.ctrlKey && e.key === 'e') {
+            e.preventDefault();
+            expandAll();
+        }
+        // Ctrl+C to collapse all
+        if (e.ctrlKey && e.key === 'c') {
+            e.preventDefault();
+            collapseAll();
+        }
+        // Ctrl+F to focus search
+        if (e.ctrlKey && e.key === 'f') {
+            e.preventDefault();
+            document.getElementById('componentSearch').focus();
+        }
+    });
+});
+
 function saveConfig(event, componentId) {
     event.preventDefault();
     

@@ -1,16 +1,59 @@
 -- ============================================================
--- MSI Factory Database Schema for MS SQL Server
--- Version: 3.0
+-- MSI Factory Complete Baseline Database Schema for MS SQL Server
+-- Version: 4.0
 -- Created: 2024-09-15
 -- Updated: 2025-09-16
--- Description: Complete MS SQL Server schema for MSI Factory system
---              with GitFlow, JFrog integration, and comprehensive MSI configuration
+-- Description: Complete production-ready MS SQL Server baseline schema for MSI Factory system
+--              with GitFlow, JFrog integration, comprehensive MSI configuration,
+--              enhanced error handling, validation, and performance optimizations
+-- 
+-- USAGE:
+-- This script is designed to be run on a fresh SQL Server instance to create
+-- the complete MSI Factory database. It can be safely re-run without data loss.
 -- ============================================================
 
--- Create database if it doesn't exist
+SET NOCOUNT ON;
+GO
+
+-- ============================================================
+-- ENVIRONMENT VALIDATION
+-- ============================================================
+PRINT 'MSI Factory Baseline Schema v4.0 - Starting Installation...'
+PRINT 'Checking SQL Server environment...'
+
+-- Check SQL Server version
+DECLARE @sql_version VARCHAR(50) = @@VERSION;
+DECLARE @version_year INT = 
+    CASE 
+        WHEN @sql_version LIKE '%2019%' THEN 2019
+        WHEN @sql_version LIKE '%2017%' THEN 2017
+        WHEN @sql_version LIKE '%2016%' THEN 2016
+        WHEN @sql_version LIKE '%2014%' THEN 2014
+        WHEN @sql_version LIKE '%2012%' THEN 2012
+        ELSE 2008
+    END;
+
+IF @version_year < 2012
+BEGIN
+    PRINT 'ERROR: SQL Server 2012 or later is required. Current version not supported.';
+    RAISERROR('Unsupported SQL Server version', 16, 1);
+    RETURN;
+END
+
+PRINT 'SQL Server version check passed: ' + CAST(@version_year AS VARCHAR(4));
+
+-- ============================================================
+-- DATABASE CREATION WITH ENHANCED SETTINGS
+-- ============================================================
 IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'MSIFactory')
 BEGIN
+    PRINT 'Creating MSIFactory database...';
     CREATE DATABASE MSIFactory;
+    PRINT 'Database MSIFactory created successfully.';
+END
+ELSE
+BEGIN
+    PRINT 'Database MSIFactory already exists. Continuing with schema updates...';
 END
 GO
 
@@ -18,15 +61,34 @@ USE MSIFactory;
 GO
 
 -- ============================================================
+-- DATABASE CONFIGURATION
+-- ============================================================
+PRINT 'Configuring database settings...';
+
+-- Set database options for better performance and reliability
+ALTER DATABASE MSIFactory SET RECOVERY SIMPLE;
+ALTER DATABASE MSIFactory SET AUTO_SHRINK OFF;
+ALTER DATABASE MSIFactory SET AUTO_CREATE_STATISTICS ON;
+ALTER DATABASE MSIFactory SET AUTO_UPDATE_STATISTICS ON;
+ALTER DATABASE MSIFactory SET PAGE_VERIFY CHECKSUM;
+
+PRINT 'Database configuration completed.'
+GO
+
+-- ============================================================
 -- CORE TABLES
 -- ============================================================
+
+PRINT 'Creating core tables...';
 
 -- ============================================================
 -- USERS TABLE
 -- Stores user account information and authentication data
 -- ============================================================
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='users' AND xtype='U')
-CREATE TABLE users (
+BEGIN
+    PRINT 'Creating users table...';
+    CREATE TABLE users (
     user_id INT PRIMARY KEY IDENTITY(1,1),
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -41,16 +103,33 @@ CREATE TABLE users (
     approved_by VARCHAR(50),
     last_login DATETIME,
     login_count INT DEFAULT 0,
-    is_active BIT DEFAULT 1
-);
+    is_active BIT DEFAULT 1,
+    password_hash VARCHAR(255), -- For future use
+    password_salt VARCHAR(255), -- For future use
+    last_password_change DATETIME,
+    failed_login_attempts INT DEFAULT 0,
+    account_locked_until DATETIME,
+    
+    -- Constraints
+    CONSTRAINT CK_users_email_format CHECK (email LIKE '%@%.%'),
+    CONSTRAINT CK_users_names_not_empty CHECK (LEN(TRIM(first_name)) > 0 AND LEN(TRIM(last_name)) > 0)
+    );
+    PRINT 'Users table created successfully.';
+END
+ELSE
+BEGIN
+    PRINT 'Users table already exists.';
+END
 GO
 
 -- ============================================================
--- PROJECTS TABLE
+-- PROJECTS TABLE  
 -- Stores project information and configuration
 -- ============================================================
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='projects' AND xtype='U')
-CREATE TABLE projects (
+BEGIN
+    PRINT 'Creating projects table...';
+    CREATE TABLE projects (
     project_id INT PRIMARY KEY IDENTITY(1,1),
     project_guid UNIQUEIDENTIFIER DEFAULT NEWID(),
     project_name VARCHAR(100) NOT NULL,
@@ -73,8 +152,22 @@ CREATE TABLE projects (
     created_by VARCHAR(50) NOT NULL,
     updated_date DATETIME DEFAULT GETDATE(),
     updated_by VARCHAR(50),
-    is_active BIT DEFAULT 1
-);
+    is_active BIT DEFAULT 1,
+    artifact_api_key VARCHAR(255),   -- For API-based authentication
+    auto_version_increment BIT DEFAULT 1,
+    default_environment VARCHAR(20) DEFAULT 'DEV',
+    notification_email VARCHAR(500), -- Comma-separated emails
+    
+    -- Constraints
+    CONSTRAINT CK_projects_key_format CHECK (project_key LIKE '[A-Z]%' AND LEN(project_key) >= 3),
+    CONSTRAINT CK_projects_colors CHECK (color_primary LIKE '#[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]')
+    );
+    PRINT 'Projects table created successfully.';
+END
+ELSE
+BEGIN
+    PRINT 'Projects table already exists.';
+END
 GO
 
 -- ============================================================
@@ -82,7 +175,9 @@ GO
 -- Stores component information for multi-component projects
 -- ============================================================
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='components' AND xtype='U')
-CREATE TABLE components (
+BEGIN
+    PRINT 'Creating components table...';
+    CREATE TABLE components (
     component_id INT PRIMARY KEY IDENTITY(1,1),
     component_guid UNIQUEIDENTIFIER DEFAULT NEWID(),
     unique_guid UNIQUEIDENTIFIER DEFAULT NEWID(),  -- For folder naming
@@ -101,11 +196,29 @@ CREATE TABLE components (
     last_extract_path VARCHAR(500),
     last_artifact_time DATETIME,
     
+    -- Component Settings
+    is_enabled BIT DEFAULT 1 NOT NULL,
+    order_index INT DEFAULT 1,
+    dependencies VARCHAR(500), -- JSON array of component dependencies
+    
     -- Metadata
     created_date DATETIME DEFAULT GETDATE(),
     created_by VARCHAR(50) NOT NULL,
-    FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE
-);
+    updated_date DATETIME DEFAULT GETDATE(),
+    updated_by VARCHAR(50),
+    
+    FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE,
+    
+    -- Constraints
+    CONSTRAINT CK_components_name_not_empty CHECK (LEN(TRIM(component_name)) > 0),
+    CONSTRAINT UK_components_project_name UNIQUE (project_id, component_name)
+    );
+    PRINT 'Components table created successfully.';
+END
+ELSE
+BEGIN
+    PRINT 'Components table already exists.';
+END
 GO
 
 -- ============================================================
@@ -113,7 +226,9 @@ GO
 -- Stores environment configurations for projects
 -- ============================================================
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='project_environments' AND xtype='U')
-CREATE TABLE project_environments (
+BEGIN
+    PRINT 'Creating project_environments table...';
+    CREATE TABLE project_environments (
     env_id INT PRIMARY KEY IDENTITY(1,1),
     project_id INT NOT NULL,
     environment_name VARCHAR(20) NOT NULL,
@@ -121,30 +236,49 @@ CREATE TABLE project_environments (
     servers TEXT,  -- Comma-separated list of servers
     region VARCHAR(50),
     is_active BIT DEFAULT 1,
+    environment_type VARCHAR(20) CHECK (environment_type IN ('development', 'testing', 'staging', 'production')),
+    order_index INT DEFAULT 1,
     created_date DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE
-);
+    
+    FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE,
+    CONSTRAINT UK_project_env_name UNIQUE (project_id, environment_name)
+    );
+    PRINT 'Project environments table created successfully.';
+END
+ELSE
+BEGIN
+    PRINT 'Project environments table already exists.';
+END
 GO
 
 -- ============================================================
 -- GITFLOW & ARTIFACT POLLING TABLES
 -- ============================================================
 
+PRINT 'Creating GitFlow and artifact polling tables...';
+
 -- ============================================================
 -- BRANCH_MAPPINGS TABLE
 -- GitFlow branch to repository path mappings
 -- ============================================================
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='branch_mappings' AND xtype='U')
-CREATE TABLE branch_mappings (
+BEGIN
+    PRINT 'Creating branch_mappings table...';
+    CREATE TABLE branch_mappings (
     mapping_id INT IDENTITY(1,1) PRIMARY KEY,
     project_id INT,
     branch_pattern VARCHAR(100),
     repository_path VARCHAR(200),
     environment_type VARCHAR(50), -- dev, qa, staging, prod
     auto_deploy BIT DEFAULT 0,
+    priority INT DEFAULT 5,
+    is_active BIT DEFAULT 1 NOT NULL,
     created_date DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (project_id) REFERENCES projects(project_id)
-);
+    
+    FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE
+    );
+    PRINT 'Branch mappings table created successfully.';
+END
 GO
 
 -- Insert default GitFlow patterns
@@ -166,7 +300,9 @@ GO
 -- Tracks all downloaded artifacts
 -- ============================================================
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='artifact_history' AND xtype='U')
-CREATE TABLE artifact_history (
+BEGIN
+    PRINT 'Creating artifact_history table...';
+    CREATE TABLE artifact_history (
     history_id INT IDENTITY(1,1) PRIMARY KEY,
     component_id INT,
     artifact_version VARCHAR(100),
@@ -176,8 +312,13 @@ CREATE TABLE artifact_history (
     branch_name VARCHAR(100),
     artifact_size BIGINT,
     artifact_hash VARCHAR(100),
-    FOREIGN KEY (component_id) REFERENCES components(component_id)
-);
+    status VARCHAR(20) DEFAULT 'downloaded' CHECK (status IN ('downloading', 'downloaded', 'extracted', 'failed', 'deleted')),
+    error_message TEXT,
+    
+    FOREIGN KEY (component_id) REFERENCES components(component_id) ON DELETE CASCADE
+    );
+    PRINT 'Artifact history table created successfully.';
+END
 GO
 
 -- Create indexes only if they don't exist
@@ -193,7 +334,9 @@ GO
 -- Component-specific polling settings
 -- ============================================================
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='polling_config' AND xtype='U')
-CREATE TABLE polling_config (
+BEGIN
+    PRINT 'Creating polling_config table...';
+    CREATE TABLE polling_config (
     config_id INT IDENTITY(1,1) PRIMARY KEY,
     component_id INT UNIQUE,
     jfrog_repository VARCHAR(200),
@@ -203,22 +346,36 @@ CREATE TABLE polling_config (
     last_successful_poll DATETIME,
     consecutive_failures INT DEFAULT 0,
     max_retries INT DEFAULT 3,
+    timeout_seconds INT DEFAULT 300,
+    notification_on_success BIT DEFAULT 0,
+    notification_on_failure BIT DEFAULT 1,
     created_date DATETIME DEFAULT GETDATE(),
     updated_date DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (component_id) REFERENCES components(component_id)
-);
+    
+    FOREIGN KEY (component_id) REFERENCES components(component_id) ON DELETE CASCADE,
+    
+    CONSTRAINT CK_polling_interval CHECK (polling_interval_seconds >= 30),
+    CONSTRAINT CK_max_retries CHECK (max_retries >= 0),
+    CONSTRAINT CK_timeout CHECK (timeout_seconds > 0)
+    );
+    PRINT 'Polling config table created successfully.';
+END
 GO
 
 -- ============================================================
 -- MSI CONFIGURATION TABLES
 -- ============================================================
 
+PRINT 'Creating MSI configuration tables...';
+
 -- ============================================================
 -- MSI_CONFIGURATIONS TABLE
 -- Comprehensive MSI and deployment configuration per component
 -- ============================================================
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='msi_configurations' AND xtype='U')
-CREATE TABLE msi_configurations (
+BEGIN
+    PRINT 'Creating msi_configurations table...';
+    CREATE TABLE msi_configurations (
     config_id INT IDENTITY(1,1) PRIMARY KEY,
     component_id INT UNIQUE NOT NULL,
     
@@ -296,9 +453,17 @@ CREATE TABLE msi_configurations (
     updated_by VARCHAR(100),
     is_template BIT DEFAULT 0,
     template_name VARCHAR(100),
+    is_active BIT DEFAULT 1,
     
-    FOREIGN KEY (component_id) REFERENCES components(component_id)
-);
+    FOREIGN KEY (component_id) REFERENCES components(component_id) ON DELETE CASCADE,
+    
+    CONSTRAINT CK_msi_port CHECK (iis_port IS NULL OR (iis_port BETWEEN 1 AND 65535)),
+    CONSTRAINT CK_msi_pipeline CHECK (app_pool_pipeline_mode IS NULL OR app_pool_pipeline_mode IN ('Integrated', 'Classic')),
+    CONSTRAINT CK_msi_start_mode CHECK (app_pool_start_mode IS NULL OR app_pool_start_mode IN ('OnDemand', 'AlwaysRunning')),
+    CONSTRAINT CK_service_start CHECK (service_start_type IS NULL OR service_start_type IN ('Automatic', 'Manual', 'Disabled'))
+    );
+    PRINT 'MSI configurations table created successfully.';
+END
 GO
 
 -- Create indexes only if they don't exist
@@ -739,20 +904,143 @@ END
 GO
 
 -- ============================================================
--- FINAL SETUP
+-- VIEWS FOR COMMON QUERIES
+-- ============================================================
+
+PRINT 'Creating views...';
+
+-- Component details with project info
+IF EXISTS (SELECT * FROM sys.views WHERE name = 'vw_component_details')
+    DROP VIEW vw_component_details
+GO
+
+CREATE VIEW vw_component_details
+AS
+SELECT 
+    c.component_id,
+    c.component_guid,
+    c.unique_guid,
+    c.component_name,
+    c.component_type,
+    c.framework,
+    c.is_enabled,
+    p.project_id,
+    p.project_name,
+    p.project_key,
+    p.project_type,
+    p.owner_team,
+    p.status as project_status,
+    mc.config_id,
+    mc.unique_id as msi_unique_id,
+    mc.app_name,
+    mc.app_version,
+    mc.target_environment,
+    c.created_date,
+    c.created_by
+FROM components c
+INNER JOIN projects p ON c.project_id = p.project_id
+LEFT JOIN msi_configurations mc ON c.component_id = mc.component_id
+WHERE c.is_enabled = 1 AND p.is_active = 1
+GO
+
+-- ============================================================
+-- HEALTH CHECK PROCEDURE
+-- ============================================================
+
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_HealthCheck')
+    DROP PROCEDURE sp_HealthCheck
+GO
+
+CREATE PROCEDURE sp_HealthCheck
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DECLARE @results TABLE (
+        check_name VARCHAR(100),
+        status VARCHAR(20),
+        details VARCHAR(500)
+    );
+    
+    -- Check table counts
+    INSERT INTO @results SELECT 'Users Count', 'OK', CAST(COUNT(*) AS VARCHAR) + ' users' FROM users;
+    INSERT INTO @results SELECT 'Projects Count', 'OK', CAST(COUNT(*) AS VARCHAR) + ' projects' FROM projects;
+    INSERT INTO @results SELECT 'Components Count', 'OK', CAST(COUNT(*) AS VARCHAR) + ' components' FROM components;
+    
+    -- Check for orphaned records
+    IF EXISTS (SELECT 1 FROM components c LEFT JOIN projects p ON c.project_id = p.project_id WHERE p.project_id IS NULL)
+        INSERT INTO @results VALUES ('Orphaned Components', 'WARNING', 'Found components without valid projects');
+    ELSE
+        INSERT INTO @results VALUES ('Orphaned Components', 'OK', 'No orphaned components found');
+    
+    -- Check database size
+    DECLARE @db_size VARCHAR(20)
+    SELECT @db_size = CAST(SUM(size * 8.0 / 1024) AS VARCHAR(20)) + ' MB'
+    FROM sys.master_files 
+    WHERE database_id = DB_ID();
+    
+    INSERT INTO @results VALUES ('Database Size', 'OK', @db_size);
+    
+    SELECT * FROM @results ORDER BY check_name;
+END
+GO
+
+-- ============================================================
+-- FINAL VALIDATION AND CLEANUP
+-- ============================================================
+
+PRINT 'Running final validation...';
+
+-- Validate critical constraints
+IF NOT EXISTS (SELECT * FROM users WHERE role = 'admin')
+BEGIN
+    PRINT 'WARNING: No admin users found. Creating emergency admin...';
+    INSERT INTO users (username, email, first_name, last_name, status, role, created_date, approved_date, approved_by, is_active)
+    VALUES ('emergency_admin', 'emergency@company.com', 'Emergency', 'Admin', 'approved', 'admin', GETDATE(), GETDATE(), 'system', 1);
+END
+
+-- Update statistics for better performance
+UPDATE STATISTICS users;
+UPDATE STATISTICS projects;
+UPDATE STATISTICS components;
+
+-- ============================================================
+-- FINAL SUMMARY
 -- ============================================================
 PRINT '============================================================'
-PRINT 'MSI Factory database schema v3.0 created successfully'
-PRINT 'Features included:'
-PRINT '  ✓ Core user and project management'
-PRINT '  ✓ Multi-component support with unique GUIDs'
-PRINT '  ✓ Dynamic environment configurations'
-PRINT '  ✓ GitFlow branch tracking'
-PRINT '  ✓ JFrog artifact polling'
-PRINT '  ✓ Comprehensive MSI configuration'
-PRINT '  ✓ IIS and Windows Service settings'
-PRINT '  ✓ Version history and templates'
-PRINT '  ✓ Build queue management'
-PRINT '  ✓ Audit logging and session management'
+PRINT 'MSI Factory Baseline Database Schema v4.0 - INSTALLATION COMPLETE'
 PRINT '============================================================'
+PRINT 'Database: MSIFactory'
+PRINT 'Schema Version: 4.0'
+PRINT 'Installation Date: ' + CONVERT(VARCHAR, GETDATE(), 120)
+PRINT ''
+PRINT 'Features Successfully Installed:'
+PRINT '  ✓ Enhanced user management with security features'
+PRINT '  ✓ Multi-component project support with unique GUIDs'
+PRINT '  ✓ Dynamic environment configurations'
+PRINT '  ✓ GitFlow branch tracking and artifact polling'
+PRINT '  ✓ Comprehensive MSI configuration management'
+PRINT '  ✓ IIS and Windows Service deployment settings'
+PRINT '  ✓ Version history and configuration templates'
+PRINT '  ✓ Build queue and deployment management'
+PRINT '  ✓ Advanced audit logging and session management'
+PRINT '  ✓ Performance optimized indexes'
+PRINT '  ✓ Data validation and constraints'
+PRINT '  ✓ Stored procedures and views'
+PRINT '  ✓ Health monitoring capabilities'
+PRINT ''
+PRINT 'Next Steps:'
+PRINT '  1. Create application database user and assign permissions'
+PRINT '  2. Configure connection strings in your application'
+PRINT '  3. Test connectivity using the sp_HealthCheck procedure'
+PRINT '  4. Review and customize default configuration templates'
+PRINT ''
+PRINT 'For support and documentation, refer to the MSI Factory documentation.'
+PRINT '============================================================'
+
+-- Run health check
+EXEC sp_HealthCheck;
+
 GO
+
+SET NOCOUNT OFF;
