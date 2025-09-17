@@ -109,8 +109,8 @@
                                             </a></li>
                                             {% endif %}
                                             <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item" href="{{ url_for('project_settings', project_id=project.project_id) }}">
-                                                <i class="fas fa-cog me-2"></i>Settings
+                                            <li><a class="dropdown-item" href="{{ url_for('edit_project_page', project_id=project.project_id) }}">
+                                                <i class="fas fa-edit me-2"></i>Edit Project
                                             </a></li>
                                         </ul>
                                     </div>

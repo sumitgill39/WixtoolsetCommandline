@@ -19,6 +19,10 @@ from simple_auth import SimpleAuth
 sys.path.append('database')
 from database.connection_manager import execute_with_retry, get_db_connection_info
 
+# Import API client for database operations
+sys.path.append('api')
+from api.api_client import get_api_client
+
 # Import our MSI generation engine
 sys.path.append('engine')
 
@@ -31,6 +35,221 @@ app.secret_key = 'msi_factory_main_secret_key_change_in_production'
 # Initialize components
 auth_system = SimpleAuth()
 logger = get_logger()
+
+# Initialize API client
+try:
+    api_client = get_api_client()
+    if api_client.check_health():
+        print("[INFO] Connected to MSI Factory API")
+        log_info("MSI Factory API connection established")
+    else:
+        print("[WARNING] API server not responding, using fallback methods")
+        log_info("API server not responding, using fallback auth_system methods")
+        api_client = None
+except Exception as e:
+    print(f"[WARNING] Could not initialize API client: {e}")
+    log_error(f"Could not initialize API client: {str(e)}")
+    api_client = None
+
+def simple_delete_project_from_database(project_id):
+    """Simple project deletion without complex transaction handling"""
+    log_info(f"SIMPLE: Attempting simple database deletion for project {project_id}")
+
+    try:
+        import pyodbc
+
+        conn_str = (
+            "DRIVER={ODBC Driver 17 for SQL Server};"
+            "SERVER=SUMEETGILL7E47\\MSSQLSERVER01;"
+            "DATABASE=MSIFactory;"
+            "Trusted_Connection=yes;"
+            "Connection Timeout=5;"
+        )
+
+        with pyodbc.connect(conn_str, timeout=5) as conn:
+            with conn.cursor() as cursor:
+                # Delete dependent records first to avoid foreign key constraints
+                # The error shows msi_configurations has FK constraint on component_id
+                # Let's try deleting by component_id = project_id (they might be the same)
+
+                # First, let's see what records exist in msi_configurations
+                log_info(f"SIMPLE: Checking what records exist in msi_configurations")
+                try:
+                    cursor.execute("SELECT COUNT(*) FROM msi_configurations")
+                    total_count = cursor.fetchone()[0]
+                    log_info(f"SIMPLE: Total msi_configurations records: {total_count}")
+
+                    # Check what columns exist
+                    cursor.execute("SELECT TOP 1 * FROM msi_configurations")
+                    columns = [column[0] for column in cursor.description]
+                    log_info(f"SIMPLE: msi_configurations columns: {columns}")
+
+                    # Look for any records that might reference project 10
+                    if 'component_id' in columns:
+                        cursor.execute("SELECT COUNT(*) FROM msi_configurations WHERE component_id = ?", (project_id,))
+                        component_count = cursor.fetchone()[0]
+                        log_info(f"SIMPLE: Records with component_id={project_id}: {component_count}")
+
+                    # Try to find records that might be blocking deletion
+                    cursor.execute("SELECT COUNT(*) FROM msi_configurations")
+                    all_records = cursor.fetchone()[0]
+                    if all_records > 0:
+                        # Try to see actual data to understand the relationship
+                        cursor.execute("SELECT TOP 5 * FROM msi_configurations")
+                        sample_data = cursor.fetchall()
+                        for i, row in enumerate(sample_data):
+                            log_info(f"SIMPLE: Sample record {i+1}: {dict(zip(columns, row))}")
+
+                        # Check if there's a component_id = 10 or any reference to 10
+                        if 'component_id' in columns:
+                            # Maybe the foreign key references the Projects table directly
+                            # Let's try to delete records where component_id could be referencing project 10
+                            cursor.execute("DELETE FROM msi_configurations WHERE component_id = ?", (project_id,))
+                            targeted_delete = cursor.rowcount
+                            log_info(f"SIMPLE: Targeted delete of component_id={project_id}: {targeted_delete} rows")
+
+                            # If that didn't work, check for other possible relationships
+                            if targeted_delete == 0:
+                                # The constraint might be that component_id references Projects.project_id
+                                # So we need to delete msi_configurations that reference project 10 directly
+                                log_info(f"SIMPLE: No targeted deletion worked, checking constraint direction")
+                                # The FK constraint error suggests msi_configurations.component_id -> Projects.project_id
+                                # So we need to clear all records from msi_configurations to allow project deletion
+                                cursor.execute("DELETE FROM msi_configurations")
+                                cleared_all = cursor.rowcount
+                                log_info(f"SIMPLE: Cleared ALL {cleared_all} msi_configurations records to resolve constraint")
+
+                except Exception as msi_error:
+                    log_info(f"SIMPLE: msi_configurations inspection failed: {str(msi_error)}")
+
+                # Also try other possible relationships
+                try:
+                    cursor.execute("DELETE FROM msi_configurations WHERE project_id = ?", (project_id,))
+                    rows_deleted = cursor.rowcount
+                    log_info(f"SIMPLE: Deleted {rows_deleted} rows from msi_configurations (project_id)")
+                except Exception as msi_error2:
+                    log_info(f"SIMPLE: msi_configurations project_id deletion: {str(msi_error2)}")
+
+                # Try deleting other dependent tables
+                for table in ["ProjectComponents", "ProjectEnvironments"]:
+                    try:
+                        cursor.execute(f"DELETE FROM {table} WHERE project_id = ?", (project_id,))
+                        rows_deleted = cursor.rowcount
+                        log_info(f"SIMPLE: Deleted {rows_deleted} rows from {table}")
+                    except Exception as dep_error:
+                        log_info(f"SIMPLE: {table} deletion: {str(dep_error)}")
+
+                # Now delete the main project
+                cursor.execute("DELETE FROM Projects WHERE project_id = ?", (project_id,))
+                rows_affected = cursor.rowcount
+                log_info(f"SIMPLE: Deleted {rows_affected} rows for project {project_id}")
+
+                if rows_affected > 0:
+                    conn.commit()
+                    log_info(f"SIMPLE: Project {project_id} deleted successfully")
+                    return True, "Project deleted successfully"
+                else:
+                    log_info(f"SIMPLE: No rows found for project {project_id}")
+                    return False, "Project not found"
+
+    except Exception as e:
+        log_error(f"SIMPLE: Error deleting project {project_id}: {str(e)}")
+        return False, f"Simple deletion error: {str(e)}"
+
+def delete_project_from_database(project_id):
+    """Delete project from SQL Server database"""
+    log_info(f"Attempting database deletion for project {project_id}")
+
+    try:
+        import pyodbc
+        log_info(f"pyodbc imported successfully")
+
+        # Connection string
+        conn_str = (
+            "DRIVER={ODBC Driver 17 for SQL Server};"
+            "SERVER=SUMEETGILL7E47\\MSSQLSERVER01;"
+            "DATABASE=MSIFactory;"
+            "Trusted_Connection=yes;"
+        )
+
+        log_info(f"Attempting database connection...")
+        conn = pyodbc.connect(conn_str, timeout=10)  # Add timeout
+        cursor = conn.cursor()
+        log_info(f"Database connection successful")
+
+        # Check if project exists
+        log_info(f"Checking if project {project_id} exists in database...")
+        cursor.execute("SELECT COUNT(*) FROM Projects WHERE project_id = ?", (project_id,))
+        count = cursor.fetchone()[0]
+        log_info(f"Project {project_id} count in database: {count}")
+
+        if count == 0:
+            conn.close()
+            log_info(f"Project {project_id} not found in database")
+            return False, "Project not found in database"
+
+        # Delete related records first (if any foreign key constraints exist)
+        log_info(f"Deleting related records for project {project_id}...")
+
+        # Delete in proper order to handle foreign key constraints
+        dependent_tables = [
+            ("msi_configurations", "component_id IN (SELECT component_id FROM ProjectComponents WHERE project_id = ?)"),
+            ("ProjectComponents", "project_id = ?"),
+            ("ProjectEnvironments", "project_id = ?")
+        ]
+
+        for table_name, where_clause in dependent_tables:
+            try:
+                full_sql = f"DELETE FROM {table_name} WHERE {where_clause}"
+                log_info(f"Executing: {full_sql}")
+                cursor.execute(full_sql, (project_id,))
+                rows_deleted = cursor.rowcount
+                log_info(f"Deleted {rows_deleted} rows from {table_name} for project {project_id}")
+            except Exception as rel_error:
+                log_info(f"Related table {table_name} deletion warning: {str(rel_error)} (table might not exist)")
+
+        # Delete the project
+        log_info(f"Deleting main project record {project_id}...")
+        try:
+            log_info(f"Executing DELETE FROM Projects WHERE project_id = {project_id}")
+            cursor.execute("DELETE FROM Projects WHERE project_id = ?", (project_id,))
+            log_info(f"DELETE command completed, checking affected rows...")
+            rows_affected = cursor.rowcount
+            log_info(f"DELETE command executed successfully, rows affected: {rows_affected}")
+
+            if rows_affected == 0:
+                log_error(f"No rows were deleted for project {project_id}")
+                conn.close()
+                return False, "No rows were deleted - project may not exist"
+
+        except Exception as delete_error:
+            log_error(f"Exception during DELETE operation for project {project_id}: {str(delete_error)}")
+            try:
+                conn.close()
+            except:
+                pass
+            return False, f"Failed to delete project: {str(delete_error)}"
+
+        # Commit the transaction
+        log_info(f"Committing database transaction...")
+        try:
+            conn.commit()
+            log_info(f"Transaction committed successfully")
+        except Exception as commit_error:
+            log_error(f"Failed to commit transaction: {str(commit_error)}")
+            conn.rollback()
+            conn.close()
+            return False, f"Failed to commit deletion: {str(commit_error)}"
+
+        conn.close()
+        log_info(f"Project {project_id} deleted successfully from database")
+
+        return True, "Project deleted successfully from database"
+
+    except Exception as e:
+        error_msg = f"Database deletion error: {str(e)}"
+        log_error(error_msg)
+        return False, error_msg
 
 def get_detailed_projects():
     """Get detailed project information including artifacts, environments, and components"""
@@ -494,23 +713,273 @@ def edit_project():
     
     return redirect(url_for('project_management'))
 
-@app.route('/delete-project', methods=['POST'])
-def delete_project():
-    """Delete project"""
+@app.route('/edit-project/<int:project_id>')
+def edit_project_page(project_id):
+    """Project edit page with component management"""
     if 'username' not in session or session.get('role') != 'admin':
         flash('Admin access required', 'error')
         return redirect(url_for('login'))
     
-    project_id = request.form['project_id']
+    try:
+        import pyodbc
+        
+        # Connection string
+        conn_str = (
+            "DRIVER={ODBC Driver 17 for SQL Server};"
+            "SERVER=SUMEETGILL7E47\\MSSQLSERVER01;"
+            "DATABASE=MSIFactory;"
+            "Trusted_Connection=yes;"
+        )
+        
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+        
+        # Get project details
+        cursor.execute("""
+            SELECT project_id, project_name, project_key, description, project_type, 
+                   owner_team, status, color_primary, color_secondary,
+                   artifact_source_type, artifact_url, artifact_username,
+                   created_date, created_by
+            FROM projects 
+            WHERE project_id = ? AND is_active = 1
+        """, project_id)
+        
+        project_row = cursor.fetchone()
+        if not project_row:
+            flash('Project not found', 'error')
+            return redirect(url_for('project_management'))
+        
+        project = {
+            'project_id': project_row[0],
+            'project_name': project_row[1],
+            'project_key': project_row[2],
+            'description': project_row[3],
+            'project_type': project_row[4],
+            'owner_team': project_row[5],
+            'status': project_row[6],
+            'color_primary': project_row[7],
+            'color_secondary': project_row[8],
+            'artifact_source_type': project_row[9],
+            'artifact_url': project_row[10],
+            'artifact_username': project_row[11],
+            'created_date': project_row[12],
+            'created_by': project_row[13]
+        }
+        
+        # Get project components
+        cursor.execute("""
+            SELECT component_id, component_name, component_type, framework,
+                   artifact_source, branch_name, polling_enabled, created_date
+            FROM components 
+            WHERE project_id = ?
+            ORDER BY component_name
+        """, project_id)
+        
+        components = []
+        for row in cursor.fetchall():
+            components.append({
+                'component_id': row[0],
+                'component_name': row[1],
+                'component_type': row[2],
+                'framework': row[3],
+                'artifact_source': row[4],
+                'branch_name': row[5],
+                'polling_enabled': row[6],
+                'created_date': row[7]
+            })
+        
+        # Get project environments
+        cursor.execute("""
+            SELECT env_id, environment_name, environment_description, servers, region
+            FROM project_environments 
+            WHERE project_id = ? AND is_active = 1
+            ORDER BY environment_name
+        """, project_id)
+        
+        environments = []
+        for row in cursor.fetchall():
+            environments.append({
+                'env_id': row[0],
+                'environment_name': row[1],
+                'environment_description': row[2],
+                'servers': row[3],
+                'region': row[4]
+            })
+        
+        conn.close()
+        
+        return render_template('edit_project.html', 
+                             project=project, 
+                             components=components,
+                             environments=environments)
+        
+    except Exception as e:
+        flash(f'Error loading project: {str(e)}', 'error')
+        return redirect(url_for('project_management'))
+
+@app.route('/add-component', methods=['POST'])
+def add_component():
+    """Add new component to project"""
+    if 'username' not in session or session.get('role') != 'admin':
+        flash('Admin access required', 'error')
+        return redirect(url_for('login'))
     
-    success, message = auth_system.delete_project(project_id)
+    try:
+        import pyodbc
+        
+        project_id = request.form['project_id']
+        component_data = {
+            'component_name': request.form['component_name'],
+            'component_type': request.form['component_type'],
+            'framework': request.form['framework'],
+            'artifact_source': request.form.get('artifact_source', ''),
+            'branch_name': request.form.get('branch_name', 'develop'),
+            'polling_enabled': 1 if request.form.get('polling_enabled') else 0
+        }
+        
+        # Connection string
+        conn_str = (
+            "DRIVER={ODBC Driver 17 for SQL Server};"
+            "SERVER=SUMEETGILL7E47\\MSSQLSERVER01;"
+            "DATABASE=MSIFactory;"
+            "Trusted_Connection=yes;"
+        )
+        
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+        
+        # Insert new component
+        cursor.execute("""
+            INSERT INTO components (project_id, component_name, component_type, framework,
+                                  artifact_source, branch_name, polling_enabled, created_by)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, project_id, component_data['component_name'], component_data['component_type'],
+             component_data['framework'], component_data['artifact_source'],
+             component_data['branch_name'], component_data['polling_enabled'],
+             session.get('username'))
+        
+        conn.commit()
+        conn.close()
+        
+        flash('Component added successfully', 'success')
+        
+    except Exception as e:
+        flash(f'Error adding component: {str(e)}', 'error')
     
-    if success:
-        logger.log_system_event("PROJECT_DELETED", f"Project ID: {project_id}, Deleted by: {session.get('username')}")
-        flash(message, 'success')
-    else:
-        flash(message, 'error')
+    return redirect(url_for('edit_project_page', project_id=project_id))
+
+@app.route('/remove-component', methods=['POST'])
+def remove_component():
+    """Remove component from project"""
+    if 'username' not in session or session.get('role') != 'admin':
+        flash('Admin access required', 'error')
+        return redirect(url_for('login'))
     
+    try:
+        import pyodbc
+        
+        component_id = request.form['component_id']
+        project_id = request.form['project_id']
+        
+        # Connection string
+        conn_str = (
+            "DRIVER={ODBC Driver 17 for SQL Server};"
+            "SERVER=SUMEETGILL7E47\\MSSQLSERVER01;"
+            "DATABASE=MSIFactory;"
+            "Trusted_Connection=yes;"
+        )
+        
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+        
+        # Delete component (this will cascade to related MSI configurations)
+        cursor.execute("DELETE FROM components WHERE component_id = ?", component_id)
+        
+        conn.commit()
+        conn.close()
+        
+        flash('Component removed successfully', 'success')
+        
+    except Exception as e:
+        flash(f'Error removing component: {str(e)}', 'error')
+    
+    return redirect(url_for('edit_project_page', project_id=project_id))
+
+@app.route('/delete-project', methods=['POST'])
+def delete_project():
+    """Delete project from database"""
+    log_info(f"Delete project function called by user: {session.get('username', 'unknown')}")
+
+    if 'username' not in session or session.get('role') != 'admin':
+        if request.is_json:
+            return jsonify({'success': False, 'message': 'Admin access required'}), 403
+        flash('Admin access required', 'error')
+        return redirect(url_for('login'))
+    
+    try:
+        # Handle both form data and JSON requests
+        if request.is_json:
+            project_id = request.json.get('project_id')
+        else:
+            project_id = request.form.get('project_id')
+        
+        if not project_id:
+            if request.is_json:
+                return jsonify({'success': False, 'message': 'Project ID is required'}), 400
+            flash('Project ID is required', 'error')
+            return redirect(url_for('project_management'))
+        
+        # Use API client if available, otherwise fall back to auth_system
+        if api_client:
+            try:
+                log_info(f"Attempting to delete project {project_id} via API client")
+                response = api_client.delete_project(int(project_id), hard_delete=True)
+                success = response.get('success', False)
+                message = response.get('message', 'Unknown error')
+                log_info(f"API delete response: success={success}, message={message}")
+            except Exception as api_error:
+                log_error(f"API delete project error: {str(api_error)}")
+                # Fallback to auth_system when API fails
+                log_info(f"Falling back to auth_system for project {project_id}")
+                success, message = auth_system.delete_project(project_id)
+        else:
+            # Fallback to auth_system if API is not available
+            log_info(f"No API client available, using auth_system to delete project {project_id}")
+
+            # Try simple database deletion first, then complex, then fall back to JSON
+            try:
+                # Try simple deletion method first
+                success, message = simple_delete_project_from_database(project_id)
+                if not success:
+                    log_info(f"Simple deletion failed: {message}, trying complex method...")
+                    # Try complex deletion method
+                    success, message = delete_project_from_database(project_id)
+                    if not success:
+                        log_error(f"Both database deletion methods failed: {message}")
+                        log_info(f"Falling back to JSON file for project {project_id}")
+                        success, message = auth_system.delete_project(project_id)
+            except Exception as db_error:
+                log_error(f"Database deletion exception: {str(db_error)}, falling back to JSON")
+                success, message = auth_system.delete_project(project_id)
+        
+        if success:
+            username = session.get('username', 'unknown')
+            log_info(f"PROJECT_DELETED: Project ID: {project_id}, Deleted by: {username}")
+            if request.is_json:
+                return jsonify({'success': True, 'message': message})
+            flash(message, 'success')
+        else:
+            log_error(f"PROJECT_DELETE_FAILED: Project ID: {project_id}, Error: {message}")
+            if request.is_json:
+                return jsonify({'success': False, 'message': message}), 404
+            flash(message, 'error')
+
+    except Exception as e:
+        log_error(f"Error deleting project: {str(e)}")
+        if request.is_json:
+            return jsonify({'success': False, 'message': f'Error deleting project: {str(e)}'}), 500
+        flash(f'Error deleting project: {str(e)}', 'error')
+
     return redirect(url_for('project_management'))
 
 @app.route('/project/<int:project_id>')

@@ -250,3 +250,183 @@
 2025-09-16 09:56:04 | SYSTEM | INITIALIZATION | System directories created
 2025-09-16 09:56:04 | SYSTEM | INITIALIZATION | Authentication system loaded
 2025-09-16 09:56:25 | SYSTEM | USER_SESSION_START | User: admin, Role: admin
+2025-09-17 14:37:48 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-17 14:37:48 | SYSTEM | INITIALIZATION | System directories created
+2025-09-17 14:37:48 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-17 15:35:05 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-17 15:35:05 | SYSTEM | INITIALIZATION | System directories created
+2025-09-17 15:35:05 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-17 16:21:27 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-17 16:21:27 | SYSTEM | INITIALIZATION | System directories created
+2025-09-17 16:21:27 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-17 16:21:39 | SYSTEM | USER_SESSION_START | User: admin, Role: admin
+2025-09-17 19:27:19 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-17 19:27:19 | SYSTEM | INITIALIZATION | System directories created
+2025-09-17 19:27:19 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-17 19:27:29 | SYSTEM | USER_SESSION_START | User: admin, Role: admin
+2025-09-17 22:05:37 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-17 22:05:38 | SYSTEM | INITIALIZATION | System directories created
+2025-09-17 22:05:38 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-17 22:15:57 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-17 22:15:57 | SYSTEM | INITIALIZATION | System directories created
+2025-09-17 22:15:57 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-17 23:01:10 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-17 23:01:10 | SYSTEM | INITIALIZATION | System directories created
+2025-09-17 23:01:10 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-17 23:01:19 | SYSTEM | USER_SESSION_START | User: admin, Role: admin
+2025-09-17 23:28:51 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-17 23:28:51 | SYSTEM | INITIALIZATION | System directories created
+2025-09-17 23:28:51 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-17 23:46:26 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-17 23:46:27 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-17 23:46:27 | SYSTEM | INITIALIZATION | System directories created
+2025-09-17 23:46:27 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-17 23:46:39 | SYSTEM | INFO | Delete project function called by user: admin
+2025-09-17 23:46:39 | SYSTEM | INFO | No API client available, using auth_system to delete project 10
+2025-09-17 23:48:34 | SYSTEM | INFO | Delete project function called by user: admin
+2025-09-17 23:48:34 | SYSTEM | INFO | No API client available, using auth_system to delete project 10
+2025-09-17 23:50:20 | SYSTEM | INFO | Delete project function called by user: admin
+2025-09-17 23:50:20 | SYSTEM | INFO | No API client available, using auth_system to delete project 10
+2025-09-17 23:54:34 | SYSTEM | INFO | Delete project function called by user: admin
+2025-09-17 23:54:34 | SYSTEM | INFO | No API client available, using auth_system to delete project 10
+2025-09-17 23:55:06 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-17 23:55:06 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-17 23:55:06 | SYSTEM | INITIALIZATION | System directories created
+2025-09-17 23:55:06 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-17 23:55:23 | SYSTEM | INFO | Delete project function called by user: admin
+2025-09-17 23:55:23 | SYSTEM | INFO | No API client available, using auth_system to delete project 10
+2025-09-17 23:58:06 | SYSTEM | INFO | Delete project function called by user: admin
+2025-09-17 23:58:06 | SYSTEM | INFO | No API client available, using auth_system to delete project 10
+2025-09-18 00:00:43 | SYSTEM | INFO | Delete project function called by user: admin
+2025-09-18 00:00:43 | SYSTEM | INFO | No API client available, using auth_system to delete project 10
+2025-09-18 00:01:07 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-18 00:01:07 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-18 00:01:07 | SYSTEM | INITIALIZATION | System directories created
+2025-09-18 00:01:07 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-18 00:01:18 | SYSTEM | INFO | Delete project function called by user: admin
+2025-09-18 00:01:18 | SYSTEM | INFO | No API client available, using auth_system to delete project 10
+2025-09-18 00:01:18 | SYSTEM | INFO | Attempting database deletion for project 10
+2025-09-18 00:01:18 | SYSTEM | INFO | pyodbc imported successfully
+2025-09-18 00:01:18 | SYSTEM | INFO | Attempting database connection...
+2025-09-18 00:01:18 | SYSTEM | INFO | Database connection successful
+2025-09-18 00:01:18 | SYSTEM | INFO | Checking if project 10 exists in database...
+2025-09-18 00:01:19 | SYSTEM | INFO | Project 10 count in database: 1
+2025-09-18 00:01:19 | SYSTEM | INFO | Deleting related records for project 10...
+2025-09-18 00:01:19 | SYSTEM | INFO | Related table deletion warning: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectEnvironments'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)") (tables might not exist)
+2025-09-18 00:01:19 | SYSTEM | INFO | Deleting main project record 10...
+2025-09-18 00:01:20 | SYSTEM | INFO | Database deletion failed, trying JSON file for project 10
+2025-09-18 00:03:50 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-18 00:03:50 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-18 00:03:50 | SYSTEM | INITIALIZATION | System directories created
+2025-09-18 00:03:50 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-18 00:03:59 | SYSTEM | INFO | Delete project function called by user: admin
+2025-09-18 00:03:59 | SYSTEM | INFO | No API client available, using auth_system to delete project 10
+2025-09-18 00:03:59 | SYSTEM | INFO | Attempting database deletion for project 10
+2025-09-18 00:03:59 | SYSTEM | INFO | pyodbc imported successfully
+2025-09-18 00:03:59 | SYSTEM | INFO | Attempting database connection...
+2025-09-18 00:03:59 | SYSTEM | INFO | Database connection successful
+2025-09-18 00:03:59 | SYSTEM | INFO | Checking if project 10 exists in database...
+2025-09-18 00:03:59 | SYSTEM | INFO | Project 10 count in database: 1
+2025-09-18 00:03:59 | SYSTEM | INFO | Deleting related records for project 10...
+2025-09-18 00:03:59 | SYSTEM | INFO | Related table deletion warning: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectEnvironments'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)") (tables might not exist)
+2025-09-18 00:03:59 | SYSTEM | INFO | Deleting main project record 10...
+2025-09-18 00:04:00 | SYSTEM | INFO | Falling back to JSON file for project 10
+2025-09-18 00:07:48 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-18 00:07:48 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-18 00:07:48 | SYSTEM | INITIALIZATION | System directories created
+2025-09-18 00:07:48 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-18 00:08:04 | SYSTEM | INFO | Delete project function called by user: admin
+2025-09-18 00:08:04 | SYSTEM | INFO | No API client available, using auth_system to delete project 10
+2025-09-18 00:08:04 | SYSTEM | INFO | SIMPLE: Attempting simple database deletion for project 10
+2025-09-18 00:08:05 | SYSTEM | INFO | Simple deletion failed: Simple deletion error: ('23000', '[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The DELETE statement conflicted with the REFERENCE constraint "FK__msi_confi__compo__45BE5BA9". The conflict occurred in database "MSIFactory", table "dbo.msi_configurations", column \'component_id\'. (547) (SQLExecDirectW); [23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The statement has been terminated. (3621)'), trying complex method...
+2025-09-18 00:08:05 | SYSTEM | INFO | Attempting database deletion for project 10
+2025-09-18 00:08:05 | SYSTEM | INFO | pyodbc imported successfully
+2025-09-18 00:08:05 | SYSTEM | INFO | Attempting database connection...
+2025-09-18 00:08:05 | SYSTEM | INFO | Database connection successful
+2025-09-18 00:08:05 | SYSTEM | INFO | Checking if project 10 exists in database...
+2025-09-18 00:08:05 | SYSTEM | INFO | Project 10 count in database: 1
+2025-09-18 00:08:05 | SYSTEM | INFO | Deleting related records for project 10...
+2025-09-18 00:08:05 | SYSTEM | INFO | Related table deletion warning: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectEnvironments'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)") (tables might not exist)
+2025-09-18 00:08:05 | SYSTEM | INFO | Deleting main project record 10...
+2025-09-18 00:08:05 | SYSTEM | INFO | Executing DELETE FROM Projects WHERE project_id = 10
+2025-09-18 00:08:05 | SYSTEM | INFO | Falling back to JSON file for project 10
+2025-09-18 00:10:32 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-18 00:10:32 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-18 00:10:32 | SYSTEM | INITIALIZATION | System directories created
+2025-09-18 00:10:32 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-18 00:10:49 | SYSTEM | INFO | Delete project function called by user: admin
+2025-09-18 00:10:49 | SYSTEM | INFO | No API client available, using auth_system to delete project 10
+2025-09-18 00:10:49 | SYSTEM | INFO | SIMPLE: Attempting simple database deletion for project 10
+2025-09-18 00:10:50 | SYSTEM | INFO | SIMPLE: msi_configurations deletion warning: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectComponents'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)") (table might not exist)
+2025-09-18 00:10:50 | SYSTEM | INFO | SIMPLE: ProjectComponents deletion warning: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectComponents'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)") (table might not exist)
+2025-09-18 00:10:50 | SYSTEM | INFO | SIMPLE: ProjectEnvironments deletion warning: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectEnvironments'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)") (table might not exist)
+2025-09-18 00:10:50 | SYSTEM | INFO | Simple deletion failed: Simple deletion error: ('23000', '[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The DELETE statement conflicted with the REFERENCE constraint "FK__msi_confi__compo__45BE5BA9". The conflict occurred in database "MSIFactory", table "dbo.msi_configurations", column \'component_id\'. (547) (SQLExecDirectW); [23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The statement has been terminated. (3621)'), trying complex method...
+2025-09-18 00:10:50 | SYSTEM | INFO | Attempting database deletion for project 10
+2025-09-18 00:10:50 | SYSTEM | INFO | pyodbc imported successfully
+2025-09-18 00:10:50 | SYSTEM | INFO | Attempting database connection...
+2025-09-18 00:10:50 | SYSTEM | INFO | Database connection successful
+2025-09-18 00:10:50 | SYSTEM | INFO | Checking if project 10 exists in database...
+2025-09-18 00:10:50 | SYSTEM | INFO | Project 10 count in database: 1
+2025-09-18 00:10:50 | SYSTEM | INFO | Deleting related records for project 10...
+2025-09-18 00:10:50 | SYSTEM | INFO | Executing: DELETE FROM msi_configurations WHERE component_id IN (SELECT component_id FROM ProjectComponents WHERE project_id = ?)
+2025-09-18 00:10:50 | SYSTEM | INFO | Related table msi_configurations deletion warning: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectComponents'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)") (table might not exist)
+2025-09-18 00:10:50 | SYSTEM | INFO | Executing: DELETE FROM ProjectComponents WHERE project_id = ?
+2025-09-18 00:10:50 | SYSTEM | INFO | Related table ProjectComponents deletion warning: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectComponents'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)") (table might not exist)
+2025-09-18 00:10:50 | SYSTEM | INFO | Executing: DELETE FROM ProjectEnvironments WHERE project_id = ?
+2025-09-18 00:10:50 | SYSTEM | INFO | Related table ProjectEnvironments deletion warning: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectEnvironments'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)") (table might not exist)
+2025-09-18 00:10:50 | SYSTEM | INFO | Deleting main project record 10...
+2025-09-18 00:10:50 | SYSTEM | INFO | Executing DELETE FROM Projects WHERE project_id = 10
+2025-09-18 00:10:50 | SYSTEM | INFO | Falling back to JSON file for project 10
+2025-09-18 00:14:08 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-18 00:14:08 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-18 00:14:08 | SYSTEM | INITIALIZATION | System directories created
+2025-09-18 00:14:08 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-18 00:14:22 | SYSTEM | INFO | Delete project function called by user: admin
+2025-09-18 00:14:22 | SYSTEM | INFO | No API client available, using auth_system to delete project 10
+2025-09-18 00:14:22 | SYSTEM | INFO | SIMPLE: Attempting simple database deletion for project 10
+2025-09-18 00:14:23 | SYSTEM | INFO | SIMPLE: Deleting from msi_configurations where component_id = 10
+2025-09-18 00:14:23 | SYSTEM | INFO | SIMPLE: Deleted 0 rows from msi_configurations (component_id)
+2025-09-18 00:14:23 | SYSTEM | INFO | SIMPLE: msi_configurations project_id deletion: ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'project_id'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-18 00:14:23 | SYSTEM | INFO | SIMPLE: ProjectComponents deletion: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectComponents'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-18 00:14:23 | SYSTEM | INFO | SIMPLE: ProjectEnvironments deletion: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectEnvironments'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-18 00:14:23 | SYSTEM | INFO | Simple deletion failed: Simple deletion error: ('23000', '[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The DELETE statement conflicted with the REFERENCE constraint "FK__msi_confi__compo__45BE5BA9". The conflict occurred in database "MSIFactory", table "dbo.msi_configurations", column \'component_id\'. (547) (SQLExecDirectW); [23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The statement has been terminated. (3621)'), trying complex method...
+2025-09-18 00:14:23 | SYSTEM | INFO | Attempting database deletion for project 10
+2025-09-18 00:14:23 | SYSTEM | INFO | pyodbc imported successfully
+2025-09-18 00:14:23 | SYSTEM | INFO | Attempting database connection...
+2025-09-18 00:14:23 | SYSTEM | INFO | Database connection successful
+2025-09-18 00:14:23 | SYSTEM | INFO | Checking if project 10 exists in database...
+2025-09-18 00:14:23 | SYSTEM | INFO | Project 10 count in database: 1
+2025-09-18 00:14:23 | SYSTEM | INFO | Deleting related records for project 10...
+2025-09-18 00:14:23 | SYSTEM | INFO | Executing: DELETE FROM msi_configurations WHERE component_id IN (SELECT component_id FROM ProjectComponents WHERE project_id = ?)
+2025-09-18 00:14:23 | SYSTEM | INFO | Related table msi_configurations deletion warning: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectComponents'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)") (table might not exist)
+2025-09-18 00:14:23 | SYSTEM | INFO | Executing: DELETE FROM ProjectComponents WHERE project_id = ?
+2025-09-18 00:14:23 | SYSTEM | INFO | Related table ProjectComponents deletion warning: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectComponents'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)") (table might not exist)
+2025-09-18 00:14:23 | SYSTEM | INFO | Executing: DELETE FROM ProjectEnvironments WHERE project_id = ?
+2025-09-18 00:14:23 | SYSTEM | INFO | Related table ProjectEnvironments deletion warning: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectEnvironments'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)") (table might not exist)
+2025-09-18 00:14:23 | SYSTEM | INFO | Deleting main project record 10...
+2025-09-18 00:14:23 | SYSTEM | INFO | Executing DELETE FROM Projects WHERE project_id = 10
+2025-09-18 00:14:23 | SYSTEM | INFO | Falling back to JSON file for project 10
+2025-09-18 00:17:37 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-18 00:17:37 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-18 00:17:37 | SYSTEM | INITIALIZATION | System directories created
+2025-09-18 00:17:37 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-18 00:17:52 | SYSTEM | INFO | Delete project function called by user: admin
+2025-09-18 00:17:52 | SYSTEM | INFO | No API client available, using auth_system to delete project 10
+2025-09-18 00:17:52 | SYSTEM | INFO | SIMPLE: Attempting simple database deletion for project 10
+2025-09-18 00:17:53 | SYSTEM | INFO | SIMPLE: Checking what records exist in msi_configurations
+2025-09-18 00:17:53 | SYSTEM | INFO | SIMPLE: Total msi_configurations records: 4
+2025-09-18 00:17:53 | SYSTEM | INFO | SIMPLE: msi_configurations columns: ['config_id', 'component_id', 'unique_id', 'app_name', 'app_version', 'auto_increment_version', 'manufacturer', 'upgrade_code', 'product_code', 'install_folder', 'target_server', 'target_environment', 'component_type', 'iis_website_name', 'iis_app_path', 'iis_app_pool_name', 'iis_port', 'iis_binding_info', 'parent_website', 'parent_webapp', 'app_pool_identity', 'app_pool_dotnet_version', 'app_pool_pipeline_mode', 'app_pool_enable_32bit', 'app_pool_start_mode', 'app_pool_idle_timeout', 'app_pool_recycling_schedule', 'enable_preload', 'enable_anonymous_auth', 'enable_windows_auth', 'custom_headers', 'connection_strings', 'app_settings', 'service_name', 'service_display_name', 'service_description', 'service_start_type', 'service_account', 'service_password', 'service_dependencies', 'features', 'registry_entries', 'environment_variables', 'shortcuts', 'pre_install_script', 'post_install_script', 'pre_uninstall_script', 'post_uninstall_script', 'folder_permissions', 'created_date', 'created_by', 'updated_date', 'updated_by', 'is_template', 'template_name']
+2025-09-18 00:17:53 | SYSTEM | INFO | SIMPLE: Records with component_id=10: 0
+2025-09-18 00:17:53 | SYSTEM | INFO | SIMPLE: Sample record 1: {'config_id': 1, 'component_id': 1, 'unique_id': '0792E954-8E38-4E94-884E-5571D8A9C546', 'app_name': 'Test Component', 'app_version': '1.0.0.0', 'auto_increment_version': False, 'manufacturer': 'Your Company', 'upgrade_code': None, 'product_code': None, 'install_folder': 'C:\\Program Files\\Test Component', 'target_server': '', 'target_environment': 'DEV', 'component_type': None, 'iis_website_name': 'Default Web Site', 'iis_app_path': None, 'iis_app_pool_name': 'Test ComponentAppPool', 'iis_port': None, 'iis_binding_info': None, 'parent_website': None, 'parent_webapp': None, 'app_pool_identity': None, 'app_pool_dotnet_version': 'v4.0', 'app_pool_pipeline_mode': None, 'app_pool_enable_32bit': False, 'app_pool_start_mode': None, 'app_pool_idle_timeout': 20, 'app_pool_recycling_schedule': None, 'enable_preload': False, 'enable_anonymous_auth': True, 'enable_windows_auth': False, 'custom_headers': None, 'connection_strings': None, 'app_settings': None, 'service_name': None, 'service_display_name': None, 'service_description': None, 'service_start_type': None, 'service_account': None, 'service_password': None, 'service_dependencies': None, 'features': None, 'registry_entries': None, 'environment_variables': None, 'shortcuts': None, 'pre_install_script': None, 'post_install_script': None, 'pre_uninstall_script': None, 'post_uninstall_script': None, 'folder_permissions': None, 'created_date': datetime.datetime(2025, 9, 16, 10, 4, 51, 483000), 'created_by': 'admin', 'updated_date': datetime.datetime(2025, 9, 17, 14, 42, 19, 733000), 'updated_by': 'admin', 'is_template': False, 'template_name': None}
+2025-09-18 00:17:53 | SYSTEM | INFO | SIMPLE: Sample record 2: {'config_id': 2, 'component_id': 4, 'unique_id': '7E6BC9A1-B62F-49C6-9342-CA64DAF58AF2', 'app_name': 'Test Web Component', 'app_version': '1.0.0.0', 'auto_increment_version': True, 'manufacturer': 'Your Company', 'upgrade_code': None, 'product_code': None, 'install_folder': 'C:\\Program Files\\Test Web Component', 'target_server': '', 'target_environment': '', 'component_type': None, 'iis_website_name': 'Default Web Site', 'iis_app_path': None, 'iis_app_pool_name': 'Test Web ComponentAppPool', 'iis_port': None, 'iis_binding_info': None, 'parent_website': None, 'parent_webapp': None, 'app_pool_identity': None, 'app_pool_dotnet_version': 'v4.0', 'app_pool_pipeline_mode': 'Integrated', 'app_pool_enable_32bit': False, 'app_pool_start_mode': None, 'app_pool_idle_timeout': 20, 'app_pool_recycling_schedule': None, 'enable_preload': False, 'enable_anonymous_auth': True, 'enable_windows_auth': False, 'custom_headers': None, 'connection_strings': None, 'app_settings': None, 'service_name': None, 'service_display_name': None, 'service_description': None, 'service_start_type': None, 'service_account': None, 'service_password': None, 'service_dependencies': None, 'features': None, 'registry_entries': None, 'environment_variables': None, 'shortcuts': None, 'pre_install_script': None, 'post_install_script': None, 'pre_uninstall_script': None, 'post_uninstall_script': None, 'folder_permissions': None, 'created_date': datetime.datetime(2025, 9, 16, 10, 4, 53, 760000), 'created_by': 'admin', 'updated_date': datetime.datetime(2025, 9, 16, 10, 4, 53, 760000), 'updated_by': 'admin', 'is_template': False, 'template_name': None}
+2025-09-18 00:17:53 | SYSTEM | INFO | SIMPLE: Sample record 3: {'config_id': 3, 'component_id': 3, 'unique_id': '98ED8F69-3AD0-45F0-B280-EEEC69273E69', 'app_name': 'API', 'app_version': '1.0.0.0', 'auto_increment_version': False, 'manufacturer': 'Your Company', 'upgrade_code': None, 'product_code': None, 'install_folder': 'C:\\Program Files\\API', 'target_server': '', 'target_environment': '', 'component_type': None, 'iis_website_name': 'Default Web Site', 'iis_app_path': None, 'iis_app_pool_name': 'APIAppPool', 'iis_port': None, 'iis_binding_info': None, 'parent_website': None, 'parent_webapp': None, 'app_pool_identity': None, 'app_pool_dotnet_version': 'v4.0', 'app_pool_pipeline_mode': None, 'app_pool_enable_32bit': False, 'app_pool_start_mode': None, 'app_pool_idle_timeout': 20, 'app_pool_recycling_schedule': None, 'enable_preload': False, 'enable_anonymous_auth': True, 'enable_windows_auth': False, 'custom_headers': None, 'connection_strings': None, 'app_settings': None, 'service_name': None, 'service_display_name': None, 'service_description': None, 'service_start_type': None, 'service_account': None, 'service_password': None, 'service_dependencies': None, 'features': None, 'registry_entries': None, 'environment_variables': None, 'shortcuts': None, 'pre_install_script': None, 'post_install_script': None, 'pre_uninstall_script': None, 'post_uninstall_script': None, 'folder_permissions': None, 'created_date': datetime.datetime(2025, 9, 16, 23, 56, 23, 633000), 'created_by': 'admin', 'updated_date': datetime.datetime(2025, 9, 16, 23, 56, 23, 633000), 'updated_by': 'admin', 'is_template': False, 'template_name': None}
+2025-09-18 00:17:53 | SYSTEM | INFO | SIMPLE: Sample record 4: {'config_id': 4, 'component_id': 6, 'unique_id': '83082FF9-226F-4C59-A918-D6746725A648', 'app_name': 'API Backend', 'app_version': '1.0.0.0', 'auto_increment_version': False, 'manufacturer': 'Your Company', 'upgrade_code': None, 'product_code': None, 'install_folder': 'C:\\Program Files\\API Backend', 'target_server': '', 'target_environment': '', 'component_type': None, 'iis_website_name': 'Default Web Site', 'iis_app_path': None, 'iis_app_pool_name': 'API BackendAppPool', 'iis_port': None, 'iis_binding_info': None, 'parent_website': None, 'parent_webapp': None, 'app_pool_identity': None, 'app_pool_dotnet_version': 'v4.0', 'app_pool_pipeline_mode': None, 'app_pool_enable_32bit': False, 'app_pool_start_mode': None, 'app_pool_idle_timeout': 20, 'app_pool_recycling_schedule': None, 'enable_preload': False, 'enable_anonymous_auth': True, 'enable_windows_auth': False, 'custom_headers': None, 'connection_strings': None, 'app_settings': None, 'service_name': None, 'service_display_name': None, 'service_description': None, 'service_start_type': None, 'service_account': None, 'service_password': None, 'service_dependencies': None, 'features': None, 'registry_entries': None, 'environment_variables': None, 'shortcuts': None, 'pre_install_script': None, 'post_install_script': None, 'pre_uninstall_script': None, 'post_uninstall_script': None, 'folder_permissions': None, 'created_date': datetime.datetime(2025, 9, 16, 23, 56, 35, 227000), 'created_by': 'admin', 'updated_date': datetime.datetime(2025, 9, 16, 23, 56, 35, 227000), 'updated_by': 'admin', 'is_template': False, 'template_name': None}
+2025-09-18 00:17:53 | SYSTEM | INFO | SIMPLE: Targeted delete of component_id=10: 0 rows
+2025-09-18 00:17:53 | SYSTEM | INFO | SIMPLE: No targeted deletion worked, checking constraint direction
+2025-09-18 00:17:53 | SYSTEM | INFO | SIMPLE: Cleared ALL 4 msi_configurations records to resolve constraint
+2025-09-18 00:17:53 | SYSTEM | INFO | SIMPLE: msi_configurations project_id deletion: ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'project_id'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-18 00:17:53 | SYSTEM | INFO | SIMPLE: ProjectComponents deletion: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectComponents'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-18 00:17:53 | SYSTEM | INFO | SIMPLE: ProjectEnvironments deletion: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectEnvironments'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-18 00:17:53 | SYSTEM | INFO | SIMPLE: Deleted 1 rows for project 10
+2025-09-18 00:17:53 | SYSTEM | INFO | SIMPLE: Project 10 deleted successfully
+2025-09-18 00:17:53 | SYSTEM | INFO | PROJECT_DELETED: Project ID: 10, Deleted by: admin

@@ -581,8 +581,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Project actions
 function editProject(projectId) {
-    console.log('Edit project:', projectId);
-    // Implement edit functionality
+    window.location.href = `{{ url_for('edit_project_page', project_id=0) }}`.replace('0', projectId);
 }
 
 function viewProject(projectId) {
