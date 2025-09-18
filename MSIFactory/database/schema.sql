@@ -475,7 +475,7 @@ END;
 -- Insert default system settings
 MERGE system_settings AS target
 USING (VALUES 
-    ('app_name', 'Swadhina MSI Factory', 'string', 'Application name displayed in UI', 'general'),
+    ('app_name', 'CelerDeploy', 'string', 'Application name displayed in UI', 'general'),
     ('app_version', '1.0.0', 'string', 'Current application version', 'general'),
     ('max_concurrent_builds', '5', 'integer', 'Maximum number of concurrent MSI builds', 'build'),
     ('build_timeout_minutes', '30', 'integer', 'Build timeout in minutes', 'build'),

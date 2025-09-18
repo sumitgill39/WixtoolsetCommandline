@@ -53,7 +53,7 @@ except Exception as e:
 
 def simple_delete_project_from_database(project_id):
     """Simple project deletion without complex transaction handling"""
-    log_info(f"SIMPLE: Attempting simple database deletion for project {project_id}")
+    log_info(f"DATABASE: Attempting simple database deletion for project {project_id}")
 
     try:
         import pyodbc
@@ -73,22 +73,22 @@ def simple_delete_project_from_database(project_id):
                 # Let's try deleting by component_id = project_id (they might be the same)
 
                 # First, let's see what records exist in msi_configurations
-                log_info(f"SIMPLE: Checking what records exist in msi_configurations")
+                log_info(f"DATABASE: Checking what records exist in msi_configurations")
                 try:
                     cursor.execute("SELECT COUNT(*) FROM msi_configurations")
                     total_count = cursor.fetchone()[0]
-                    log_info(f"SIMPLE: Total msi_configurations records: {total_count}")
+                    log_info(f"DATABASE: Total msi_configurations records: {total_count}")
 
                     # Check what columns exist
                     cursor.execute("SELECT TOP 1 * FROM msi_configurations")
                     columns = [column[0] for column in cursor.description]
-                    log_info(f"SIMPLE: msi_configurations columns: {columns}")
+                    log_info(f"DATABASE: msi_configurations columns: {columns}")
 
-                    # Look for any records that might reference project 10
+                    # Look for any records that might reference project ID
                     if 'component_id' in columns:
                         cursor.execute("SELECT COUNT(*) FROM msi_configurations WHERE component_id = ?", (project_id,))
                         component_count = cursor.fetchone()[0]
-                        log_info(f"SIMPLE: Records with component_id={project_id}: {component_count}")
+                        log_info(f"DATABASE: Records with component_id={project_id}: {component_count}")
 
                     # Try to find records that might be blocking deletion
                     cursor.execute("SELECT COUNT(*) FROM msi_configurations")
@@ -98,63 +98,62 @@ def simple_delete_project_from_database(project_id):
                         cursor.execute("SELECT TOP 5 * FROM msi_configurations")
                         sample_data = cursor.fetchall()
                         for i, row in enumerate(sample_data):
-                            log_info(f"SIMPLE: Sample record {i+1}: {dict(zip(columns, row))}")
+                            log_info(f"DATABASE: Sample record {i+1}: {dict(zip(columns, row))}")
 
-                        # Check if there's a component_id = 10 or any reference to 10
+                        # Check if there's a component_id or any reference to project ID
                         if 'component_id' in columns:
-                            # Maybe the foreign key references the Projects table directly
-                            # Let's try to delete records where component_id could be referencing project 10
+                            # Try to delete records where component_id could be referencing project
                             cursor.execute("DELETE FROM msi_configurations WHERE component_id = ?", (project_id,))
                             targeted_delete = cursor.rowcount
-                            log_info(f"SIMPLE: Targeted delete of component_id={project_id}: {targeted_delete} rows")
+                            log_info(f"DATABASE: Targeted delete of component_id={project_id}: {targeted_delete} rows")
 
                             # If that didn't work, check for other possible relationships
                             if targeted_delete == 0:
                                 # The constraint might be that component_id references Projects.project_id
-                                # So we need to delete msi_configurations that reference project 10 directly
-                                log_info(f"SIMPLE: No targeted deletion worked, checking constraint direction")
+                                # So we need to clear all records from msi_configurations to allow project deletion
+                                log_info(f"DATABASE: No targeted deletion worked, checking constraint direction")
                                 # The FK constraint error suggests msi_configurations.component_id -> Projects.project_id
                                 # So we need to clear all records from msi_configurations to allow project deletion
                                 cursor.execute("DELETE FROM msi_configurations")
                                 cleared_all = cursor.rowcount
-                                log_info(f"SIMPLE: Cleared ALL {cleared_all} msi_configurations records to resolve constraint")
+                                log_info(f"DATABASE: Cleared ALL {cleared_all} msi_configurations records to resolve constraint")
 
                 except Exception as msi_error:
-                    log_info(f"SIMPLE: msi_configurations inspection failed: {str(msi_error)}")
+                    log_info(f"DATABASE: msi_configurations inspection failed: {str(msi_error)}")
 
                 # Also try other possible relationships
                 try:
                     cursor.execute("DELETE FROM msi_configurations WHERE project_id = ?", (project_id,))
                     rows_deleted = cursor.rowcount
-                    log_info(f"SIMPLE: Deleted {rows_deleted} rows from msi_configurations (project_id)")
+                    log_info(f"DATABASE: Deleted {rows_deleted} rows from msi_configurations (project_id)")
                 except Exception as msi_error2:
-                    log_info(f"SIMPLE: msi_configurations project_id deletion: {str(msi_error2)}")
+                    log_info(f"DATABASE: msi_configurations project_id deletion: {str(msi_error2)}")
 
                 # Try deleting other dependent tables
                 for table in ["ProjectComponents", "ProjectEnvironments"]:
                     try:
                         cursor.execute(f"DELETE FROM {table} WHERE project_id = ?", (project_id,))
                         rows_deleted = cursor.rowcount
-                        log_info(f"SIMPLE: Deleted {rows_deleted} rows from {table}")
+                        log_info(f"DATABASE: Deleted {rows_deleted} rows from {table}")
                     except Exception as dep_error:
-                        log_info(f"SIMPLE: {table} deletion: {str(dep_error)}")
+                        log_info(f"DATABASE: {table} deletion: {str(dep_error)}")
 
                 # Now delete the main project
                 cursor.execute("DELETE FROM Projects WHERE project_id = ?", (project_id,))
                 rows_affected = cursor.rowcount
-                log_info(f"SIMPLE: Deleted {rows_affected} rows for project {project_id}")
+                log_info(f"DATABASE: Deleted {rows_affected} rows for project {project_id}")
 
                 if rows_affected > 0:
                     conn.commit()
-                    log_info(f"SIMPLE: Project {project_id} deleted successfully")
+                    log_info(f"DATABASE: Project {project_id} deleted successfully")
                     return True, "Project deleted successfully"
                 else:
-                    log_info(f"SIMPLE: No rows found for project {project_id}")
+                    log_info(f"DATABASE: No rows found for project {project_id}")
                     return False, "Project not found"
 
     except Exception as e:
-        log_error(f"SIMPLE: Error deleting project {project_id}: {str(e)}")
-        return False, f"Simple deletion error: {str(e)}"
+        log_error(f"DATABASE: Error deleting project {project_id}: {str(e)}")
+        return False, f"Database deletion error: {str(e)}"
 
 def delete_project_from_database(project_id):
     """Delete project from SQL Server database"""
@@ -1147,7 +1146,7 @@ def api_generate_msi():
 
 @app.route('/component-configuration')
 def component_configuration():
-    """Component MSI Configuration Management page"""
+    """Component Configuration Management page"""
     if 'username' not in session or session.get('role') != 'admin':
         flash('Admin access required', 'error')
         return redirect(url_for('login'))

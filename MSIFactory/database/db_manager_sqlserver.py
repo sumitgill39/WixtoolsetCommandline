@@ -242,7 +242,7 @@ class SQLServerDatabaseManager:
             default_settings = [
                 {
                     'setting_key': 'app_name',
-                    'setting_value': 'Swadhina MSI Factory',
+                    'setting_value': 'CelerDeploy',
                     'setting_type': 'string',
                     'description': 'Application name displayed in UI',
                     'category': 'general'
