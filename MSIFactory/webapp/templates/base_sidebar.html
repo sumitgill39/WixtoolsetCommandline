@@ -26,7 +26,7 @@
 
         .sidebar {
             background: linear-gradient(135deg, var(--primary), var(--dark));
-            min-height: 100vh;
+            height: 100vh;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             position: fixed;
             top: 0;
@@ -34,12 +34,16 @@
             width: 280px;
             z-index: 1000;
             transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .sidebar-header {
             background: rgba(0,0,0,0.1);
             padding: 1.5rem 1rem;
             border-bottom: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
         }
 
         .sidebar-brand {
@@ -51,6 +55,28 @@
 
         .sidebar-nav {
             padding: 1rem 0;
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* Custom scrollbar for sidebar */
+        .sidebar-nav::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.5);
         }
 
         .nav-section {
@@ -144,13 +170,10 @@
         }
 
         .sidebar-footer {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
             padding: 1rem;
             border-top: 1px solid rgba(255,255,255,0.1);
             background: rgba(0,0,0,0.1);
+            flex-shrink: 0;
         }
 
         @media (max-width: 768px) {
@@ -219,7 +242,6 @@
                 </div>
             </div>
 
-            <!-- Debug: Role = {{ session.role }} -->
             {% if session.role == 'admin' %}
             <div class="nav-section">
                 <div class="nav-section-title">Administration</div>
@@ -246,6 +268,42 @@
                 <div class="nav-item">
                     <a href="{{ url_for('system_settings') }}" class="nav-link">
                         <i class="fas fa-sliders-h"></i>System Settings
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if session.role == 'admin' %}
+            <div class="nav-section">
+                <div class="nav-section-title">CMDB</div>
+                <div class="nav-item">
+                    <a href="{{ url_for('cmdb_dashboard') }}" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>CMDB Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('cmdb_servers') }}" class="nav-link">
+                        <i class="fas fa-server"></i>Server Inventory
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('cmdb_assignments') }}" class="nav-link">
+                        <i class="fas fa-project-diagram"></i>Server Assignments
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('cmdb_utilization') }}" class="nav-link">
+                        <i class="fas fa-chart-bar"></i>Utilization Report
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('cmdb_groups') }}" class="nav-link">
+                        <i class="fas fa-layer-group"></i>Server Groups
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{{ url_for('integrations') }}" class="nav-link">
+                        <i class="fas fa-plug"></i>Integrations
                     </a>
                 </div>
             </div>

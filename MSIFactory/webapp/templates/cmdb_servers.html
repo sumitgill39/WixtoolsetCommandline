@@ -1,0 +1,323 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}Server Inventory - MSI Factory CMDB{% endblock %}
+{% block page_title %}Server Inventory{% endblock %}
+
+{% block content %}
+<!-- Filters and Search -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Server Filters</h5>
+                    {% if session.role == 'admin' %}
+                    <a href="{{ url_for('cmdb_add_server') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Add Server
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="infra_filter" class="form-label">Infrastructure</label>
+                        <select class="form-select" id="infra_filter" name="infra_type">
+                            <option value="">All Types</option>
+                            <option value="AWS" {{ 'selected' if request.args.get('infra_type') == 'AWS' }}>AWS</option>
+                            <option value="AZURE" {{ 'selected' if request.args.get('infra_type') == 'AZURE' }}>Azure</option>
+                            <option value="WINTEL" {{ 'selected' if request.args.get('infra_type') == 'WINTEL' }}>WINTEL</option>
+                            <option value="VMWARE" {{ 'selected' if request.args.get('infra_type') == 'VMWARE' }}>VMware</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="region_filter" class="form-label">Region</label>
+                        <select class="form-select" id="region_filter" name="region">
+                            <option value="">All Regions</option>
+                            {% for region in available_regions %}
+                            <option value="{{ region }}" {{ 'selected' if request.args.get('region') == region }}>{{ region }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="status_filter" class="form-label">Status</label>
+                        <select class="form-select" id="status_filter" name="status">
+                            <option value="">All Status</option>
+                            <option value="active" {{ 'selected' if request.args.get('status') == 'active' }}>Active</option>
+                            <option value="inactive" {{ 'selected' if request.args.get('status') == 'inactive' }}>Inactive</option>
+                            <option value="maintenance" {{ 'selected' if request.args.get('status') == 'maintenance' }}>Maintenance</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="search" class="form-label">Search</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="search" name="search"
+                                   placeholder="Server name or IP..." value="{{ request.args.get('search', '') }}">
+                            <button class="btn btn-outline-secondary" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Server Inventory Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-server me-2"></i>Servers ({{ servers|length }})</h5>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleView('table')">
+                            <i class="fas fa-table"></i> Table
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="toggleView('cards')">
+                            <i class="fas fa-th"></i> Cards
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Table View -->
+                <div id="tableView" class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Server</th>
+                                <th>Infrastructure</th>
+                                <th>IP Address</th>
+                                <th>Region</th>
+                                <th>Environment</th>
+                                <th>Specifications</th>
+                                <th>Utilization</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for server in servers %}
+                            <tr>
+                                <td>
+                                    <div>
+                                        <strong>{{ server.server_name }}</strong><br>
+                                        <small class="text-muted">{{ server.fqdn }}</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'warning' if server.infra_type == 'AWS' else 'primary' if server.infra_type == 'AZURE' else 'success' }}">
+                                        {{ server.infra_type }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="font-monospace">{{ server.ip_address }}</span>
+                                    {% if server.ip_address_internal %}
+                                    <br><small class="text-muted">Int: {{ server.ip_address_internal }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>{{ server.region }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'danger' if server.environment_type == 'production' else 'warning' if server.environment_type == 'staging' else 'info' }}">
+                                        {{ server.environment_type.title() if server.environment_type else 'Unknown' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if server.cpu_cores or server.memory_gb %}
+                                    <small>
+                                        {{ server.cpu_cores }}C / {{ server.memory_gb }}GB
+                                        {% if server.storage_gb %} / {{ server.storage_gb }}GB{% endif %}
+                                    </small>
+                                    {% else %}
+                                    <small class="text-muted">Not specified</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if server.current_app_count is not none and server.max_concurrent_apps %}
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                            <div class="progress-bar bg-{{ 'danger' if (server.current_app_count / server.max_concurrent_apps * 100) > 80 else 'warning' if (server.current_app_count / server.max_concurrent_apps * 100) > 60 else 'success' }}"
+                                                 style="width: {{ (server.current_app_count / server.max_concurrent_apps * 100) if server.max_concurrent_apps > 0 else 0 }}%"></div>
+                                        </div>
+                                        <small>{{ server.current_app_count }}/{{ server.max_concurrent_apps }}</small>
+                                    </div>
+                                    {% else %}
+                                    <small class="text-muted">-</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if server.status == 'active' else 'warning' if server.status == 'maintenance' else 'danger' }}">
+                                        {{ server.status.title() }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="{{ url_for('cmdb_server_detail', server_id=server.server_id) }}"
+                                           class="btn btn-outline-primary" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        {% if session.role == 'admin' %}
+                                        <a href="{{ url_for('cmdb_server_detail', server_id=server.server_id) }}"
+                                           class="btn btn-outline-secondary" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-outline-info"
+                                                onclick="showAssignments({{ server.server_id }}, '{{ server.server_name }}')" title="Assignments">
+                                            <i class="fas fa-link"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="9" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <i class="fas fa-server fa-3x mb-3"></i>
+                                        <p>No servers found matching your criteria.</p>
+                                        {% if session.role == 'admin' %}
+                                        <a href="{{ url_for('cmdb_add_server') }}" class="btn btn-primary">
+                                            <i class="fas fa-plus me-1"></i>Add First Server
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Cards View (Hidden by default) -->
+                <div id="cardsView" class="row" style="display: none;">
+                    {% for server in servers %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span class="badge bg-{{ 'warning' if server.infra_type == 'AWS' else 'primary' if server.infra_type == 'AZURE' else 'success' }}">
+                                    {{ server.infra_type }}
+                                </span>
+                                <span class="badge bg-{{ 'success' if server.status == 'active' else 'warning' if server.status == 'maintenance' else 'danger' }}">
+                                    {{ server.status.title() }}
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <h6 class="card-title">{{ server.server_name }}</h6>
+                                <p class="card-text small text-muted">{{ server.fqdn }}</p>
+
+                                <div class="mb-2">
+                                    <strong>IP:</strong> <span class="font-monospace">{{ server.ip_address }}</span>
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Region:</strong> {{ server.region }}
+                                </div>
+                                {% if server.cpu_cores or server.memory_gb %}
+                                <div class="mb-2">
+                                    <strong>Specs:</strong> {{ server.cpu_cores }}C / {{ server.memory_gb }}GB
+                                </div>
+                                {% endif %}
+
+                                {% if server.current_app_count is not none and server.max_concurrent_apps %}
+                                <div class="mb-3">
+                                    <strong>Utilization:</strong>
+                                    <div class="progress mt-1" style="height: 8px;">
+                                        <div class="progress-bar bg-{{ 'danger' if (server.current_app_count / server.max_concurrent_apps * 100) > 80 else 'warning' if (server.current_app_count / server.max_concurrent_apps * 100) > 60 else 'success' }}"
+                                             style="width: {{ (server.current_app_count / server.max_concurrent_apps * 100) if server.max_concurrent_apps > 0 else 0 }}%"></div>
+                                    </div>
+                                    <small>{{ server.current_app_count }}/{{ server.max_concurrent_apps }} apps</small>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer">
+                                <div class="btn-group w-100" role="group">
+                                    <a href="{{ url_for('cmdb_server_detail', server_id=server.server_id) }}"
+                                       class="btn btn-outline-primary btn-sm">Details</a>
+                                    {% if session.role == 'admin' %}
+                                    <a href="{{ url_for('cmdb_server_detail', server_id=server.server_id) }}"
+                                       class="btn btn-outline-secondary btn-sm">Edit</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Server Assignments Modal -->
+<div class="modal fade" id="assignmentsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Server Assignments</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="assignmentsContent">
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleView(view) {
+    const tableView = document.getElementById('tableView');
+    const cardsView = document.getElementById('cardsView');
+
+    if (view === 'table') {
+        tableView.style.display = 'block';
+        cardsView.style.display = 'none';
+    } else {
+        tableView.style.display = 'none';
+        cardsView.style.display = 'block';
+    }
+}
+
+function showAssignments(serverId, serverName) {
+    const modal = new bootstrap.Modal(document.getElementById('assignmentsModal'));
+    document.querySelector('#assignmentsModal .modal-title').textContent = `${serverName} - Assignments`;
+
+    // Load assignments via AJAX
+    fetch(`/api/cmdb/server/${serverId}/assignments`)
+        .then(response => response.json())
+        .then(data => {
+            let html = '<div class="table-responsive"><table class="table table-sm">';
+            html += '<thead><tr><th>Project</th><th>Environment</th><th>Type</th><th>Purpose</th><th>Status</th></tr></thead><tbody>';
+
+            if (data.assignments && data.assignments.length > 0) {
+                data.assignments.forEach(assignment => {
+                    html += `<tr>
+                        <td><strong>${assignment.project_name}</strong><br><small class="text-muted">${assignment.project_key}</small></td>
+                        <td><span class="badge bg-secondary">${assignment.environment_name}</span></td>
+                        <td>${assignment.assignment_type}</td>
+                        <td>${assignment.purpose || '-'}</td>
+                        <td><span class="badge bg-${assignment.status === 'active' ? 'success' : 'warning'}">${assignment.status}</span></td>
+                    </tr>`;
+                });
+            } else {
+                html += '<tr><td colspan="5" class="text-center text-muted">No assignments found</td></tr>';
+            }
+
+            html += '</tbody></table></div>';
+            document.getElementById('assignmentsContent').innerHTML = html;
+        })
+        .catch(error => {
+            document.getElementById('assignmentsContent').innerHTML =
+                '<div class="alert alert-danger">Error loading assignments</div>';
+        });
+
+    modal.show();
+}
+</script>
+{% endblock %}

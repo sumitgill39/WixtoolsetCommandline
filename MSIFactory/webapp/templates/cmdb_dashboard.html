@@ -1,0 +1,284 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}CMDB Dashboard - MSI Factory{% endblock %}
+{% block page_title %}CMDB Dashboard{% endblock %}
+
+{% block content %}
+<!-- CMDB Overview Stats -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-0">Total Servers</h6>
+                        <h3 class="mb-0">{{ cmdb_stats.total_servers }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-server fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-0">Active Servers</h6>
+                        <h3 class="mb-0">{{ cmdb_stats.active_servers }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-0">Assigned Servers</h6>
+                        <h3 class="mb-0">{{ cmdb_stats.assigned_servers }}</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-link fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-title mb-0">Avg Utilization</h6>
+                        <h3 class="mb-0">{{ "%.1f"|format(cmdb_stats.avg_utilization) }}%</h3>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-chart-line fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Infrastructure Distribution -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-cloud me-2"></i>Infrastructure Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="infraChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-globe me-2"></i>Regional Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="regionChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                    {% if session.role == 'admin' %}
+                    <div>
+                        <a href="{{ url_for('cmdb_add_server') }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus me-1"></i>Add Server
+                        </a>
+                        <a href="{{ url_for('cmdb_servers') }}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-list me-1"></i>View All Servers
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('cmdb_servers') }}" class="text-decoration-none">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-server fa-2x text-primary mb-2"></i>
+                                    <h6 class="card-title">Server Inventory</h6>
+                                    <p class="card-text small">Manage server inventory and specifications</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('cmdb_assignments') }}" class="text-decoration-none">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-project-diagram fa-2x text-success mb-2"></i>
+                                    <h6 class="card-title">Project Assignments</h6>
+                                    <p class="card-text small">View and manage project-server assignments</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('cmdb_utilization') }}" class="text-decoration-none">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-chart-bar fa-2x text-warning mb-2"></i>
+                                    <h6 class="card-title">Utilization Report</h6>
+                                    <p class="card-text small">Monitor server utilization and capacity</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('cmdb_groups') }}" class="text-decoration-none">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-layer-group fa-2x text-info mb-2"></i>
+                                    <h6 class="card-title">Server Groups</h6>
+                                    <p class="card-text small">Manage server clusters and groups</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent CMDB Activity -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent CMDB Activity</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_cmdb_activity %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Action</th>
+                                <th>Server</th>
+                                <th>Changed By</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in recent_cmdb_activity %}
+                            <tr>
+                                <td>{{ activity.changed_date.strftime('%m/%d %H:%M') if activity.changed_date else '' }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if activity.change_type == 'created' else 'primary' if activity.change_type == 'updated' else 'danger' }}">
+                                        {{ activity.change_type.title() }}
+                                    </span>
+                                </td>
+                                <td>{{ activity.server_name }}</td>
+                                <td>{{ activity.changed_by }}</td>
+                                <td>{{ activity.change_reason or 'No details' }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <div class="text-muted mb-3" style="font-size: 2rem;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h6 class="mb-2">No Recent Activity</h6>
+                    <p class="text-muted small">CMDB activities will appear here as servers are added or modified.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Infrastructure Distribution Chart
+    const infraCtx = document.getElementById('infraChart').getContext('2d');
+    const infraData = {{ infra_distribution | tojson }};
+
+    new Chart(infraCtx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(infraData),
+            datasets: [{
+                data: Object.values(infraData),
+                backgroundColor: [
+                    '#FF6B35',  // AWS - Orange
+                    '#0078D4',  // Azure - Blue
+                    '#28A745',  // WINTEL - Green
+                    '#6F42C1',  // VMware - Purple
+                    '#FD7E14'   // HyperV - Orange variant
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Regional Distribution Chart
+    const regionCtx = document.getElementById('regionChart').getContext('2d');
+    const regionData = {{ region_distribution | tojson }};
+
+    new Chart(regionCtx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(regionData),
+            datasets: [{
+                label: 'Servers',
+                data: Object.values(regionData),
+                backgroundColor: '#0D6EFD'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

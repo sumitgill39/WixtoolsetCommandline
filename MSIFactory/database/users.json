@@ -10,8 +10,8 @@
       "status": "approved",
       "role": "user",
       "approved_apps": [
-        "WEBAPP01",
-        "PORTAL"
+        "APPALLEGRO",
+        "SUNLIFE"
       ],
       "created_date": "2024-09-01",
       "approved_by": "admin@company.com"

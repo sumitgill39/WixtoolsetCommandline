@@ -1,0 +1,288 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}Server Assignments - MSI Factory CMDB{% endblock %}
+{% block page_title %}Server Assignments{% endblock %}
+
+{% block content %}
+<!-- Assignment Filters -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Assignment Filters</h5>
+                    {% if session.role == 'admin' %}
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#assignmentModal">
+                        <i class="fas fa-plus me-1"></i>Create Assignment
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="project_filter" class="form-label">Project</label>
+                        <select class="form-select" id="project_filter" name="project_id">
+                            <option value="">All Projects</option>
+                            {% for project in available_projects %}
+                            <option value="{{ project.project_id }}" {{ 'selected' if request.args.get('project_id') == project.project_id|string }}>{{ project.project_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="server_filter" class="form-label">Server</label>
+                        <select class="form-select" id="server_filter" name="server_id">
+                            <option value="">All Servers</option>
+                            {% for server in available_servers %}
+                            <option value="{{ server.server_id }}" {{ 'selected' if request.args.get('server_id') == server.server_id|string }}>{{ server.server_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="assignment_type_filter" class="form-label">Assignment Type</label>
+                        <select class="form-select" id="assignment_type_filter" name="assignment_type">
+                            <option value="">All Types</option>
+                            <option value="primary" {{ 'selected' if request.args.get('assignment_type') == 'primary' }}>Primary</option>
+                            <option value="backup" {{ 'selected' if request.args.get('assignment_type') == 'backup' }}>Backup</option>
+                            <option value="load_balancer" {{ 'selected' if request.args.get('assignment_type') == 'load_balancer' }}>Load Balancer</option>
+                            <option value="development" {{ 'selected' if request.args.get('assignment_type') == 'development' }}>Development</option>
+                            <option value="testing" {{ 'selected' if request.args.get('assignment_type') == 'testing' }}>Testing</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="status_filter" class="form-label">Status</label>
+                        <select class="form-select" id="status_filter" name="status">
+                            <option value="">All Status</option>
+                            <option value="active" {{ 'selected' if request.args.get('status') == 'active' }}>Active</option>
+                            <option value="inactive" {{ 'selected' if request.args.get('status') == 'inactive' }}>Inactive</option>
+                            <option value="pending" {{ 'selected' if request.args.get('status') == 'pending' }}>Pending</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-outline-secondary" type="submit">
+                            <i class="fas fa-search"></i> Apply Filters
+                        </button>
+                        <a href="{{ url_for('cmdb_assignments') }}" class="btn btn-outline-secondary ms-2">
+                            <i class="fas fa-times"></i> Clear
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assignments Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-project-diagram me-2"></i>Server Assignments ({{ assignments|length }})</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Project</th>
+                                <th>Environment</th>
+                                <th>Server</th>
+                                <th>Assignment Type</th>
+                                <th>Purpose</th>
+                                <th>Assigned Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for assignment in assignments %}
+                            <tr>
+                                <td>
+                                    <div>
+                                        <strong>{{ assignment.project_name }}</strong><br>
+                                        <small class="text-muted">{{ assignment.project_key }}</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'danger' if assignment.environment_name == 'production' else 'warning' if assignment.environment_name == 'staging' else 'info' }}">
+                                        {{ assignment.environment_name.title() }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>{{ assignment.server_name }}</strong><br>
+                                        <small class="text-muted font-monospace">{{ assignment.ip_address }}</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{{ 'primary' if assignment.assignment_type == 'primary' else 'secondary' if assignment.assignment_type == 'backup' else 'warning' if assignment.assignment_type == 'load_balancer' else 'info' }}">
+                                        {{ assignment.assignment_type.title() }}
+                                    </span>
+                                </td>
+                                <td>{{ assignment.purpose or '-' }}</td>
+                                <td>{{ assignment.assigned_date.strftime('%m/%d/%Y') if assignment.assigned_date else '-' }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if assignment.status == 'active' else 'warning' if assignment.status == 'pending' else 'danger' }}">
+                                        {{ assignment.status.title() }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        {% if session.role == 'admin' %}
+                                        <button type="button" class="btn btn-outline-secondary"
+                                                onclick="editAssignment({{ assignment.assignment_id }}, '{{ assignment.project_name }}', '{{ assignment.server_name }}', '{{ assignment.assignment_type }}', '{{ assignment.purpose }}', '{{ assignment.status }}')"
+                                                title="Edit Assignment">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger"
+                                                onclick="deleteAssignment({{ assignment.assignment_id }}, '{{ assignment.project_name }}', '{{ assignment.server_name }}')"
+                                                title="Remove Assignment">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        {% endif %}
+                                        <button type="button" class="btn btn-outline-info"
+                                                onclick="viewAssignmentDetails({{ assignment.assignment_id }})"
+                                                title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center py-4">
+                                    <div class="text-muted">
+                                        <i class="fas fa-project-diagram fa-3x mb-3"></i>
+                                        <p>No server assignments found matching your criteria.</p>
+                                        {% if session.role == 'admin' %}
+                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#assignmentModal">
+                                            <i class="fas fa-plus me-1"></i>Create First Assignment
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Assignment Modal -->
+<div class="modal fade" id="assignmentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Server Assignment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="assignmentForm" method="POST" action="{{ url_for('cmdb_create_assignment') }}">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="project_id" class="form-label">Project *</label>
+                            <select class="form-select" id="project_id" name="project_id" required>
+                                <option value="">Select Project</option>
+                                {% for project in available_projects %}
+                                <option value="{{ project.project_id }}">{{ project.project_name }} ({{ project.project_key }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="environment_id" class="form-label">Environment *</label>
+                            <select class="form-select" id="environment_id" name="environment_id" required>
+                                <option value="">Select Environment</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="server_id" class="form-label">Server *</label>
+                            <select class="form-select" id="server_id" name="server_id" required>
+                                <option value="">Select Server</option>
+                                {% for server in available_servers %}
+                                <option value="{{ server.server_id }}">{{ server.server_name }} ({{ server.ip_address }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="assignment_type" class="form-label">Assignment Type *</label>
+                            <select class="form-select" id="assignment_type" name="assignment_type" required>
+                                <option value="">Select Type</option>
+                                <option value="primary">Primary</option>
+                                <option value="backup">Backup</option>
+                                <option value="load_balancer">Load Balancer</option>
+                                <option value="development">Development</option>
+                                <option value="testing">Testing</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="purpose" class="form-label">Purpose/Description</label>
+                        <textarea class="form-control" id="purpose" name="purpose" rows="3" placeholder="Describe the purpose of this assignment..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="active">Active</option>
+                            <option value="pending">Pending</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Assignment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Load environments when project is selected
+document.getElementById('project_id').addEventListener('change', function() {
+    const projectId = this.value;
+    const environmentSelect = document.getElementById('environment_id');
+
+    environmentSelect.innerHTML = '<option value="">Loading...</option>';
+
+    if (projectId) {
+        fetch(`/api/project/${projectId}/environments`)
+            .then(response => response.json())
+            .then(data => {
+                let html = '<option value="">Select Environment</option>';
+                data.environments.forEach(env => {
+                    html += `<option value="${env.environment_id}">${env.environment_name}</option>`;
+                });
+                environmentSelect.innerHTML = html;
+            })
+            .catch(error => {
+                environmentSelect.innerHTML = '<option value="">Error loading environments</option>';
+            });
+    } else {
+        environmentSelect.innerHTML = '<option value="">Select Environment</option>';
+    }
+});
+
+function editAssignment(assignmentId, projectName, serverName, assignmentType, purpose, status) {
+    // Implementation for editing assignments
+    alert(`Edit assignment for ${projectName} on ${serverName}`);
+}
+
+function deleteAssignment(assignmentId, projectName, serverName) {
+    if (confirm(`Are you sure you want to remove the assignment of ${serverName} from ${projectName}?`)) {
+        // Implementation for deleting assignments
+        window.location.href = `/api/cmdb/assignment/${assignmentId}/delete`;
+    }
+}
+
+function viewAssignmentDetails(assignmentId) {
+    // Implementation for viewing assignment details
+    window.location.href = `/cmdb/assignment/${assignmentId}`;
+}
+</script>
+{% endblock %}

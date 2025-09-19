@@ -1,0 +1,697 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}Integrations - MSI Factory{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-plug me-2"></i>External System Integrations</h1>
+                <div>
+                    <button type="button" class="btn btn-success" onclick="testAllConnections()">
+                        <i class="fas fa-check-circle me-1"></i>Test All Connections
+                    </button>
+                </div>
+            </div>
+
+            <!-- ServiceNow Integration -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-cloud me-2"></i>ServiceNow CMDB Integration
+                            <span id="snowStatus" class="badge bg-secondary ms-2">Not Configured</span>
+                        </h5>
+                        <div>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="testServiceNowConnection()">
+                                <i class="fas fa-check me-1"></i>Test Connection
+                            </button>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="syncFromServiceNow()">
+                                <i class="fas fa-sync me-1"></i>Sync Servers
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form id="serviceNowForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="snow_instance_url" class="form-label">Instance URL *</label>
+                                    <input type="url" class="form-control" id="snow_instance_url" name="snow_instance_url"
+                                           placeholder="https://yourcompany.service-now.com" required>
+                                    <div class="form-text">Your ServiceNow instance URL</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="snow_username" class="form-label">Username *</label>
+                                    <input type="text" class="form-control" id="snow_username" name="snow_username" required>
+                                    <div class="form-text">ServiceNow API username</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="snow_password" class="form-label">Password *</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="snow_password" name="snow_password" required>
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('snow_password')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text">ServiceNow API password (stored securely in Vault)</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="snow_auto_sync" name="snow_auto_sync">
+                                        <label class="form-check-label" for="snow_auto_sync">
+                                            Enable automatic synchronization (daily)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="snow_table" class="form-label">CMDB Table</label>
+                                    <select class="form-select" id="snow_table" name="snow_table">
+                                        <option value="cmdb_ci_server" selected>Servers (cmdb_ci_server)</option>
+                                        <option value="cmdb_ci_computer">Computers (cmdb_ci_computer)</option>
+                                        <option value="cmdb_ci_linux_server">Linux Servers (cmdb_ci_linux_server)</option>
+                                        <option value="cmdb_ci_win_server">Windows Servers (cmdb_ci_win_server)</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="snow_filter" class="form-label">Additional Filters</label>
+                                    <textarea class="form-control" id="snow_filter" name="snow_filter" rows="2"
+                                              placeholder="operational_status=Operational^environment=Production"></textarea>
+                                    <div class="form-text">ServiceNow query filters (optional)</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="snow_sync_frequency" class="form-label">Sync Frequency</label>
+                                    <select class="form-select" id="snow_sync_frequency" name="snow_sync_frequency">
+                                        <option value="manual">Manual Only</option>
+                                        <option value="hourly">Every Hour</option>
+                                        <option value="daily" selected>Daily</option>
+                                        <option value="weekly">Weekly</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Last Sync Status</label>
+                                    <div id="snowLastSync" class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>No sync performed yet
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <hr>
+                                <button type="button" class="btn btn-primary" onclick="saveServiceNowConfig()">
+                                    <i class="fas fa-save me-1"></i>Save Configuration
+                                </button>
+                                <button type="button" class="btn btn-outline-danger ms-2" onclick="clearServiceNowConfig()">
+                                    <i class="fas fa-trash me-1"></i>Clear Configuration
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- HashiCorp Vault Integration -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-vault me-2"></i>HashiCorp Vault Integration
+                            <span id="vaultStatus" class="badge bg-secondary ms-2">Not Configured</span>
+                        </h5>
+                        <div>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="testVaultConnection()">
+                                <i class="fas fa-check me-1"></i>Test Connection
+                            </button>
+                            <button type="button" class="btn btn-info btn-sm" onclick="viewVaultSecrets()">
+                                <i class="fas fa-key me-1"></i>View Secrets
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form id="vaultForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="vault_url" class="form-label">Vault URL *</label>
+                                    <input type="url" class="form-control" id="vault_url" name="vault_url"
+                                           placeholder="https://vault.company.com:8200" required>
+                                    <div class="form-text">HashiCorp Vault server URL</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="vault_auth_method" class="form-label">Authentication Method</label>
+                                    <select class="form-select" id="vault_auth_method" name="vault_auth_method" onchange="toggleVaultAuthFields()">
+                                        <option value="token" selected>Token</option>
+                                        <option value="userpass">Username/Password</option>
+                                        <option value="ldap">LDAP</option>
+                                        <option value="approle">AppRole</option>
+                                    </select>
+                                </div>
+
+                                <!-- Token Auth -->
+                                <div id="vaultTokenAuth" class="mb-3">
+                                    <label for="vault_token" class="form-label">Vault Token *</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="vault_token" name="vault_token">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('vault_token')">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <div class="form-text">Vault authentication token</div>
+                                </div>
+
+                                <!-- Username/Password Auth -->
+                                <div id="vaultUserPassAuth" style="display: none;">
+                                    <div class="mb-3">
+                                        <label for="vault_username" class="form-label">Username</label>
+                                        <input type="text" class="form-control" id="vault_username" name="vault_username">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="vault_user_password" class="form-label">Password</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" id="vault_user_password" name="vault_user_password">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('vault_user_password')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- AppRole Auth -->
+                                <div id="vaultAppRoleAuth" style="display: none;">
+                                    <div class="mb-3">
+                                        <label for="vault_role_id" class="form-label">Role ID</label>
+                                        <input type="text" class="form-control" id="vault_role_id" name="vault_role_id">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="vault_secret_id" class="form-label">Secret ID</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" id="vault_secret_id" name="vault_secret_id">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('vault_secret_id')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="vault_mount_path" class="form-label">Secrets Engine Mount Path</label>
+                                    <input type="text" class="form-control" id="vault_mount_path" name="vault_mount_path"
+                                           value="secret" placeholder="secret">
+                                    <div class="form-text">KV secrets engine mount path</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="vault_app_path" class="form-label">Application Secret Path</label>
+                                    <input type="text" class="form-control" id="vault_app_path" name="vault_app_path"
+                                           value="msifactory" placeholder="msifactory">
+                                    <div class="form-text">Path where MSI Factory secrets are stored</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="vault_ssl_verify" name="vault_ssl_verify" checked>
+                                        <label class="form-check-label" for="vault_ssl_verify">
+                                            Verify SSL certificates
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="vault_auto_renew" name="vault_auto_renew" checked>
+                                        <label class="form-check-label" for="vault_auto_renew">
+                                            Enable automatic token renewal
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Connection Status</label>
+                                    <div id="vaultLastCheck" class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>No connection test performed
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <hr>
+                                <button type="button" class="btn btn-primary" onclick="saveVaultConfig()">
+                                    <i class="fas fa-save me-1"></i>Save Configuration
+                                </button>
+                                <button type="button" class="btn btn-outline-danger ms-2" onclick="clearVaultConfig()">
+                                    <i class="fas fa-trash me-1"></i>Clear Configuration
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Integration Status Dashboard -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Integration Status Dashboard</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3">Recent Activity</h6>
+                            <div id="recentActivity">
+                                <div class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>No recent integration activity
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3">Quick Actions</h6>
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-outline-primary" onclick="exportIntegrationConfig()">
+                                    <i class="fas fa-download me-1"></i>Export Configuration
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="importIntegrationConfig()">
+                                    <i class="fas fa-upload me-1"></i>Import Configuration
+                                </button>
+                                <button type="button" class="btn btn-outline-info" onclick="viewIntegrationLogs()">
+                                    <i class="fas fa-file-alt me-1"></i>View Integration Logs
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<!-- Vault Secrets Modal -->
+<div class="modal fade" id="vaultSecretsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-key me-2"></i>Vault Secrets</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="vaultSecretsContent">
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sync Results Modal -->
+<div class="modal fade" id="syncResultsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-sync me-2"></i>Synchronization Results</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="syncResultsContent"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Load configuration on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadIntegrationConfigs();
+});
+
+// ServiceNow Functions
+function saveServiceNowConfig() {
+    const formData = new FormData(document.getElementById('serviceNowForm'));
+
+    fetch('/api/integrations/servicenow/config', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateStatus('snowStatus', 'Configured', 'success');
+            showAlert('ServiceNow configuration saved successfully', 'success');
+        } else {
+            showAlert('Error saving ServiceNow configuration: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        showAlert('Error saving ServiceNow configuration: ' + error, 'error');
+    });
+}
+
+function testServiceNowConnection() {
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Testing...';
+    button.disabled = true;
+
+    fetch('/api/integrations/servicenow/test', {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateStatus('snowStatus', 'Connected', 'success');
+            showAlert('ServiceNow connection successful', 'success');
+        } else {
+            updateStatus('snowStatus', 'Connection Failed', 'danger');
+            showAlert('ServiceNow connection failed: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        updateStatus('snowStatus', 'Connection Failed', 'danger');
+        showAlert('ServiceNow connection failed: ' + error, 'error');
+    })
+    .finally(() => {
+        button.innerHTML = originalText;
+        button.disabled = false;
+    });
+}
+
+function syncFromServiceNow() {
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Syncing...';
+    button.disabled = true;
+
+    fetch('/api/integrations/servicenow/sync', {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        showSyncResults(data);
+        if (data.success) {
+            updateLastSync('snowLastSync', data);
+        }
+    })
+    .catch(error => {
+        showAlert('ServiceNow sync failed: ' + error, 'error');
+    })
+    .finally(() => {
+        button.innerHTML = originalText;
+        button.disabled = false;
+    });
+}
+
+// Vault Functions
+function saveVaultConfig() {
+    const formData = new FormData(document.getElementById('vaultForm'));
+
+    fetch('/api/integrations/vault/config', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateStatus('vaultStatus', 'Configured', 'success');
+            showAlert('Vault configuration saved successfully', 'success');
+        } else {
+            showAlert('Error saving Vault configuration: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        showAlert('Error saving Vault configuration: ' + error, 'error');
+    });
+}
+
+function testVaultConnection() {
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Testing...';
+    button.disabled = true;
+
+    fetch('/api/integrations/vault/test', {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            updateStatus('vaultStatus', 'Connected', 'success');
+            updateLastCheck('vaultLastCheck', data);
+            showAlert('Vault connection successful', 'success');
+        } else {
+            updateStatus('vaultStatus', 'Connection Failed', 'danger');
+            showAlert('Vault connection failed: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        updateStatus('vaultStatus', 'Connection Failed', 'danger');
+        showAlert('Vault connection failed: ' + error, 'error');
+    })
+    .finally(() => {
+        button.innerHTML = originalText;
+        button.disabled = false;
+    });
+}
+
+function viewVaultSecrets() {
+    fetch('/api/integrations/vault/secrets')
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('vaultSecretsContent').innerHTML = formatVaultSecrets(data);
+        new bootstrap.Modal(document.getElementById('vaultSecretsModal')).show();
+    })
+    .catch(error => {
+        showAlert('Error retrieving Vault secrets: ' + error, 'error');
+    });
+}
+
+// Utility Functions
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const icon = event.target.querySelector('i') || event.target;
+
+    if (field.type === 'password') {
+        field.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+    } else {
+        field.type = 'password';
+        icon.className = 'fas fa-eye';
+    }
+}
+
+function toggleVaultAuthFields() {
+    const authMethod = document.getElementById('vault_auth_method').value;
+
+    document.getElementById('vaultTokenAuth').style.display = authMethod === 'token' ? 'block' : 'none';
+    document.getElementById('vaultUserPassAuth').style.display = authMethod === 'userpass' || authMethod === 'ldap' ? 'block' : 'none';
+    document.getElementById('vaultAppRoleAuth').style.display = authMethod === 'approle' ? 'block' : 'none';
+}
+
+function updateStatus(elementId, text, type) {
+    const element = document.getElementById(elementId);
+    element.textContent = text;
+    element.className = `badge bg-${type} ms-2`;
+}
+
+function showAlert(message, type) {
+    // Create Bootstrap alert
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.top = '20px';
+    alertDiv.style.right = '20px';
+    alertDiv.style.zIndex = '9999';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    document.body.appendChild(alertDiv);
+
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.parentNode.removeChild(alertDiv);
+        }
+    }, 5000);
+}
+
+function showSyncResults(data) {
+    const content = `
+        <div class="row">
+            <div class="col-md-3">
+                <div class="text-center">
+                    <h3 class="text-primary">${data.servers_synced || 0}</h3>
+                    <small class="text-muted">Total Servers</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <h3 class="text-success">${data.servers_added || 0}</h3>
+                    <small class="text-muted">Added</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <h3 class="text-info">${data.servers_updated || 0}</h3>
+                    <small class="text-muted">Updated</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <h3 class="text-warning">${data.errors ? data.errors.length : 0}</h3>
+                    <small class="text-muted">Errors</small>
+                </div>
+            </div>
+        </div>
+        ${data.errors && data.errors.length > 0 ? `
+            <hr>
+            <h6>Errors:</h6>
+            <ul class="list-unstyled">
+                ${data.errors.map(error => `<li class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i>${error}</li>`).join('')}
+            </ul>
+        ` : ''}
+    `;
+
+    document.getElementById('syncResultsContent').innerHTML = content;
+    new bootstrap.Modal(document.getElementById('syncResultsModal')).show();
+}
+
+function formatVaultSecrets(data) {
+    if (!data.success || !data.secrets) {
+        return '<div class="text-danger">Error retrieving secrets</div>';
+    }
+
+    let html = '<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Secret Path</th><th>Keys</th><th>Last Updated</th></tr></thead><tbody>';
+
+    for (const secret of data.secrets) {
+        html += `
+            <tr>
+                <td><code>${secret.path}</code></td>
+                <td>${secret.keys ? secret.keys.join(', ') : 'N/A'}</td>
+                <td>${secret.updated || 'N/A'}</td>
+            </tr>
+        `;
+    }
+
+    html += '</tbody></table></div>';
+    return html;
+}
+
+function loadIntegrationConfigs() {
+    // Load ServiceNow config
+    fetch('/api/integrations/servicenow/config')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.config) {
+            const config = data.config;
+            document.getElementById('snow_instance_url').value = config.instance_url || '';
+            document.getElementById('snow_username').value = config.username || '';
+            document.getElementById('snow_table').value = config.table || 'cmdb_ci_server';
+            document.getElementById('snow_filter').value = config.filter || '';
+            document.getElementById('snow_sync_frequency').value = config.sync_frequency || 'daily';
+            document.getElementById('snow_auto_sync').checked = config.auto_sync || false;
+
+            if (config.configured) {
+                updateStatus('snowStatus', 'Configured', 'success');
+            }
+        }
+    })
+    .catch(error => console.log('ServiceNow config load error:', error));
+
+    // Load Vault config
+    fetch('/api/integrations/vault/config')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.config) {
+            const config = data.config;
+            document.getElementById('vault_url').value = config.url || '';
+            document.getElementById('vault_auth_method').value = config.auth_method || 'token';
+            document.getElementById('vault_mount_path').value = config.mount_path || 'secret';
+            document.getElementById('vault_app_path').value = config.app_path || 'msifactory';
+            document.getElementById('vault_ssl_verify').checked = config.ssl_verify !== false;
+            document.getElementById('vault_auto_renew').checked = config.auto_renew !== false;
+
+            toggleVaultAuthFields();
+
+            if (config.configured) {
+                updateStatus('vaultStatus', 'Configured', 'success');
+            }
+        }
+    })
+    .catch(error => console.log('Vault config load error:', error));
+}
+
+function testAllConnections() {
+    testServiceNowConnection();
+    setTimeout(() => testVaultConnection(), 1000);
+}
+
+function clearServiceNowConfig() {
+    if (confirm('Are you sure you want to clear the ServiceNow configuration?')) {
+        document.getElementById('serviceNowForm').reset();
+        updateStatus('snowStatus', 'Not Configured', 'secondary');
+    }
+}
+
+function clearVaultConfig() {
+    if (confirm('Are you sure you want to clear the Vault configuration?')) {
+        document.getElementById('vaultForm').reset();
+        updateStatus('vaultStatus', 'Not Configured', 'secondary');
+        toggleVaultAuthFields();
+    }
+}
+
+function updateLastSync(elementId, data) {
+    const element = document.getElementById(elementId);
+    const now = new Date().toLocaleString();
+    element.innerHTML = `
+        <i class="fas fa-check-circle text-success me-1"></i>
+        Last sync: ${now} (${data.servers_added} added, ${data.servers_updated} updated)
+    `;
+}
+
+function updateLastCheck(elementId, data) {
+    const element = document.getElementById(elementId);
+    const now = new Date().toLocaleString();
+    element.innerHTML = `
+        <i class="fas fa-check-circle text-success me-1"></i>
+        Last check: ${now} - Connection successful
+    `;
+}
+
+// Placeholder functions for future implementation
+function exportIntegrationConfig() {
+    showAlert('Export functionality will be implemented soon', 'info');
+}
+
+function importIntegrationConfig() {
+    showAlert('Import functionality will be implemented soon', 'info');
+}
+
+function viewIntegrationLogs() {
+    showAlert('Integration logs viewer will be implemented soon', 'info');
+}
+</script>
+{% endblock %}

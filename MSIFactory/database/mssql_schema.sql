@@ -22,25 +22,26 @@ PRINT 'MSI Factory Baseline Schema v4.0 - Starting Installation...'
 PRINT 'Checking SQL Server environment...'
 
 -- Check SQL Server version
-DECLARE @sql_version VARCHAR(50) = @@VERSION;
-DECLARE @version_year INT = 
-    CASE 
+DECLARE @sql_version VARCHAR(500) = @@VERSION;
+DECLARE @version_year INT =
+    CASE
+        WHEN @sql_version LIKE '%2022%' THEN 2022
         WHEN @sql_version LIKE '%2019%' THEN 2019
         WHEN @sql_version LIKE '%2017%' THEN 2017
         WHEN @sql_version LIKE '%2016%' THEN 2016
         WHEN @sql_version LIKE '%2014%' THEN 2014
         WHEN @sql_version LIKE '%2012%' THEN 2012
-        ELSE 2008
+        ELSE 2012 -- Default to 2012 for unknown versions
     END;
 
 IF @version_year < 2012
 BEGIN
-    PRINT 'ERROR: SQL Server 2012 or later is required. Current version not supported.';
-    RAISERROR('Unsupported SQL Server version', 16, 1);
-    RETURN;
+    PRINT 'WARNING: SQL Server 2012 or later is recommended. Attempting to continue...';
 END
-
-PRINT 'SQL Server version check passed: ' + CAST(@version_year AS VARCHAR(4));
+ELSE
+BEGIN
+    PRINT 'SQL Server version check passed: ' + CAST(@version_year AS VARCHAR(4));
+END
 
 -- ============================================================
 -- DATABASE CREATION WITH ENHANCED SETTINGS
@@ -322,10 +323,12 @@ END
 GO
 
 -- Create indexes only if they don't exist
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_artifact_history_component' AND object_id = OBJECT_ID('artifact_history'))
+IF EXISTS (SELECT * FROM sysobjects WHERE name='artifact_history' AND xtype='U')
+    AND NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_artifact_history_component' AND object_id = OBJECT_ID('artifact_history'))
     CREATE INDEX idx_artifact_history_component ON artifact_history(component_id);
 
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_artifact_history_time' AND object_id = OBJECT_ID('artifact_history'))
+IF EXISTS (SELECT * FROM sysobjects WHERE name='artifact_history' AND xtype='U')
+    AND NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_artifact_history_time' AND object_id = OBJECT_ID('artifact_history'))
     CREATE INDEX idx_artifact_history_time ON artifact_history(download_time);
 GO
 
@@ -785,25 +788,32 @@ GO
 -- INDEXES FOR PERFORMANCE
 -- ============================================================
 -- Create indexes only if they don't exist
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_users_username' AND object_id = OBJECT_ID('users'))
+IF EXISTS (SELECT * FROM sysobjects WHERE name='users' AND xtype='U')
+    AND NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_users_username' AND object_id = OBJECT_ID('users'))
     CREATE INDEX idx_users_username ON users(username);
 
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_users_email' AND object_id = OBJECT_ID('users'))
+IF EXISTS (SELECT * FROM sysobjects WHERE name='users' AND xtype='U')
+    AND NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_users_email' AND object_id = OBJECT_ID('users'))
     CREATE INDEX idx_users_email ON users(email);
 
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_projects_key' AND object_id = OBJECT_ID('projects'))
+IF EXISTS (SELECT * FROM sysobjects WHERE name='projects' AND xtype='U')
+    AND NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_projects_key' AND object_id = OBJECT_ID('projects'))
     CREATE INDEX idx_projects_key ON projects(project_key);
 
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_components_project' AND object_id = OBJECT_ID('components'))
+IF EXISTS (SELECT * FROM sysobjects WHERE name='components' AND xtype='U')
+    AND NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_components_project' AND object_id = OBJECT_ID('components'))
     CREATE INDEX idx_components_project ON components(project_id);
 
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_components_branch' AND object_id = OBJECT_ID('components'))
+IF EXISTS (SELECT * FROM sysobjects WHERE name='components' AND xtype='U')
+    AND NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_components_branch' AND object_id = OBJECT_ID('components'))
     CREATE INDEX idx_components_branch ON components(branch_name);
 
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_system_logs_date' AND object_id = OBJECT_ID('system_logs'))
+IF EXISTS (SELECT * FROM sysobjects WHERE name='system_logs' AND xtype='U')
+    AND NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_system_logs_date' AND object_id = OBJECT_ID('system_logs'))
     CREATE INDEX idx_system_logs_date ON system_logs(created_date);
 
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_user_sessions_user' AND object_id = OBJECT_ID('user_sessions'))
+IF EXISTS (SELECT * FROM sysobjects WHERE name='user_sessions' AND xtype='U')
+    AND NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_user_sessions_user' AND object_id = OBJECT_ID('user_sessions'))
     CREATE INDEX idx_user_sessions_user ON user_sessions(user_id);
 GO
 
@@ -916,14 +926,12 @@ GO
 
 CREATE VIEW vw_component_details
 AS
-SELECT 
+SELECT
     c.component_id,
     c.component_guid,
-    c.unique_guid,
     c.component_name,
     c.component_type,
     c.framework,
-    c.is_enabled,
     p.project_id,
     p.project_name,
     p.project_key,
@@ -940,7 +948,7 @@ SELECT
 FROM components c
 INNER JOIN projects p ON c.project_id = p.project_id
 LEFT JOIN msi_configurations mc ON c.component_id = mc.component_id
-WHERE c.is_enabled = 1 AND p.is_active = 1
+WHERE p.is_active = 1
 GO
 
 -- ============================================================
@@ -986,6 +994,565 @@ END
 GO
 
 -- ============================================================
+-- CMDB (Configuration Management Database) TABLES
+-- ============================================================
+
+PRINT 'Creating CMDB tables...';
+
+-- ============================================================
+-- CMDB_SERVERS TABLE
+-- Complete server inventory with infrastructure details
+-- ============================================================
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='cmdb_servers' AND xtype='U')
+BEGIN
+    PRINT 'Creating cmdb_servers table...';
+    CREATE TABLE cmdb_servers (
+        server_id INT PRIMARY KEY IDENTITY(1,1),
+        server_name VARCHAR(255) UNIQUE NOT NULL,
+        fqdn VARCHAR(500),
+
+        -- Infrastructure Details
+        infra_type VARCHAR(50) NOT NULL CHECK (infra_type IN ('AWS', 'AZURE', 'WINTEL', 'VMWARE', 'HYPERV')),
+        ip_address VARCHAR(45) NOT NULL,
+        ip_address_internal VARCHAR(45),
+        region VARCHAR(100),
+        datacenter VARCHAR(100),
+        availability_zone VARCHAR(50),
+
+        -- Environment and Status
+        environment_type VARCHAR(50) CHECK (environment_type IN ('development', 'testing', 'staging', 'production', 'shared')),
+        status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'maintenance', 'decommissioned')),
+
+        -- Hardware Specifications
+        cpu_cores INT,
+        memory_gb INT,
+        storage_gb BIGINT,
+        network_speed VARCHAR(20),
+
+        -- Capacity Management
+        current_app_count INT DEFAULT 0,
+        max_concurrent_apps INT DEFAULT 1,
+
+        -- Cloud/Virtual Details
+        instance_type VARCHAR(100),
+        instance_id VARCHAR(200),
+        cloud_account_id VARCHAR(200),
+        resource_group VARCHAR(200),
+        subnet_id VARCHAR(200),
+        security_groups TEXT,
+
+        -- Operating System
+        os_name VARCHAR(100),
+        os_version VARCHAR(50),
+        os_architecture VARCHAR(20),
+        patch_level VARCHAR(100),
+
+        -- Network Configuration
+        public_dns VARCHAR(500),
+        private_dns VARCHAR(500),
+        vpc_id VARCHAR(200),
+        network_acl TEXT,
+
+        -- Management
+        owner_team VARCHAR(100),
+        technical_contact VARCHAR(100),
+        business_contact VARCHAR(100),
+        cost_center VARCHAR(50),
+
+        -- Monitoring
+        monitoring_enabled BIT DEFAULT 1,
+        backup_enabled BIT DEFAULT 1,
+        patching_group VARCHAR(50),
+        maintenance_window VARCHAR(100),
+
+        -- Compliance
+        compliance_tags TEXT,
+        security_classification VARCHAR(50),
+        data_classification VARCHAR(50),
+
+        -- Metadata
+        created_date DATETIME DEFAULT GETDATE(),
+        created_by VARCHAR(100),
+        last_updated DATETIME DEFAULT GETDATE(),
+        updated_by VARCHAR(100),
+        is_active BIT DEFAULT 1,
+
+        -- Constraints
+        CONSTRAINT CK_cmdb_cpu_cores CHECK (cpu_cores IS NULL OR cpu_cores > 0),
+        CONSTRAINT CK_cmdb_memory CHECK (memory_gb IS NULL OR memory_gb > 0),
+        CONSTRAINT CK_cmdb_storage CHECK (storage_gb IS NULL OR storage_gb > 0),
+        CONSTRAINT CK_cmdb_max_apps CHECK (max_concurrent_apps > 0),
+        CONSTRAINT CK_cmdb_current_apps CHECK (current_app_count >= 0)
+    );
+    PRINT 'CMDB servers table created successfully.';
+END
+ELSE
+BEGIN
+    PRINT 'CMDB servers table already exists.';
+END
+GO
+
+-- ============================================================
+-- CMDB_SERVER_GROUPS TABLE
+-- Server clusters and load balancing groups
+-- ============================================================
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='cmdb_server_groups' AND xtype='U')
+BEGIN
+    PRINT 'Creating cmdb_server_groups table...';
+    CREATE TABLE cmdb_server_groups (
+        group_id INT PRIMARY KEY IDENTITY(1,1),
+        group_name VARCHAR(255) UNIQUE NOT NULL,
+        group_type VARCHAR(50) NOT NULL CHECK (group_type IN ('cluster', 'load_balancer', 'failover', 'development')),
+        description TEXT,
+
+        -- Load Balancing Configuration
+        load_balancer_server_id INT,
+        load_balancing_algorithm VARCHAR(50),
+        health_check_url VARCHAR(500),
+        health_check_interval INT DEFAULT 30,
+
+        -- Group Settings
+        min_servers INT DEFAULT 1,
+        max_servers INT DEFAULT 10,
+        auto_scaling_enabled BIT DEFAULT 0,
+
+        -- Metadata
+        created_date DATETIME DEFAULT GETDATE(),
+        created_by VARCHAR(100),
+        is_active BIT DEFAULT 1,
+
+        FOREIGN KEY (load_balancer_server_id) REFERENCES cmdb_servers(server_id),
+
+        CONSTRAINT CK_group_min_max_servers CHECK (min_servers <= max_servers),
+        CONSTRAINT CK_group_health_interval CHECK (health_check_interval > 0)
+    );
+    PRINT 'CMDB server groups table created successfully.';
+END
+GO
+
+-- ============================================================
+-- CMDB_SERVER_GROUP_MEMBERS TABLE
+-- Many-to-many relationship between servers and groups
+-- ============================================================
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='cmdb_server_group_members' AND xtype='U')
+BEGIN
+    PRINT 'Creating cmdb_server_group_members table...';
+    CREATE TABLE cmdb_server_group_members (
+        membership_id INT PRIMARY KEY IDENTITY(1,1),
+        group_id INT NOT NULL,
+        server_id INT NOT NULL,
+        role VARCHAR(50) DEFAULT 'member' CHECK (role IN ('member', 'primary', 'backup', 'load_balancer')),
+        priority INT DEFAULT 1,
+        is_active BIT DEFAULT 1,
+        joined_date DATETIME DEFAULT GETDATE(),
+
+        FOREIGN KEY (group_id) REFERENCES cmdb_server_groups(group_id) ON DELETE CASCADE,
+        FOREIGN KEY (server_id) REFERENCES cmdb_servers(server_id) ON DELETE CASCADE,
+
+        UNIQUE(group_id, server_id)
+    );
+    PRINT 'CMDB server group members table created successfully.';
+END
+GO
+
+-- ============================================================
+-- PROJECT_SERVERS TABLE
+-- Links projects to servers for deployment
+-- ============================================================
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='project_servers' AND xtype='U')
+BEGIN
+    PRINT 'Creating project_servers table...';
+    CREATE TABLE project_servers (
+        assignment_id INT PRIMARY KEY IDENTITY(1,1),
+        project_id INT NOT NULL,
+        environment_id INT NOT NULL,
+        server_id INT NOT NULL,
+        assignment_type VARCHAR(50) NOT NULL CHECK (assignment_type IN ('primary', 'backup', 'load_balancer', 'development', 'testing')),
+        purpose TEXT,
+        status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'pending')),
+        assigned_date DATETIME DEFAULT GETDATE(),
+        assigned_by VARCHAR(100),
+
+        FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE NO ACTION,
+        FOREIGN KEY (environment_id) REFERENCES project_environments(env_id) ON DELETE NO ACTION,
+        FOREIGN KEY (server_id) REFERENCES cmdb_servers(server_id) ON DELETE CASCADE,
+
+        UNIQUE(project_id, environment_id, server_id, assignment_type)
+    );
+    PRINT 'Project servers table created successfully.';
+END
+GO
+
+-- ============================================================
+-- COMPONENT_SERVERS TABLE
+-- Links components to specific servers
+-- ============================================================
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='component_servers' AND xtype='U')
+BEGIN
+    PRINT 'Creating component_servers table...';
+    CREATE TABLE component_servers (
+        component_server_id INT PRIMARY KEY IDENTITY(1,1),
+        component_id INT NOT NULL,
+        server_id INT NOT NULL,
+        assignment_type VARCHAR(50) NOT NULL CHECK (assignment_type IN ('primary', 'backup', 'development')),
+        deployment_path VARCHAR(500),
+        status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'pending')),
+        assigned_date DATETIME DEFAULT GETDATE(),
+        assigned_by VARCHAR(100),
+
+        FOREIGN KEY (component_id) REFERENCES components(component_id) ON DELETE NO ACTION,
+        FOREIGN KEY (server_id) REFERENCES cmdb_servers(server_id) ON DELETE CASCADE,
+
+        UNIQUE(component_id, server_id, assignment_type)
+    );
+    PRINT 'Component servers table created successfully.';
+END
+GO
+
+-- ============================================================
+-- CMDB_SERVER_CHANGES TABLE
+-- Audit trail for all server changes
+-- ============================================================
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='cmdb_server_changes' AND xtype='U')
+BEGIN
+    PRINT 'Creating cmdb_server_changes table...';
+    CREATE TABLE cmdb_server_changes (
+        change_id INT PRIMARY KEY IDENTITY(1,1),
+        server_id INT NOT NULL,
+        change_type VARCHAR(50) NOT NULL CHECK (change_type IN ('created', 'updated', 'deleted', 'status_change', 'assignment_change')),
+        field_name VARCHAR(100),
+        old_value TEXT,
+        new_value TEXT,
+        change_reason TEXT,
+        changed_date DATETIME DEFAULT GETDATE(),
+        changed_by VARCHAR(100) NOT NULL,
+
+        FOREIGN KEY (server_id) REFERENCES cmdb_servers(server_id) ON DELETE CASCADE
+    );
+    PRINT 'CMDB server changes table created successfully.';
+END
+GO
+
+-- ============================================================
+-- CMDB STORED PROCEDURES
+-- ============================================================
+
+-- Stored procedure for server discovery
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_CMDB_DiscoverServer')
+    DROP PROCEDURE sp_CMDB_DiscoverServer
+GO
+
+CREATE PROCEDURE sp_CMDB_DiscoverServer
+    @server_name VARCHAR(255),
+    @ip_address VARCHAR(45),
+    @infra_type VARCHAR(50),
+    @discovered_by VARCHAR(100)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF NOT EXISTS (SELECT 1 FROM cmdb_servers WHERE server_name = @server_name OR ip_address = @ip_address)
+    BEGIN
+        INSERT INTO cmdb_servers (server_name, ip_address, infra_type, status, created_by)
+        VALUES (@server_name, @ip_address, @infra_type, 'active', @discovered_by);
+
+        DECLARE @server_id INT = SCOPE_IDENTITY();
+
+        INSERT INTO cmdb_server_changes (server_id, change_type, change_reason, changed_by)
+        VALUES (@server_id, 'created', 'Server discovered automatically', @discovered_by);
+
+        SELECT @server_id as server_id, 'Server discovered and added' as message;
+    END
+    ELSE
+    BEGIN
+        SELECT 0 as server_id, 'Server already exists' as message;
+    END
+END
+GO
+
+-- Stored procedure for assigning server to project
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_AssignServerToProject')
+    DROP PROCEDURE sp_AssignServerToProject
+GO
+
+CREATE PROCEDURE sp_AssignServerToProject
+    @project_id INT,
+    @environment_id INT,
+    @server_id INT,
+    @assignment_type VARCHAR(50),
+    @assigned_by VARCHAR(100)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        IF NOT EXISTS (SELECT 1 FROM project_servers
+                      WHERE project_id = @project_id
+                        AND environment_id = @environment_id
+                        AND server_id = @server_id
+                        AND assignment_type = @assignment_type)
+        BEGIN
+            INSERT INTO project_servers (project_id, environment_id, server_id, assignment_type, assigned_by)
+            VALUES (@project_id, @environment_id, @server_id, @assignment_type, @assigned_by);
+
+            INSERT INTO cmdb_server_changes (server_id, change_type, change_reason, changed_by)
+            VALUES (@server_id, 'assignment_change',
+                   'Assigned to project ' + CAST(@project_id AS VARCHAR), @assigned_by);
+
+            SELECT 1 as success, 'Server assigned successfully' as message;
+        END
+        ELSE
+        BEGIN
+            SELECT 0 as success, 'Assignment already exists' as message;
+        END
+    END TRY
+    BEGIN CATCH
+        SELECT 0 as success, ERROR_MESSAGE() as message;
+    END CATCH
+END
+GO
+
+-- ============================================================
+-- CMDB VIEWS
+-- ============================================================
+
+-- Comprehensive server inventory view
+IF EXISTS (SELECT * FROM sys.views WHERE name = 'vw_cmdb_server_inventory')
+    DROP VIEW vw_cmdb_server_inventory
+GO
+
+CREATE VIEW vw_cmdb_server_inventory
+AS
+SELECT
+    s.server_id,
+    s.server_name,
+    s.fqdn,
+    s.infra_type,
+    s.ip_address,
+    s.ip_address_internal,
+    s.region,
+    s.datacenter,
+    s.environment_type,
+    s.status,
+    s.cpu_cores,
+    s.memory_gb,
+    s.storage_gb,
+    s.current_app_count,
+    s.max_concurrent_apps,
+    CASE
+        WHEN s.max_concurrent_apps > 0 THEN (s.current_app_count * 100.0 / s.max_concurrent_apps)
+        ELSE 0
+    END as utilization_percentage,
+    s.owner_team,
+    s.technical_contact,
+    s.created_date,
+    s.last_updated,
+    -- Group membership
+    STRING_AGG(sg.group_name, ', ') as server_groups,
+    -- Project assignments count
+    (SELECT COUNT(*) FROM project_servers ps WHERE ps.server_id = s.server_id AND ps.status = 'active') as active_assignments
+FROM cmdb_servers s
+LEFT JOIN cmdb_server_group_members sgm ON s.server_id = sgm.server_id AND sgm.is_active = 1
+LEFT JOIN cmdb_server_groups sg ON sgm.group_id = sg.group_id AND sg.is_active = 1
+WHERE s.is_active = 1
+GROUP BY
+    s.server_id, s.server_name, s.fqdn, s.infra_type, s.ip_address, s.ip_address_internal,
+    s.region, s.datacenter, s.environment_type, s.status, s.cpu_cores, s.memory_gb,
+    s.storage_gb, s.current_app_count, s.max_concurrent_apps, s.owner_team,
+    s.technical_contact, s.created_date, s.last_updated
+GO
+
+-- Project server assignments view
+IF EXISTS (SELECT * FROM sys.views WHERE name = 'vw_project_server_assignments')
+    DROP VIEW vw_project_server_assignments
+GO
+
+CREATE VIEW vw_project_server_assignments
+AS
+SELECT
+    ps.assignment_id,
+    p.project_name,
+    p.project_key,
+    pe.environment_name,
+    pe.environment_description,
+    s.server_name,
+    s.ip_address,
+    s.infra_type,
+    s.region,
+    ps.assignment_type,
+    ps.purpose,
+    ps.status,
+    ps.assigned_date,
+    ps.assigned_by
+FROM project_servers ps
+INNER JOIN projects p ON ps.project_id = p.project_id
+INNER JOIN project_environments pe ON ps.environment_id = pe.env_id
+INNER JOIN cmdb_servers s ON ps.server_id = s.server_id
+WHERE p.is_active = 1 AND s.is_active = 1
+GO
+
+-- ============================================================
+-- CMDB INDEXES FOR PERFORMANCE
+-- ============================================================
+
+-- Create indexes only if they don't exist
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_cmdb_servers_infra_type' AND object_id = OBJECT_ID('cmdb_servers'))
+    CREATE INDEX idx_cmdb_servers_infra_type ON cmdb_servers(infra_type);
+
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_cmdb_servers_region' AND object_id = OBJECT_ID('cmdb_servers'))
+    CREATE INDEX idx_cmdb_servers_region ON cmdb_servers(region);
+
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_cmdb_servers_status' AND object_id = OBJECT_ID('cmdb_servers'))
+    CREATE INDEX idx_cmdb_servers_status ON cmdb_servers(status);
+
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_project_servers_project' AND object_id = OBJECT_ID('project_servers'))
+    CREATE INDEX idx_project_servers_project ON project_servers(project_id);
+
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_project_servers_server' AND object_id = OBJECT_ID('project_servers'))
+    CREATE INDEX idx_project_servers_server ON project_servers(server_id);
+
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_cmdb_changes_server' AND object_id = OBJECT_ID('cmdb_server_changes'))
+    CREATE INDEX idx_cmdb_changes_server ON cmdb_server_changes(server_id);
+
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'idx_cmdb_changes_date' AND object_id = OBJECT_ID('cmdb_server_changes'))
+    CREATE INDEX idx_cmdb_changes_date ON cmdb_server_changes(changed_date);
+
+GO
+
+-- ============================================================
+-- SAMPLE CMDB DATA
+-- ============================================================
+
+PRINT 'Inserting sample CMDB data...';
+
+-- Insert sample servers for different infrastructure types
+IF NOT EXISTS (SELECT * FROM cmdb_servers WHERE server_name = 'DEV-WEB-01')
+BEGIN
+    INSERT INTO cmdb_servers (server_name, fqdn, infra_type, ip_address, region, datacenter, environment_type,
+                             cpu_cores, memory_gb, storage_gb, max_concurrent_apps, owner_team, technical_contact, created_by)
+    VALUES
+        ('DEV-WEB-01', 'dev-web-01.company.local', 'WINTEL', '192.168.1.100', 'US-EAST', 'DC01', 'development',
+         4, 16, 500, 5, 'Development Team', 'dev-ops@company.com', 'admin'),
+
+        ('PROD-WEB-01', 'prod-web-01.company.com', 'AWS', '10.0.1.100', 'US-EAST-1', 'AWS-USE1-AZ1', 'production',
+         8, 32, 1000, 10, 'Production Team', 'prod-ops@company.com', 'admin'),
+
+        ('AZURE-API-01', 'azure-api-01.eastus.cloudapp.azure.com', 'AZURE', '10.1.1.100', 'EAST-US', 'Azure-EastUS', 'production',
+         4, 16, 500, 8, 'API Team', 'api-ops@company.com', 'admin'),
+
+        ('QA-SRV-01', 'qa-srv-01.company.local', 'VMWARE', '192.168.10.50', 'US-WEST', 'DC02', 'testing',
+         2, 8, 250, 3, 'QA Team', 'qa-ops@company.com', 'admin');
+END
+GO
+
+-- Insert sample server group
+IF NOT EXISTS (SELECT * FROM cmdb_server_groups WHERE group_name = 'Production Web Cluster')
+BEGIN
+    INSERT INTO cmdb_server_groups (group_name, group_type, description, min_servers, max_servers, created_by)
+    VALUES ('Production Web Cluster', 'cluster', 'Production web server cluster for load balancing', 2, 5, 'admin');
+
+    DECLARE @group_id INT = SCOPE_IDENTITY();
+    DECLARE @prod_server_id INT = (SELECT server_id FROM cmdb_servers WHERE server_name = 'PROD-WEB-01');
+
+    IF @prod_server_id IS NOT NULL
+    BEGIN
+        INSERT INTO cmdb_server_group_members (group_id, server_id, role, priority)
+        VALUES (@group_id, @prod_server_id, 'primary', 1);
+    END
+END
+GO
+
+PRINT 'CMDB tables and sample data created successfully.';
+
+-- ============================================================
+-- UPDATE EXISTING TABLES FOR CMDB INTEGRATION
+-- ============================================================
+
+PRINT 'Updating existing tables for CMDB integration...';
+
+-- Add CMDB integration fields to projects table
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'projects' AND COLUMN_NAME = 'default_server_group_id')
+BEGIN
+    ALTER TABLE projects ADD default_server_group_id INT;
+    ALTER TABLE projects ADD CONSTRAINT FK_projects_server_group
+        FOREIGN KEY (default_server_group_id) REFERENCES cmdb_server_groups(group_id);
+    PRINT 'Added default_server_group_id to projects table.';
+END
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'projects' AND COLUMN_NAME = 'preferred_infra_type')
+BEGIN
+    ALTER TABLE projects ADD preferred_infra_type VARCHAR(50);
+    ALTER TABLE projects ADD preferred_region VARCHAR(100);
+    PRINT 'Added infrastructure preferences to projects table.';
+END
+
+-- Add CMDB integration fields to components table
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'components' AND COLUMN_NAME = 'preferred_server_id')
+BEGIN
+    ALTER TABLE components ADD preferred_server_id INT;
+    PRINT 'Added preferred_server_id to components table.';
+END
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.CONSTRAINT_TABLE_USAGE WHERE CONSTRAINT_NAME = 'FK_components_preferred_server')
+BEGIN
+    ALTER TABLE components ADD CONSTRAINT FK_components_preferred_server
+        FOREIGN KEY (preferred_server_id) REFERENCES cmdb_servers(server_id);
+    PRINT 'Added FK_components_preferred_server constraint.';
+END
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'components' AND COLUMN_NAME = 'deployment_strategy')
+BEGIN
+    ALTER TABLE components ADD deployment_strategy VARCHAR(50) DEFAULT 'single_server'
+        CHECK (deployment_strategy IN ('single_server', 'load_balanced', 'clustered'));
+    PRINT 'Added deployment_strategy to components table.';
+END
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'components' AND COLUMN_NAME = 'resource_requirements')
+BEGIN
+    ALTER TABLE components ADD resource_requirements TEXT; -- JSON format
+    PRINT 'Added resource_requirements to components table.';
+END
+
+-- Add CMDB integration fields to project_environments table
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'project_environments' AND COLUMN_NAME = 'assigned_server_count')
+BEGIN
+    ALTER TABLE project_environments ADD assigned_server_count INT DEFAULT 0;
+    ALTER TABLE project_environments ADD load_balancer_server_id INT;
+    ALTER TABLE project_environments ADD CONSTRAINT FK_env_load_balancer
+        FOREIGN KEY (load_balancer_server_id) REFERENCES cmdb_servers(server_id);
+    PRINT 'Added server assignment fields to project_environments table.';
+END
+
+-- Add CMDB integration fields to msi_configurations table
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'msi_configurations' AND COLUMN_NAME = 'target_server_id')
+BEGIN
+    ALTER TABLE msi_configurations ADD target_server_id INT;
+    PRINT 'Added target_server_id to msi_configurations table.';
+END
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'msi_configurations' AND COLUMN_NAME = 'backup_server_id')
+BEGIN
+    ALTER TABLE msi_configurations ADD backup_server_id INT;
+    PRINT 'Added backup_server_id to msi_configurations table.';
+END
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.CONSTRAINT_TABLE_USAGE WHERE CONSTRAINT_NAME = 'FK_msi_target_server')
+BEGIN
+    ALTER TABLE msi_configurations ADD CONSTRAINT FK_msi_target_server
+        FOREIGN KEY (target_server_id) REFERENCES cmdb_servers(server_id);
+    PRINT 'Added FK_msi_target_server constraint.';
+END
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.CONSTRAINT_TABLE_USAGE WHERE CONSTRAINT_NAME = 'FK_msi_backup_server')
+BEGIN
+    ALTER TABLE msi_configurations ADD CONSTRAINT FK_msi_backup_server
+        FOREIGN KEY (backup_server_id) REFERENCES cmdb_servers(server_id);
+    PRINT 'Added FK_msi_backup_server constraint.';
+END
+
+GO
+
+-- ============================================================
 -- FINAL VALIDATION AND CLEANUP
 -- ============================================================
 
@@ -1000,18 +1567,25 @@ BEGIN
 END
 
 -- Update statistics for better performance
-UPDATE STATISTICS users;
-UPDATE STATISTICS projects;
-UPDATE STATISTICS components;
+IF EXISTS (SELECT * FROM sysobjects WHERE name='users' AND xtype='U')
+    UPDATE STATISTICS users;
+IF EXISTS (SELECT * FROM sysobjects WHERE name='projects' AND xtype='U')
+    UPDATE STATISTICS projects;
+IF EXISTS (SELECT * FROM sysobjects WHERE name='components' AND xtype='U')
+    UPDATE STATISTICS components;
+IF EXISTS (SELECT * FROM sysobjects WHERE name='cmdb_servers' AND xtype='U')
+    UPDATE STATISTICS cmdb_servers;
+IF EXISTS (SELECT * FROM sysobjects WHERE name='project_servers' AND xtype='U')
+    UPDATE STATISTICS project_servers;
 
 -- ============================================================
 -- FINAL SUMMARY
 -- ============================================================
 PRINT '============================================================'
-PRINT 'MSI Factory Baseline Database Schema v4.0 - INSTALLATION COMPLETE'
+PRINT 'MSI Factory Baseline Database Schema v5.0 - INSTALLATION COMPLETE'
 PRINT '============================================================'
 PRINT 'Database: MSIFactory'
-PRINT 'Schema Version: 4.0'
+PRINT 'Schema Version: 5.0 (with CMDB Integration)'
 PRINT 'Installation Date: ' + CONVERT(VARCHAR, GETDATE(), 120)
 PRINT ''
 PRINT 'Features Successfully Installed:'
@@ -1028,6 +1602,13 @@ PRINT '  ✓ Performance optimized indexes'
 PRINT '  ✓ Data validation and constraints'
 PRINT '  ✓ Stored procedures and views'
 PRINT '  ✓ Health monitoring capabilities'
+PRINT '  ✓ CMDB server inventory management'
+PRINT '  ✓ Multi-infrastructure support (AWS, AZURE, WINTEL, VMWARE)'
+PRINT '  ✓ Server groups and clustering capabilities'
+PRINT '  ✓ Project-server assignment management'
+PRINT '  ✓ Component-server deployment mapping'
+PRINT '  ✓ Server change audit trail'
+PRINT '  ✓ CMDB views and reporting'
 PRINT ''
 PRINT 'Next Steps:'
 PRINT '  1. Create application database user and assign permissions'

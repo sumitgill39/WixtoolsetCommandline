@@ -1,0 +1,250 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}Add Server - CMDB{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-server me-2"></i>Add New Server</h1>
+                <a href="{{ url_for('cmdb_servers') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Servers
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-plus me-2"></i>Server Information</h5>
+                </div>
+                <div class="card-body">
+                    <form id="addServerForm" method="POST" action="{{ url_for('cmdb_add_server_submit') }}">
+                        <div class="row">
+                            <!-- Basic Information -->
+                            <div class="col-md-6">
+                                <h6 class="text-primary mb-3"><i class="fas fa-info-circle me-1"></i>Basic Information</h6>
+
+                                <div class="mb-3">
+                                    <label for="server_name" class="form-label">Server Name *</label>
+                                    <input type="text" class="form-control" id="server_name" name="server_name" required>
+                                    <div class="form-text">Unique server name (e.g., PROD-WEB-01)</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="fqdn" class="form-label">FQDN</label>
+                                    <input type="text" class="form-control" id="fqdn" name="fqdn">
+                                    <div class="form-text">Fully qualified domain name</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="ip_address" class="form-label">IP Address *</label>
+                                    <input type="text" class="form-control" id="ip_address" name="ip_address" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="ip_address_internal" class="form-label">Internal IP Address</label>
+                                    <input type="text" class="form-control" id="ip_address_internal" name="ip_address_internal">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="infra_type" class="form-label">Infrastructure Type *</label>
+                                    <select class="form-select" id="infra_type" name="infra_type" required>
+                                        <option value="">Select Infrastructure Type</option>
+                                        <option value="AWS">AWS</option>
+                                        <option value="AZURE">Azure</option>
+                                        <option value="WINTEL">WINTEL (On-Premises)</option>
+                                        <option value="VMWARE">VMware</option>
+                                        <option value="HYPERV">Hyper-V</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="region" class="form-label">Region</label>
+                                    <input type="text" class="form-control" id="region" name="region" placeholder="e.g., US-EAST, EU-WEST">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="datacenter" class="form-label">Datacenter</label>
+                                    <input type="text" class="form-control" id="datacenter" name="datacenter" placeholder="e.g., DC01, AWS-USE1-AZ1">
+                                </div>
+                            </div>
+
+                            <!-- Environment and Specifications -->
+                            <div class="col-md-6">
+                                <h6 class="text-primary mb-3"><i class="fas fa-cogs me-1"></i>Environment & Specifications</h6>
+
+                                <div class="mb-3">
+                                    <label for="environment_type" class="form-label">Environment Type</label>
+                                    <select class="form-select" id="environment_type" name="environment_type">
+                                        <option value="">Select Environment</option>
+                                        <option value="development">Development</option>
+                                        <option value="testing">Testing</option>
+                                        <option value="staging">Staging</option>
+                                        <option value="production">Production</option>
+                                        <option value="shared">Shared</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="status" class="form-label">Status</label>
+                                    <select class="form-select" id="status" name="status">
+                                        <option value="active" selected>Active</option>
+                                        <option value="inactive">Inactive</option>
+                                        <option value="maintenance">Maintenance</option>
+                                        <option value="decommissioned">Decommissioned</option>
+                                    </select>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="cpu_cores" class="form-label">CPU Cores</label>
+                                            <input type="number" class="form-control" id="cpu_cores" name="cpu_cores" min="1">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="memory_gb" class="form-label">Memory (GB)</label>
+                                            <input type="number" class="form-control" id="memory_gb" name="memory_gb" min="1">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="storage_gb" class="form-label">Storage (GB)</label>
+                                    <input type="number" class="form-control" id="storage_gb" name="storage_gb" min="1">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="max_concurrent_apps" class="form-label">Max Concurrent Apps</label>
+                                    <input type="number" class="form-control" id="max_concurrent_apps" name="max_concurrent_apps" min="1" value="1">
+                                    <div class="form-text">Maximum number of applications this server can host</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="owner_team" class="form-label">Owner Team</label>
+                                    <input type="text" class="form-control" id="owner_team" name="owner_team" placeholder="e.g., Infrastructure Team">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="technical_contact" class="form-label">Technical Contact</label>
+                                    <input type="email" class="form-control" id="technical_contact" name="technical_contact" placeholder="tech-contact@company.com">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cloud Details (Optional) -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3"><i class="fas fa-cloud me-1"></i>Cloud Details (Optional)</h6>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="instance_type" class="form-label">Instance Type</label>
+                                    <input type="text" class="form-control" id="instance_type" name="instance_type" placeholder="e.g., t3.medium, Standard_D2s_v3">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="instance_id" class="form-label">Instance ID</label>
+                                    <input type="text" class="form-control" id="instance_id" name="instance_id" placeholder="e.g., i-1234567890abcdef0">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="cloud_account_id" class="form-label">Cloud Account ID</label>
+                                    <input type="text" class="form-control" id="cloud_account_id" name="cloud_account_id">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="resource_group" class="form-label">Resource Group</label>
+                                    <input type="text" class="form-control" id="resource_group" name="resource_group">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Operating System -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3"><i class="fas fa-desktop me-1"></i>Operating System</h6>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="os_name" class="form-label">OS Name</label>
+                                    <input type="text" class="form-control" id="os_name" name="os_name" placeholder="e.g., Windows Server 2019">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="os_version" class="form-label">OS Version</label>
+                                    <input type="text" class="form-control" id="os_version" name="os_version" placeholder="e.g., 10.0.17763">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="os_architecture" class="form-label">Architecture</label>
+                                    <select class="form-select" id="os_architecture" name="os_architecture">
+                                        <option value="">Select Architecture</option>
+                                        <option value="x64">x64</option>
+                                        <option value="x86">x86</option>
+                                        <option value="ARM64">ARM64</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <hr>
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{{ url_for('cmdb_servers') }}" class="btn btn-secondary">Cancel</a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i>Add Server
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validation and enhancement
+document.getElementById('addServerForm').addEventListener('submit', function(e) {
+    const serverName = document.getElementById('server_name').value.trim();
+    const ipAddress = document.getElementById('ip_address').value.trim();
+    const infraType = document.getElementById('infra_type').value;
+
+    if (!serverName || !ipAddress || !infraType) {
+        e.preventDefault();
+        alert('Please fill in all required fields (Server Name, IP Address, Infrastructure Type)');
+        return false;
+    }
+
+    // Basic IP validation
+    const ipPattern = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    if (!ipPattern.test(ipAddress)) {
+        e.preventDefault();
+        alert('Please enter a valid IP address');
+        return false;
+    }
+
+    return true;
+});
+
+// Auto-generate FQDN based on server name
+document.getElementById('server_name').addEventListener('blur', function() {
+    const serverName = this.value.toLowerCase();
+    const fqdnField = document.getElementById('fqdn');
+
+    if (serverName && !fqdnField.value) {
+        fqdnField.value = serverName + '.company.local';
+    }
+});
+</script>
+{% endblock %}
