@@ -190,9 +190,9 @@ BEGIN
         component_name VARCHAR(100) NOT NULL,
         component_type VARCHAR(20) NOT NULL CHECK (component_type IN ('webapp', 'website', 'service', 'scheduler', 'api', 'desktop', 'library')),
         framework VARCHAR(20) NOT NULL CHECK (framework IN ('netframework', 'netcore', 'react', 'angular', 'python', 'static', 'vue', 'nodejs')),
-        artifact_source VARCHAR(255),
+        description TEXT,
 
-        -- GitFlow Branch Tracking
+        -- GitFlow Branch Tracking (kept for backward compatibility)
         branch_name VARCHAR(100),
         polling_enabled BIT DEFAULT 1,
         last_poll_time DATETIME,
@@ -200,11 +200,33 @@ BEGIN
         last_download_path VARCHAR(500),
         last_extract_path VARCHAR(500),
         last_artifact_time DATETIME,
+        artifact_source VARCHAR(255),
 
         -- Component Settings
         is_enabled BIT DEFAULT 1 NOT NULL,
         order_index INT DEFAULT 1,
         dependencies VARCHAR(500),
+
+        -- MSI Package Information
+        app_name VARCHAR(100),
+        app_version VARCHAR(50) DEFAULT '1.0.0.0',
+        manufacturer VARCHAR(100) DEFAULT 'Your Company',
+
+        -- Deployment Configuration
+        target_server VARCHAR(100),
+        install_folder VARCHAR(500),
+
+        -- IIS Configuration (for web components)
+        iis_website_name VARCHAR(100),
+        iis_app_pool_name VARCHAR(100),
+        port INT,
+
+        -- Windows Service Configuration
+        service_name VARCHAR(100),
+        service_display_name VARCHAR(100),
+
+        -- Artifact Configuration
+        artifact_url VARCHAR(500),
 
         -- CMDB Integration Fields
         preferred_server_id INT,
@@ -225,7 +247,16 @@ BEGIN
     PRINT '  Components table created successfully.';
 END
 ELSE
+BEGIN
     PRINT '  Components table already exists.';
+    -- Add description column if missing
+    IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+                   WHERE TABLE_NAME = 'components' AND COLUMN_NAME = 'description')
+    BEGIN
+        ALTER TABLE components ADD description TEXT;
+        PRINT '  Added description column to components table.';
+    END
+END
 GO
 
 -- Project Environments Table
@@ -909,6 +940,16 @@ PRINT '';
 PRINT 'Updating existing tables for CMDB integration...';
 
 -- Update Projects table
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'projects' AND COLUMN_NAME = 'project_guid')
+BEGIN
+    ALTER TABLE projects ADD project_guid UNIQUEIDENTIFIER DEFAULT NEWID();
+    PRINT '  Added project_guid to projects table.';
+
+    -- Generate GUIDs for existing projects
+    UPDATE projects SET project_guid = NEWID() WHERE project_guid IS NULL;
+    PRINT '  Generated GUIDs for existing projects.';
+END
+
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'projects' AND COLUMN_NAME = 'default_server_group_id')
 BEGIN
     ALTER TABLE projects ADD default_server_group_id INT;
@@ -935,6 +976,12 @@ BEGIN
 END
 
 -- Update Components table
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'components' AND COLUMN_NAME = 'description')
+BEGIN
+    ALTER TABLE components ADD description TEXT;
+    PRINT '  Added description to components table.';
+END
+
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'components' AND COLUMN_NAME = 'preferred_server_id')
 BEGIN
     ALTER TABLE components ADD preferred_server_id INT;
@@ -959,6 +1006,77 @@ IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'comp
 BEGIN
     ALTER TABLE components ADD resource_requirements TEXT;
     PRINT '  Added resource_requirements to components table.';
+END
+
+-- Add MSI Package Information fields
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'components' AND COLUMN_NAME = 'app_name')
+BEGIN
+    ALTER TABLE components ADD app_name VARCHAR(100);
+    PRINT '  Added app_name to components table.';
+END
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'components' AND COLUMN_NAME = 'app_version')
+BEGIN
+    ALTER TABLE components ADD app_version VARCHAR(50) DEFAULT '1.0.0.0';
+    PRINT '  Added app_version to components table.';
+END
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'components' AND COLUMN_NAME = 'manufacturer')
+BEGIN
+    ALTER TABLE components ADD manufacturer VARCHAR(100) DEFAULT 'Your Company';
+    PRINT '  Added manufacturer to components table.';
+END
+
+-- Add Deployment Configuration fields
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'components' AND COLUMN_NAME = 'target_server')
+BEGIN
+    ALTER TABLE components ADD target_server VARCHAR(100);
+    PRINT '  Added target_server to components table.';
+END
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'components' AND COLUMN_NAME = 'install_folder')
+BEGIN
+    ALTER TABLE components ADD install_folder VARCHAR(500);
+    PRINT '  Added install_folder to components table.';
+END
+
+-- Add IIS Configuration fields
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'components' AND COLUMN_NAME = 'iis_website_name')
+BEGIN
+    ALTER TABLE components ADD iis_website_name VARCHAR(100);
+    PRINT '  Added iis_website_name to components table.';
+END
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'components' AND COLUMN_NAME = 'iis_app_pool_name')
+BEGIN
+    ALTER TABLE components ADD iis_app_pool_name VARCHAR(100);
+    PRINT '  Added iis_app_pool_name to components table.';
+END
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'components' AND COLUMN_NAME = 'port')
+BEGIN
+    ALTER TABLE components ADD port INT;
+    PRINT '  Added port to components table.';
+END
+
+-- Add Windows Service Configuration fields
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'components' AND COLUMN_NAME = 'service_name')
+BEGIN
+    ALTER TABLE components ADD service_name VARCHAR(100);
+    PRINT '  Added service_name to components table.';
+END
+
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'components' AND COLUMN_NAME = 'service_display_name')
+BEGIN
+    ALTER TABLE components ADD service_display_name VARCHAR(100);
+    PRINT '  Added service_display_name to components table.';
+END
+
+-- Add Artifact Configuration field
+IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'components' AND COLUMN_NAME = 'artifact_url')
+BEGIN
+    ALTER TABLE components ADD artifact_url VARCHAR(500);
+    PRINT '  Added artifact_url to components table.';
 END
 
 -- Update Project Environments table
@@ -1296,19 +1414,47 @@ BEGIN
         c.component_name,
         c.component_type,
         c.framework,
+        c.description,
+
+        -- MSI Package Information
+        c.app_name,
+        c.app_version,
+        c.manufacturer,
+
+        -- Deployment Configuration
+        c.target_server,
+        c.install_folder,
+
+        -- IIS Configuration
+        c.iis_website_name,
+        c.iis_app_pool_name,
+        c.port,
+
+        -- Windows Service Configuration
+        c.service_name,
+        c.service_display_name,
+
+        -- Artifact Configuration
+        c.artifact_url,
+
+        -- Project Information
         p.project_id,
         p.project_name,
         p.project_key,
         p.project_type,
         p.owner_team,
         p.status as project_status,
+
+        -- Legacy MSI Configuration (for backward compatibility)
         mc.config_id,
         mc.unique_id as msi_unique_id,
-        mc.app_name,
-        mc.app_version,
         mc.target_environment,
+
+        -- Metadata
         c.created_date,
-        c.created_by
+        c.created_by,
+        c.updated_date,
+        c.updated_by
     FROM components c
     INNER JOIN projects p ON c.project_id = p.project_id
     LEFT JOIN msi_configurations mc ON c.component_id = mc.component_id
@@ -1431,14 +1577,26 @@ BEGIN
 
     -- Insert components
     INSERT INTO components (project_id, component_name, component_type, framework,
-                           artifact_source, branch_name, created_by)
+                           description, artifact_source, branch_name, created_by,
+                           app_name, app_version, manufacturer, target_server, install_folder,
+                           iis_website_name, iis_app_pool_name, port,
+                           service_name, service_display_name, artifact_url)
     VALUES
         (@project_id, 'Web Frontend', 'webapp', 'react',
-         'artifactory://frontend-builds', 'develop', 'admin'),
+         'React-based user interface for the e-commerce platform', 'artifactory://frontend-builds', 'develop', 'admin',
+         'E-Commerce Web Portal', '1.0.0.0', 'Your Company', 'PRODWEB01', 'C:\inetpub\wwwroot\ECommerce',
+         'Default Web Site', 'ECommerceAppPool', 80,
+         NULL, NULL, 'https://artifactory.example.com/artifactory/frontend-builds'),
         (@project_id, 'API Backend', 'api', 'netcore',
-         'artifactory://api-builds', 'develop', 'admin'),
+         '.NET Core REST API providing backend services', 'artifactory://api-builds', 'develop', 'admin',
+         'E-Commerce API', '1.0.0.0', 'Your Company', 'PRODAPI01', 'C:\inetpub\wwwroot\ECommerceAPI',
+         'Default Web Site', 'ECommerceAPIPool', 8080,
+         NULL, NULL, 'https://artifactory.example.com/artifactory/api-builds'),
         (@project_id, 'Background Service', 'service', 'netframework',
-         'artifactory://service-builds', 'master', 'admin');
+         'Windows service for background processing tasks', 'artifactory://service-builds', 'master', 'admin',
+         'E-Commerce Background Service', '1.0.0.0', 'Your Company', 'PRODSVC01', 'C:\Program Files\ECommerce\BackgroundService',
+         NULL, NULL, NULL,
+         'ECommerceBackgroundService', 'E-Commerce Background Processing Service', 'https://artifactory.example.com/artifactory/service-builds');
 
     -- Insert environments
     INSERT INTO project_environments (project_id, environment_name, environment_description, servers, region)

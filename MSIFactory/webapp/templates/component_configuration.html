@@ -143,6 +143,13 @@
         justify-content: space-between;
         align-items: center;
         font-size: 0.85rem;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .info-item.guid-item {
+        flex-direction: column;
+        align-items: flex-start;
     }
     
     .info-label {
@@ -161,7 +168,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    
+
     .guid-value {
         font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
         font-size: 0.65rem;
@@ -169,6 +176,11 @@
         padding: 1px 4px;
         border-radius: 3px;
         color: #000000;
+        max-width: none !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        word-break: break-all;
+        white-space: normal;
     }
     
     /* Tags Section */
@@ -539,9 +551,9 @@
         <!-- Card Body -->
         <div class="card-body">
             <div class="info-grid">
-                <div class="info-item">
+                <div class="info-item guid-item">
                     <span class="info-label">GUID</span>
-                    <span class="info-value guid-value">{{ component.unique_id or 'Not Generated' }}</span>
+                    <span class="info-value guid-value">{{ component.component_guid or 'Not Generated' }}</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">Version</span>

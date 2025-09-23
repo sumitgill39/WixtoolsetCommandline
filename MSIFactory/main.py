@@ -842,10 +842,10 @@ def get_detailed_projects():
         
         # Get all projects with artifact details
         projects_sql = """
-            SELECT project_id, project_name, project_key, description, project_type, 
+            SELECT project_id, project_name, project_key, project_guid, description, project_type,
                    owner_team, status, color_primary, color_secondary, created_date, created_by,
                    artifact_source_type, artifact_url, artifact_username, artifact_password
-            FROM projects 
+            FROM projects
             WHERE is_active = 1
             ORDER BY created_date DESC
         """
@@ -881,18 +881,19 @@ def get_detailed_projects():
                 'project_id': project[0],
                 'project_name': project[1],
                 'project_key': project[2],
-                'description': project[3],
-                'project_type': project[4],
-                'owner_team': project[5],
-                'status': project[6],
-                'color_primary': project[7],
-                'color_secondary': project[8],
-                'created_date': project[9].strftime('%Y-%m-%d') if project[9] else None,
-                'created_by': project[10],
-                'artifact_source_type': project[11],
-                'artifact_url': project[12],
-                'artifact_username': project[13],
-                'artifact_password': '***' if project[14] else None,
+                'project_guid': project[3],
+                'description': project[4],
+                'project_type': project[5],
+                'owner_team': project[6],
+                'status': project[7],
+                'color_primary': project[8],
+                'color_secondary': project[9],
+                'created_date': project[10].strftime('%Y-%m-%d') if project[10] else None,
+                'created_by': project[11],
+                'artifact_source_type': project[12],
+                'artifact_url': project[13],
+                'artifact_username': project[14],
+                'artifact_password': '***' if project[15] else None,
                 'environments': [
                     {
                         'name': env[0],
@@ -1178,11 +1179,11 @@ def add_project():
         def create_project_in_db(db_session):
             # Insert main project with artifact information
             project_insert = """
-                INSERT INTO projects (project_name, project_key, description, project_type, 
+                INSERT INTO projects (project_name, project_key, project_guid, description, project_type,
                                     owner_team, color_primary, color_secondary, status, created_by,
                                     artifact_source_type, artifact_url, artifact_username, artifact_password)
                 OUTPUT INSERTED.project_id
-                VALUES (:project_name, :project_key, :description, :project_type, 
+                VALUES (:project_name, :project_key, :project_guid, :description, :project_type,
                        :owner_team, :color_primary, :color_secondary, :status, :created_by,
                        :artifact_source_type, :artifact_url, :artifact_username, :artifact_password)
             """
@@ -1190,6 +1191,7 @@ def add_project():
             result = db_session.execute(text(project_insert), {
                 'project_name': request.form.get('project_name'),
                 'project_key': request.form.get('project_key', '').upper(),
+                'project_guid': request.form.get('project_guid'),
                 'description': request.form.get('description', ''),
                 'project_type': request.form.get('project_type'),
                 'owner_team': request.form.get('owner_team'),
@@ -1260,11 +1262,19 @@ def add_project():
 @app.route('/edit-project', methods=['POST'])
 def edit_project():
     """Edit existing project"""
+    # Log the edit attempt
+    logger.log_system_event("EDIT_PROJECT_START", f"Form submission received with fields: {list(request.form.keys())[:20]}")
+
+    # Debug session information
+    logger.log_system_event("EDIT_PROJECT_SESSION_DEBUG", f"Session contents: username={session.get('username')}, role={session.get('role')}, user_id={session.get('user_id')}")
+
     if 'username' not in session or session.get('role') != 'admin':
         flash('Admin access required', 'error')
+        logger.log_system_event("EDIT_PROJECT_AUTH_FAIL", f"User not authenticated or not admin. Username: {session.get('username')}, Role: {session.get('role')}")
         return redirect(url_for('login'))
-    
+
     project_id = request.form['project_id']
+    logger.log_system_event("EDIT_PROJECT", f"Processing project {project_id}")
     project_data = {
         'project_name': request.form['project_name'],
         'project_key': request.form['project_key'].upper(),
@@ -1275,16 +1285,203 @@ def edit_project():
         'color_secondary': request.form['color_secondary'],
         'status': request.form['status']
     }
-    
-    success, message = auth_system.update_project(project_id, project_data)
-    
+
+    # Update project data directly in SQL database (bypassing JSON file)
+    logger.log_system_event("EDIT_PROJECT_UPDATE_START", f"Updating project {project_id} directly in SQL database")
+    try:
+        import pyodbc
+
+        # Connection string for project update
+        conn_str = (
+            "DRIVER={ODBC Driver 17 for SQL Server};"
+            "SERVER=SUMEETGILL7E47\\MSSQLSERVER01;"
+            "DATABASE=MSIFactory;"
+            "Trusted_Connection=yes;"
+        )
+
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+
+        # Update project in SQL database
+        cursor.execute("""
+            UPDATE projects
+            SET project_name = ?, project_key = ?, description = ?,
+                project_type = ?, owner_team = ?, color_primary = ?,
+                color_secondary = ?, status = ?
+            WHERE project_id = ?
+        """, (
+            project_data['project_name'], project_data['project_key'],
+            project_data['description'], project_data['project_type'],
+            project_data['owner_team'], project_data['color_primary'],
+            project_data['color_secondary'], project_data['status'],
+            project_id
+        ))
+
+        if cursor.rowcount > 0:
+            conn.commit()
+            logger.log_system_event("EDIT_PROJECT_UPDATE_RESULT", f"Project {project_id} updated successfully in SQL database")
+            success = True
+            message = "Project updated successfully"
+        else:
+            logger.log_error("EDIT_PROJECT_UPDATE_ERROR", f"Project {project_id} not found in SQL database")
+            success = False
+            message = "Project not found in database"
+
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
+        logger.log_error("EDIT_PROJECT_UPDATE_ERROR", f"Error updating project in SQL: {str(e)}")
+        flash(f'Error updating project: {str(e)}', 'error')
+        return redirect(url_for('edit_project_page', project_id=project_id))
+
     if success:
-        logger.log_system_event("PROJECT_UPDATED", f"Project ID: {project_id}, Updated by: {session.get('username')}")
-        flash(message, 'success')
+        try:
+            import pyodbc
+
+            # Connection string
+            conn_str = (
+                "DRIVER={ODBC Driver 17 for SQL Server};"
+                "SERVER=SUMEETGILL7E47\\MSSQLSERVER01;"
+                "DATABASE=MSIFactory;"
+                "Trusted_Connection=yes;"
+            )
+
+            conn = pyodbc.connect(conn_str)
+            cursor = conn.cursor()
+
+            # Get existing component count first
+            cursor.execute("SELECT COUNT(*) FROM components WHERE project_id = ?", project_id)
+            existing_count = cursor.fetchone()[0]
+            logger.log_system_event("COMPONENT_COUNT", f"Project {project_id} has {existing_count} existing components")
+
+            # Process new components that were added (start from existing count + 1)
+            component_counter = existing_count + 1
+            logger.log_system_event("COMPONENT_SEARCH", f"Looking for new components starting from counter {component_counter}")
+
+            while True:
+                component_guid_field = f'new_component_guid_{component_counter}'
+                component_name_field = f'new_component_name_{component_counter}'
+
+                if component_guid_field not in request.form:
+                    logger.log_system_event("COMPONENT_SEARCH_END", f"Field {component_guid_field} not found in form, ending search")
+                    break
+
+                component_guid = request.form.get(component_guid_field, '').strip()
+                component_name = request.form.get(component_name_field, '').strip()
+                logger.log_system_event("COMPONENT_FOUND", f"Found component fields: {component_name_field}={component_name}, GUID={component_guid}")
+
+                if component_name:  # Only process if component has a name
+                    logger.log_system_event("COMPONENT_PROCESS", f"Processing new component: {component_name}")
+
+                    # Validate and fix GUID format for SQL Server
+                    import uuid
+
+                    # Get project key for GUID prefix
+                    project_key = request.form.get('project_key', '').strip().upper()
+
+                    if component_guid and len(component_guid) > 0:
+                        try:
+                            # Try to parse as UUID to validate format
+                            uuid.UUID(component_guid)
+                            valid_guid = component_guid
+                        except ValueError:
+                            # Generate a new GUID with project key prefix if invalid
+                            base_guid = str(uuid.uuid4())
+                            # Create a GUID-like format with project key prefix
+                            # Format: PROJKEY-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+                            if project_key and len(project_key) <= 8:
+                                # Pad project key to 8 chars or truncate
+                                prefix = project_key.ljust(8, '0')[:8]
+                                valid_guid = f"{prefix}-{base_guid[9:]}"
+                            else:
+                                valid_guid = base_guid
+                            logger.log_system_event("COMPONENT_GUID_FIXED", f"Invalid GUID '{component_guid}' replaced with '{valid_guid}'")
+                    else:
+                        # Generate new GUID with project key prefix if empty
+                        base_guid = str(uuid.uuid4())
+                        if project_key and len(project_key) <= 8:
+                            # Pad project key to 8 chars or truncate
+                            prefix = project_key.ljust(8, '0')[:8]
+                            valid_guid = f"{prefix}-{base_guid[9:]}"
+                        else:
+                            valid_guid = base_guid
+                        logger.log_system_event("COMPONENT_GUID_GENERATED", f"Generated new GUID with project key: {valid_guid}")
+
+                    component_data = {
+                        'component_guid': valid_guid,
+                        'component_name': component_name,
+                        'component_type': request.form.get(f'new_component_type_{component_counter}', ''),
+                        'framework': request.form.get(f'new_component_framework_{component_counter}', ''),
+                        'artifact_source': request.form.get(f'new_component_artifact_{component_counter}', ''),
+                        'app_name': request.form.get(f'new_component_app_name_{component_counter}', component_name),
+                        'version': request.form.get(f'new_component_version_{component_counter}', '1.0.0.0'),
+                        'manufacturer': request.form.get(f'new_component_manufacturer_{component_counter}', 'Your Company'),
+                        'target_server': request.form.get(f'new_component_target_server_{component_counter}', ''),
+                        'install_folder': request.form.get(f'new_component_install_folder_{component_counter}', ''),
+                        'iis_website': request.form.get(f'new_component_iis_website_{component_counter}', ''),
+                        'app_pool': request.form.get(f'new_component_app_pool_{component_counter}', ''),
+                        'port': request.form.get(f'new_component_port_{component_counter}', ''),
+                        'service_name': request.form.get(f'new_component_service_name_{component_counter}', ''),
+                        'service_display': request.form.get(f'new_component_service_display_{component_counter}', '')
+                    }
+
+                    # Insert the new component
+                    insert_sql = """
+                        INSERT INTO components (
+                            project_id, component_name, component_type, framework,
+                            artifact_source, component_guid, app_name, app_version,
+                            manufacturer, target_server, install_folder,
+                            iis_website_name, iis_app_pool_name, port,
+                            service_name, service_display_name, artifact_url,
+                            created_by, created_date
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE())
+                    """
+
+                    logger.log_system_event("COMPONENT_INSERT", f"Inserting component {component_data['component_name']} into database")
+                    cursor.execute(insert_sql, (
+                        project_id,
+                        component_data['component_name'],
+                        component_data['component_type'],
+                        component_data['framework'],
+                        component_data['artifact_source'],
+                        component_data['component_guid'],
+                        component_data['app_name'],
+                        component_data['version'],
+                        component_data['manufacturer'],
+                        component_data['target_server'],
+                        component_data['install_folder'],
+                        component_data['iis_website'],
+                        component_data['app_pool'],
+                        component_data['port'],
+                        component_data['service_name'],
+                        component_data['service_display'],
+                        component_data['artifact_source'],
+                        session.get('username', 'admin')  # created_by
+                    ))
+
+                component_counter += 1
+
+            # Handle component deletions
+            delete_components = request.form.getlist('delete_components')
+            for component_id in delete_components:
+                cursor.execute("DELETE FROM components WHERE component_id = ? AND project_id = ?",
+                             (component_id, project_id))
+
+            conn.commit()
+            conn.close()
+
+            logger.log_system_event("PROJECT_UPDATED", f"Project ID: {project_id}, Updated by: {session.get('username')}")
+            flash(f"{message} Components updated successfully.", 'success')
+
+        except Exception as e:
+            logger.log_system_event("PROJECT_UPDATE_ERROR", f"Project ID: {project_id}, Error: {str(e)}")
+            logger.log_error("COMPONENT_INSERT_ERROR", f"Failed to insert components for project {project_id}: {str(e)}")
+            flash(f"Project updated but error processing components: {str(e)}", 'warning')
     else:
         flash(message, 'error')
-    
-    return redirect(url_for('project_management'))
+
+    return redirect(url_for('edit_project_page', project_id=project_id))
 
 @app.route('/edit-project/<int:project_id>')
 def edit_project_page(project_id):
@@ -1309,7 +1506,7 @@ def edit_project_page(project_id):
         
         # Get project details
         cursor.execute("""
-            SELECT project_id, project_name, project_key, description, project_type,
+            SELECT project_id, project_name, project_key, project_guid, description, project_type,
                    owner_team, status, color_primary, color_secondary,
                    artifact_source_type, artifact_url, artifact_username,
                    created_date, created_by
@@ -1326,18 +1523,18 @@ def edit_project_page(project_id):
             'project_id': project_row[0],
             'project_name': project_row[1],
             'project_key': project_row[2],
-            'description': project_row[3],
-            'project_type': project_row[4],
-            'owner_team': project_row[5],
-            'status': project_row[6],
-            'color_primary': project_row[7] or '#2c3e50',
-            'color_secondary': project_row[8] or '#3498db',
-            'artifact_source_type': project_row[9],
-            'artifact_url': project_row[10],
-            'artifact_username': project_row[11],
-            'created_date': project_row[12],
-            'created_by': project_row[13],
-            'project_guid': None  # Column doesn't exist in database
+            'project_guid': project_row[3],
+            'description': project_row[4],
+            'project_type': project_row[5],
+            'owner_team': project_row[6],
+            'status': project_row[7],
+            'color_primary': project_row[8] or '#2c3e50',
+            'color_secondary': project_row[9] or '#3498db',
+            'artifact_source_type': project_row[10],
+            'artifact_url': project_row[11],
+            'artifact_username': project_row[12],
+            'created_date': project_row[13],
+            'created_by': project_row[14]
         }
 
         # Get project environments
@@ -1364,12 +1561,16 @@ def edit_project_page(project_id):
         # Get project components
         cursor.execute("""
             SELECT component_id, component_name, component_type, framework,
-                   artifact_source, branch_name, polling_enabled, created_date
-            FROM components 
+                   artifact_source, branch_name, polling_enabled, created_date,
+                   component_guid, app_name, app_version, manufacturer,
+                   target_server, install_folder, iis_website_name,
+                   iis_app_pool_name, port, service_name, service_display_name,
+                   artifact_url
+            FROM components
             WHERE project_id = ?
             ORDER BY component_name
         """, project_id)
-        
+
         components = []
         for row in cursor.fetchall():
             components.append({
@@ -1380,7 +1581,19 @@ def edit_project_page(project_id):
                 'artifact_source': row[4],
                 'branch_name': row[5],
                 'polling_enabled': row[6],
-                'created_date': row[7]
+                'created_date': row[7],
+                'component_guid': row[8],
+                'app_name': row[9],
+                'app_version': row[10],
+                'manufacturer': row[11],
+                'target_server': row[12],
+                'install_folder': row[13],
+                'iis_website_name': row[14],
+                'iis_app_pool_name': row[15],
+                'port': row[16],
+                'service_name': row[17],
+                'service_display_name': row[18],
+                'artifact_url': row[19]
             })
         
         # Get project environments
@@ -2511,11 +2724,12 @@ def component_configuration():
         
         # Get all components with their MSI configurations
         components_sql = """
-            SELECT 
+            SELECT
                 c.component_id,
                 c.component_name,
                 c.component_type,
                 c.framework,
+                c.component_guid,
                 p.project_name,
                 p.project_key,
                 mc.config_id,
@@ -2560,21 +2774,22 @@ def component_configuration():
                 'component_name': row[1],
                 'component_type': row[2],
                 'framework': row[3],
-                'project_name': row[4],
-                'project_key': row[5],
-                'config_id': row[6],
-                'unique_id': str(row[7]) if row[7] else None,
-                'app_name': row[8],
-                'app_version': row[9],
-                'manufacturer': row[10],
-                'upgrade_code': row[11],
-                'install_folder': row[12],
-                'target_server': row[13],
-                'target_environment': row[14],
-                'iis_website_name': row[15],
-                'iis_app_pool_name': row[16],
-                'service_name': row[17],
-                'auto_increment_version': bool(row[18]) if row[18] is not None else True
+                'component_guid': row[4],
+                'project_name': row[5],
+                'project_key': row[6],
+                'config_id': row[7],
+                'unique_id': str(row[8]) if row[8] else None,
+                'app_name': row[9],
+                'app_version': row[10],
+                'manufacturer': row[11],
+                'upgrade_code': row[12],
+                'install_folder': row[13],
+                'target_server': row[14],
+                'target_environment': row[15],
+                'iis_website_name': row[16],
+                'iis_app_pool_name': row[17],
+                'service_name': row[18],
+                'auto_increment_version': bool(row[19]) if row[19] is not None else True
             }
             components_list.append(component_dict)
         
@@ -2761,6 +2976,110 @@ def api_get_next_version():
             'message': f'Error getting next version: {str(e)}'
         }), 500
 
+@app.route('/api/test-submit', methods=['POST'])
+def api_test_submit():
+    """Test endpoint to check if POST requests work"""
+    logger.log_system_event("TEST_SUBMIT_RECEIVED", f"POST request received with data: {dict(request.form)}")
+    return jsonify({'status': 'POST request received successfully', 'data': dict(request.form)})
+
+@app.route('/api/session-debug', methods=['GET', 'POST'])
+def api_session_debug():
+    """Debug endpoint to check session state"""
+    session_data = {
+        'username': session.get('username'),
+        'role': session.get('role'),
+        'user_id': session.get('user_id'),
+        'has_username': 'username' in session,
+        'is_admin': session.get('role') == 'admin',
+        'session_keys': list(session.keys())
+    }
+    logger.log_system_event("SESSION_DEBUG", f"Session state: {session_data}")
+    return jsonify(session_data)
+
+@app.route('/api/add-component', methods=['POST'])
+def api_add_component():
+    """Direct API endpoint to add a component to a project"""
+    if 'username' not in session:
+        return jsonify({'error': 'Unauthorized'}), 401
+
+    try:
+        logger.log_system_event("API_ADD_COMPONENT_START", f"Request received from user: {session.get('username')}")
+
+        # Get form data
+        project_id = request.form.get('project_id')
+        component_data = {
+            'name': request.form.get('component_name'),
+            'type': request.form.get('component_type'),
+            'framework': request.form.get('component_framework'),
+            'app_name': request.form.get('component_app_name'),
+            'version': request.form.get('component_version'),
+            'manufacturer': request.form.get('component_manufacturer'),
+            'target_server': request.form.get('component_target_server'),
+            'install_folder': request.form.get('component_install_folder'),
+            'iis_website': request.form.get('component_iis_website'),
+            'app_pool': request.form.get('component_app_pool'),
+            'port': request.form.get('component_port'),
+            'service_name': request.form.get('component_service_name', ''),
+            'service_display': request.form.get('component_service_display', ''),
+            'artifact_url': request.form.get('component_artifact', '')
+        }
+
+        logger.log_system_event("API_COMPONENT_DATA", f"Adding component: {component_data['name']} to project {project_id}")
+
+        import pyodbc
+        import uuid
+
+        conn_str = (
+            "DRIVER={ODBC Driver 17 for SQL Server};"
+            "SERVER=SUMEETGILL7E47\\MSSQLSERVER01;"
+            "DATABASE=MSIFactory;"
+            "Trusted_Connection=yes;"
+        )
+
+        conn = pyodbc.connect(conn_str)
+        cursor = conn.cursor()
+
+        # Generate component GUID
+        component_guid = str(uuid.uuid4())
+
+        # Insert component
+        cursor.execute("""
+            INSERT INTO components (
+                project_id, component_name, component_type, framework,
+                component_guid, app_name, app_version, manufacturer,
+                target_server, install_folder, iis_website_name,
+                iis_app_pool_name, port, service_name, service_display_name,
+                artifact_url, created_date
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE())
+        """, (
+            project_id, component_data['name'], component_data['type'],
+            component_data['framework'], component_guid, component_data['app_name'],
+            component_data['version'], component_data['manufacturer'],
+            component_data['target_server'], component_data['install_folder'],
+            component_data['iis_website'], component_data['app_pool'],
+            component_data['port'], component_data['service_name'],
+            component_data['service_display'], component_data['artifact_url']
+        ))
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        logger.log_system_event("API_COMPONENT_ADDED", f"Component {component_data['name']} added successfully with GUID: {component_guid}")
+
+        return jsonify({
+            'success': True,
+            'message': f"Component {component_data['name']} added successfully",
+            'component_guid': component_guid
+        })
+
+    except Exception as e:
+        logger.log_error("API_ADD_COMPONENT_ERROR", f"Failed to add component: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 @app.route('/logout')
 def logout():
     """Logout user"""
@@ -2768,7 +3087,7 @@ def logout():
     if username:
         logger.log_user_logout(username)
         logger.log_system_event("USER_SESSION_END", f"User: {username}")
-    
+
     session.clear()
     flash('You have been logged out', 'info')
     return redirect(url_for('login'))

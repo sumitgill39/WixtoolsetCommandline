@@ -64,79 +64,39 @@
                         <!-- Expandable Details Section (Hidden by Default) -->
                         <div class="project-details-curtain" id="details-{{ project.project_id }}">
                             <div class="project-details-content">
-                                <!-- Description -->
-                                {% if project.description %}
+                                <!-- Project Information -->
                                 <div class="detail-section">
-                                    <h6 class="detail-title"><i class="fas fa-info-circle me-2"></i>Description</h6>
-                                    <p class="detail-text">{{ project.description }}</p>
-                                </div>
-                                {% endif %}
-                                
-                                <!-- Artifact Configuration -->
-                                <div class="detail-section">
-                                    <h6 class="detail-title"><i class="fas fa-cloud-download-alt me-2"></i>Artifact Configuration</h6>
-                                    <div class="artifact-grid">
-                                        {% if project.artifact_source_type %}
-                                        <div class="artifact-item">
-                                            <span class="artifact-label">Source Type:</span>
-                                            <span class="badge bg-info">{{ project.artifact_source_type.upper() }}</span>
+                                    <h6 class="detail-title"><i class="fas fa-info-circle me-2"></i>Project Information</h6>
+                                    <div class="project-info-grid">
+                                        <div class="info-item">
+                                            <span class="info-label">Project GUID:</span>
+                                            <code class="info-value">{{ project.project_guid or 'Not Set' }}</code>
                                         </div>
-                                        {% if project.artifact_url %}
-                                        <div class="artifact-item">
-                                            <span class="artifact-label">URL:</span>
-                                            <code class="artifact-url">{{ project.artifact_url }}</code>
+                                        {% if project.description %}
+                                        <div class="info-item">
+                                            <span class="info-label">Description:</span>
+                                            <span class="info-value">{{ project.description }}</span>
                                         </div>
                                         {% endif %}
-                                        {% if project.artifact_username %}
-                                        <div class="artifact-item">
-                                            <span class="artifact-label">Username:</span>
-                                            <code>{{ project.artifact_username }}</code>
+                                        <div class="info-item">
+                                            <span class="info-label">Project Type:</span>
+                                            <span class="badge bg-secondary info-badge">{{ project.project_type }}</span>
                                         </div>
-                                        {% endif %}
-                                        {% else %}
-                                        <p class="text-muted">No artifact source configured</p>
-                                        {% endif %}
+                                        <div class="info-item">
+                                            <span class="info-label">Owner Team:</span>
+                                            <span class="info-value">{{ project.owner_team }}</span>
+                                        </div>
                                     </div>
                                 </div>
-                                
-                                <!-- Environments -->
+
+                                <!-- Components Summary -->
                                 <div class="detail-section">
-                                    <h6 class="detail-title"><i class="fas fa-globe me-2"></i>Deployment Environments</h6>
-                                    <div class="environments-grid">
-                                        {% if project.environments %}
-                                        {% for env in project.environments %}
-                                        <div class="environment-card">
-                                            <div class="env-header">
-                                                <span class="env-name">{{ env.name }}</span>
-                                                {% if env.region != 'Not specified' %}
-                                                <span class="env-region">{{ env.region }}</span>
-                                                {% endif %}
-                                            </div>
-                                            {% if env.description %}
-                                            <div class="env-description">{{ env.description }}</div>
-                                            {% endif %}
-                                            {% if env.servers != 'Not specified' %}
-                                            <div class="env-servers">
-                                                <i class="fas fa-server me-1"></i>
-                                                <span>{{ env.servers }}</span>
-                                            </div>
-                                            {% endif %}
-                                        </div>
-                                        {% endfor %}
-                                        {% else %}
-                                        <p class="text-muted">No environments configured</p>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                
-                                <!-- Components -->
-                                <div class="detail-section">
-                                    <h6 class="detail-title"><i class="fas fa-puzzle-piece me-2"></i>Components ({{ project.components|length }})</h6>
-                                    <div class="components-grid">
-                                        {% if project.components %}
+                                    <h6 class="detail-title"><i class="fas fa-cubes me-2"></i>Components ({{ project.components|length }})</h6>
+                                    {% if project.components %}
+                                    <div class="components-summary-grid">
                                         {% for comp in project.components %}
-                                        <div class="component-card">
-                                            <div class="component-header">
+                                        <div class="component-summary-card">
+                                            <div class="component-summary-header">
                                                 <span class="component-type-badge" data-type="{{ comp.type }}">
                                                     {% if comp.type == 'webapp' %}
                                                     <i class="fas fa-globe"></i> Web App
@@ -144,31 +104,29 @@
                                                     <i class="fas fa-cogs"></i> Service
                                                     {% elif comp.type == 'api' %}
                                                     <i class="fas fa-plug"></i> API
+                                                    {% elif comp.type == 'website' %}
+                                                    <i class="fas fa-window-restore"></i> Website
+                                                    {% elif comp.type == 'desktop' %}
+                                                    <i class="fas fa-desktop"></i> Desktop
                                                     {% else %}
-                                                    <i class="fas fa-cube"></i> {{ comp.type }}
+                                                    <i class="fas fa-cube"></i> {{ comp.type.title() }}
                                                     {% endif %}
                                                 </span>
                                             </div>
-                                            <div class="component-name">{{ comp.name }}</div>
+                                            <div class="component-summary-name">{{ comp.name }}</div>
                                             {% if comp.framework %}
-                                            <div class="component-framework">
-                                                <i class="fas fa-code me-1"></i>{{ comp.framework }}
-                                            </div>
-                                            {% endif %}
-                                            {% if comp.artifact_source %}
-                                            <div class="component-source">
-                                                <i class="fas fa-link me-1"></i>
-                                                <code>{{ comp.artifact_source[:30] }}{% if comp.artifact_source|length > 30 %}...{% endif %}</code>
+                                            <div class="component-summary-framework">
+                                                <i class="fas fa-code me-1"></i>{{ comp.framework.upper() }}
                                             </div>
                                             {% endif %}
                                         </div>
                                         {% endfor %}
-                                        {% else %}
-                                        <p class="text-muted">No components configured</p>
-                                        {% endif %}
                                     </div>
+                                    {% else %}
+                                    <p class="text-muted">No components configured</p>
+                                    {% endif %}
                                 </div>
-                                
+
                                 <!-- Action Buttons -->
                                 <div class="detail-section">
                                     <div class="action-buttons">
@@ -344,26 +302,31 @@
     margin: 0;
 }
 
-/* Artifact Grid */
-.artifact-grid {
+/* Project Information Grid */
+.project-info-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1rem;
 }
 
-.artifact-item {
+.info-item {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    flex-direction: column;
+    gap: 0.25rem;
 }
 
-.artifact-label {
-    font-weight: 500;
-    color: #6c757d;
+.info-label {
+    font-weight: 600;
+    color: #495057;
     font-size: 0.9rem;
 }
 
-.artifact-url {
+.info-value {
+    color: #6c757d;
+    font-size: 0.95rem;
+}
+
+.info-value code {
     font-size: 0.85rem;
     background: #f8f9fa;
     padding: 0.25rem 0.5rem;
@@ -371,129 +334,68 @@
     word-break: break-all;
 }
 
-/* Environments Grid */
-.environments-grid {
+.info-badge {
+    align-self: flex-start;
+    font-size: 0.8rem;
+}
+
+/* Components Summary Grid */
+.components-summary-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 1rem;
 }
 
-.environment-card {
-    background: linear-gradient(135deg, #d4edda, #c3e6cb);
-    border: 1px solid #b1dfbb;
-    border-radius: 8px;
-    padding: 1rem;
-    transition: transform 0.2s ease;
-}
-
-.environment-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.env-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-}
-
-.env-name {
-    font-weight: 600;
-    color: #155724;
-    font-size: 1rem;
-}
-
-.env-region {
-    background: #28a745;
-    color: white;
-    padding: 0.2rem 0.5rem;
-    border-radius: 12px;
-    font-size: 0.75rem;
-}
-
-.env-description {
-    color: #155724;
-    font-size: 0.85rem;
-    margin-bottom: 0.5rem;
-}
-
-.env-servers {
-    color: #155724;
-    font-size: 0.8rem;
-    opacity: 0.8;
-}
-
-/* Components Grid */
-.components-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 1rem;
-}
-
-.component-card {
+.component-summary-card {
     background: white;
-    border: 2px solid #ffc107;
-    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
     padding: 1rem;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
 }
 
-.component-card::before {
+.component-summary-card::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #ffc107, #ff9800);
+    height: 3px;
+    background: linear-gradient(90deg, #007bff, #0056b3);
 }
 
-.component-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(255, 193, 7, 0.3);
-    border-color: #ff9800;
+.component-summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+    border-color: #007bff;
 }
 
-.component-header {
-    margin-bottom: 0.75rem;
+.component-summary-header {
+    margin-bottom: 0.5rem;
 }
 
 .component-type-badge {
     display: inline-block;
-    padding: 0.4rem 0.8rem;
-    background: linear-gradient(135deg, #ffc107, #ff9800);
+    padding: 0.3rem 0.6rem;
+    background: linear-gradient(135deg, #007bff, #0056b3);
     color: white;
-    border-radius: 20px;
-    font-size: 0.8rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
     font-weight: 600;
 }
 
-.component-name {
+.component-summary-name {
     font-weight: 600;
     color: #2c3e50;
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
-}
-
-.component-framework {
-    color: #6c757d;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     margin-bottom: 0.25rem;
 }
 
-.component-source {
+.component-summary-framework {
     color: #6c757d;
     font-size: 0.8rem;
-}
-
-.component-source code {
-    background: #f8f9fa;
-    padding: 0.2rem 0.4rem;
-    border-radius: 3px;
-    font-size: 0.75rem;
 }
 
 /* Action Buttons */
@@ -510,19 +412,19 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .environments-grid,
-    .components-grid {
+    .project-info-grid,
+    .components-summary-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .project-meta {
         flex-wrap: wrap;
     }
-    
+
     .action-buttons {
         flex-direction: column;
     }
-    
+
     .action-buttons .btn {
         width: 100%;
     }

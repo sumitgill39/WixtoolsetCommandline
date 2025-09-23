@@ -54,3 +54,11 @@
 2025-09-18 15:45:59 | LOGIN | SUCCESS | User: john.doe | IP: 127.0.0.1
 2025-09-19 12:18:15 | LOGOUT | User: john.doe
 2025-09-19 12:18:20 | LOGIN | SUCCESS | User: admin | IP: 127.0.0.1
+2025-09-23 08:36:43 | LOGIN | SUCCESS | User: admin | IP: 127.0.0.1
+2025-09-23 08:54:16 | LOGIN | SUCCESS | User: admin | IP: 127.0.0.1
+2025-09-23 08:57:41 | LOGIN | SUCCESS | User: admin | IP: 127.0.0.1
+2025-09-23 09:00:08 | LOGIN | SUCCESS | User: admin | IP: 127.0.0.1
+2025-09-23 09:27:39 | LOGIN | SUCCESS | User: admin | IP: 127.0.0.1
+2025-09-23 09:31:09 | LOGIN | SUCCESS | User: admin | IP: 127.0.0.1
+2025-09-23 09:33:47 | LOGIN | SUCCESS | User: admin | IP: 127.0.0.1
+2025-09-23 09:35:11 | LOGIN | SUCCESS | User: admin | IP: 127.0.0.1

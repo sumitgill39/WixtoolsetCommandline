@@ -986,3 +986,660 @@
 2025-09-19 20:56:43 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
 2025-09-19 20:56:43 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
 2025-09-19 20:56:43 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-20 10:33:37 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-20 10:33:38 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-20 10:33:38 | SYSTEM | INITIALIZATION | System directories created
+2025-09-20 10:33:38 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-20 10:33:39 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-20 10:33:39 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-20 10:33:39 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-20 10:33:39 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-20 10:37:22 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-20 10:37:22 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-20 10:37:22 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-20 10:37:22 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-21 19:11:36 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-21 19:11:39 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-21 19:11:39 | SYSTEM | INITIALIZATION | System directories created
+2025-09-21 19:11:39 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-21 19:11:42 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-21 19:11:42 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-21 19:11:42 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-21 19:11:42 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-21 21:07:50 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-21 21:07:50 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-21 21:07:50 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-21 21:07:50 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-21 21:09:09 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-21 21:09:09 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-21 21:09:09 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-21 21:09:09 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-21 21:43:05 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-21 21:43:05 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-21 21:43:05 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-21 21:43:05 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-21 21:43:55 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-21 21:43:55 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-21 21:43:55 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-21 21:43:55 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-22 08:52:11 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-22 08:52:11 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-22 08:52:11 | SYSTEM | INITIALIZATION | System directories created
+2025-09-22 08:52:11 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-22 08:52:14 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 08:52:14 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 08:52:14 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 08:52:14 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-22 09:01:31 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 09:01:31 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 09:01:31 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 09:01:31 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-22 19:12:46 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-22 19:12:47 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-22 19:12:47 | SYSTEM | INITIALIZATION | System directories created
+2025-09-22 19:12:47 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-22 19:13:17 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 19:13:17 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 19:13:17 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 19:13:17 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-22 19:13:22 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 19:13:22 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 19:13:22 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 19:13:22 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-22 19:14:36 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 19:14:36 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 19:14:36 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 19:14:36 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-22 19:29:33 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-22 19:29:33 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-22 19:29:33 | SYSTEM | INITIALIZATION | System directories created
+2025-09-22 19:29:33 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-22 19:29:36 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 19:29:36 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 19:29:36 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 19:29:36 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-22 19:43:30 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 19:43:30 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 19:43:30 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 19:43:30 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-22 19:43:38 | SYSTEM | INFO | Delete project function called by user: admin
+2025-09-22 19:43:38 | SYSTEM | INFO | No API client available, using auth_system to delete project 12
+2025-09-22 19:43:38 | SYSTEM | INFO | DATABASE: Attempting simple database deletion for project 12
+2025-09-22 19:43:39 | SYSTEM | INFO | DATABASE: Checking what records exist in msi_configurations
+2025-09-22 19:43:39 | SYSTEM | INFO | DATABASE: Total msi_configurations records: 0
+2025-09-22 19:43:39 | SYSTEM | INFO | DATABASE: msi_configurations columns: ['config_id', 'component_id', 'unique_id', 'app_name', 'app_version', 'auto_increment_version', 'manufacturer', 'upgrade_code', 'product_code', 'install_folder', 'target_server', 'target_environment', 'component_type', 'iis_website_name', 'iis_app_path', 'iis_app_pool_name', 'iis_port', 'iis_binding_info', 'parent_website', 'parent_webapp', 'app_pool_identity', 'app_pool_dotnet_version', 'app_pool_pipeline_mode', 'app_pool_enable_32bit', 'app_pool_start_mode', 'app_pool_idle_timeout', 'app_pool_recycling_schedule', 'enable_preload', 'enable_anonymous_auth', 'enable_windows_auth', 'custom_headers', 'connection_strings', 'app_settings', 'service_name', 'service_display_name', 'service_description', 'service_start_type', 'service_account', 'service_password', 'service_dependencies', 'features', 'registry_entries', 'environment_variables', 'shortcuts', 'pre_install_script', 'post_install_script', 'pre_uninstall_script', 'post_uninstall_script', 'folder_permissions', 'created_date', 'created_by', 'updated_date', 'updated_by', 'is_template', 'template_name', 'target_server_id', 'backup_server_id']
+2025-09-22 19:43:39 | SYSTEM | INFO | DATABASE: Records with component_id=12: 0
+2025-09-22 19:43:39 | SYSTEM | INFO | DATABASE: msi_configurations project_id deletion: ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'project_id'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-22 19:43:39 | SYSTEM | INFO | DATABASE: ProjectComponents deletion: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectComponents'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-22 19:43:39 | SYSTEM | INFO | DATABASE: ProjectEnvironments deletion: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectEnvironments'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-22 19:43:39 | SYSTEM | INFO | DATABASE: Deleted 1 rows for project 12
+2025-09-22 19:43:39 | SYSTEM | INFO | DATABASE: Project 12 deleted successfully
+2025-09-22 19:43:39 | SYSTEM | INFO | PROJECT_DELETED: Project ID: 12, Deleted by: admin
+2025-09-22 19:43:39 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 19:43:39 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 19:43:39 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 19:43:39 | SYSTEM | INFO | DATABASE: Retrieved 2 projects for user admin
+2025-09-22 19:44:32 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 19:44:32 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 19:44:32 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 19:44:32 | SYSTEM | INFO | DATABASE: Retrieved 2 projects for user admin
+2025-09-22 19:50:31 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 19:50:31 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 19:50:31 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 19:50:31 | SYSTEM | INFO | DATABASE: Retrieved 2 projects for user admin
+2025-09-22 19:51:11 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 19:51:11 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 19:51:11 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 19:51:11 | SYSTEM | INFO | DATABASE: Retrieved 2 projects for user admin
+2025-09-22 19:56:29 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 19:56:29 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 19:56:29 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 19:56:29 | SYSTEM | INFO | DATABASE: Retrieved 2 projects for user admin
+2025-09-22 22:26:59 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 22:26:59 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 22:26:59 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 22:26:59 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-22 22:38:25 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 22:38:25 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 22:38:25 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 22:38:25 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-22 22:52:15 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 22:52:15 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 22:52:15 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 22:52:15 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-22 23:01:36 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 23:01:36 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 23:01:36 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 23:01:36 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-22 23:03:58 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 23:03:58 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 23:03:58 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 23:03:58 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-22 23:08:14 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 23:08:14 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 23:08:14 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 23:08:14 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-22 23:11:26 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 23:11:26 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 23:11:26 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 23:11:26 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-22 23:13:43 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 23:13:43 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 23:13:43 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 23:13:43 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-22 23:15:55 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 23:15:55 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 23:15:55 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 23:15:55 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-22 23:16:10 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 23:16:10 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 23:16:10 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 23:16:10 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-22 23:59:32 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-22 23:59:32 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-22 23:59:32 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-22 23:59:32 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 00:00:38 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 00:00:38 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 00:00:38 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 00:00:39 | SYSTEM | INFO | DATABASE: Retrieved 4 projects for user admin
+2025-09-23 00:00:49 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 00:00:49 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 00:00:49 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 00:00:49 | SYSTEM | INFO | DATABASE: Retrieved 4 projects for user admin
+2025-09-23 00:01:03 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 00:01:03 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 00:01:03 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 00:01:03 | SYSTEM | INFO | DATABASE: Retrieved 4 projects for user admin
+2025-09-23 00:13:52 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 00:13:52 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 00:13:52 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 00:13:52 | SYSTEM | INFO | DATABASE: Retrieved 4 projects for user admin
+2025-09-23 00:15:17 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 00:15:17 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 00:15:17 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 00:15:17 | SYSTEM | INFO | DATABASE: Retrieved 4 projects for user admin
+2025-09-23 00:19:55 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 00:19:56 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 00:19:56 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 00:19:56 | SYSTEM | INFO | DATABASE: Retrieved 5 projects for user admin
+2025-09-23 00:20:09 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 00:20:09 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 00:20:09 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 00:20:09 | SYSTEM | INFO | DATABASE: Retrieved 5 projects for user admin
+2025-09-23 00:20:14 | SYSTEM | INFO | Delete project function called by user: admin
+2025-09-23 00:20:14 | SYSTEM | INFO | No API client available, using auth_system to delete project 15
+2025-09-23 00:20:14 | SYSTEM | INFO | DATABASE: Attempting simple database deletion for project 15
+2025-09-23 00:20:14 | SYSTEM | INFO | DATABASE: Checking what records exist in msi_configurations
+2025-09-23 00:20:15 | SYSTEM | INFO | DATABASE: Total msi_configurations records: 0
+2025-09-23 00:20:15 | SYSTEM | INFO | DATABASE: msi_configurations columns: ['config_id', 'component_id', 'unique_id', 'app_name', 'app_version', 'auto_increment_version', 'manufacturer', 'upgrade_code', 'product_code', 'install_folder', 'target_server', 'target_environment', 'component_type', 'iis_website_name', 'iis_app_path', 'iis_app_pool_name', 'iis_port', 'iis_binding_info', 'parent_website', 'parent_webapp', 'app_pool_identity', 'app_pool_dotnet_version', 'app_pool_pipeline_mode', 'app_pool_enable_32bit', 'app_pool_start_mode', 'app_pool_idle_timeout', 'app_pool_recycling_schedule', 'enable_preload', 'enable_anonymous_auth', 'enable_windows_auth', 'custom_headers', 'connection_strings', 'app_settings', 'service_name', 'service_display_name', 'service_description', 'service_start_type', 'service_account', 'service_password', 'service_dependencies', 'features', 'registry_entries', 'environment_variables', 'shortcuts', 'pre_install_script', 'post_install_script', 'pre_uninstall_script', 'post_uninstall_script', 'folder_permissions', 'created_date', 'created_by', 'updated_date', 'updated_by', 'is_template', 'template_name', 'target_server_id', 'backup_server_id']
+2025-09-23 00:20:15 | SYSTEM | INFO | DATABASE: Records with component_id=15: 0
+2025-09-23 00:20:15 | SYSTEM | INFO | DATABASE: msi_configurations project_id deletion: ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'project_id'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-23 00:20:15 | SYSTEM | INFO | DATABASE: ProjectComponents deletion: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectComponents'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-23 00:20:15 | SYSTEM | INFO | DATABASE: ProjectEnvironments deletion: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectEnvironments'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-23 00:20:15 | SYSTEM | INFO | DATABASE: Deleted 1 rows for project 15
+2025-09-23 00:20:15 | SYSTEM | INFO | DATABASE: Project 15 deleted successfully
+2025-09-23 00:20:15 | SYSTEM | INFO | PROJECT_DELETED: Project ID: 15, Deleted by: admin
+2025-09-23 00:20:15 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 00:20:15 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 00:20:15 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 00:20:15 | SYSTEM | INFO | DATABASE: Retrieved 4 projects for user admin
+2025-09-23 00:20:20 | SYSTEM | INFO | Delete project function called by user: admin
+2025-09-23 00:20:20 | SYSTEM | INFO | No API client available, using auth_system to delete project 13
+2025-09-23 00:20:20 | SYSTEM | INFO | DATABASE: Attempting simple database deletion for project 13
+2025-09-23 00:20:20 | SYSTEM | INFO | DATABASE: Checking what records exist in msi_configurations
+2025-09-23 00:20:20 | SYSTEM | INFO | DATABASE: Total msi_configurations records: 0
+2025-09-23 00:20:20 | SYSTEM | INFO | DATABASE: msi_configurations columns: ['config_id', 'component_id', 'unique_id', 'app_name', 'app_version', 'auto_increment_version', 'manufacturer', 'upgrade_code', 'product_code', 'install_folder', 'target_server', 'target_environment', 'component_type', 'iis_website_name', 'iis_app_path', 'iis_app_pool_name', 'iis_port', 'iis_binding_info', 'parent_website', 'parent_webapp', 'app_pool_identity', 'app_pool_dotnet_version', 'app_pool_pipeline_mode', 'app_pool_enable_32bit', 'app_pool_start_mode', 'app_pool_idle_timeout', 'app_pool_recycling_schedule', 'enable_preload', 'enable_anonymous_auth', 'enable_windows_auth', 'custom_headers', 'connection_strings', 'app_settings', 'service_name', 'service_display_name', 'service_description', 'service_start_type', 'service_account', 'service_password', 'service_dependencies', 'features', 'registry_entries', 'environment_variables', 'shortcuts', 'pre_install_script', 'post_install_script', 'pre_uninstall_script', 'post_uninstall_script', 'folder_permissions', 'created_date', 'created_by', 'updated_date', 'updated_by', 'is_template', 'template_name', 'target_server_id', 'backup_server_id']
+2025-09-23 00:20:20 | SYSTEM | INFO | DATABASE: Records with component_id=13: 0
+2025-09-23 00:20:20 | SYSTEM | INFO | DATABASE: msi_configurations project_id deletion: ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'project_id'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-23 00:20:20 | SYSTEM | INFO | DATABASE: ProjectComponents deletion: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectComponents'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-23 00:20:20 | SYSTEM | INFO | DATABASE: ProjectEnvironments deletion: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectEnvironments'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-23 00:20:20 | SYSTEM | INFO | DATABASE: Deleted 1 rows for project 13
+2025-09-23 00:20:20 | SYSTEM | INFO | DATABASE: Project 13 deleted successfully
+2025-09-23 00:20:20 | SYSTEM | INFO | PROJECT_DELETED: Project ID: 13, Deleted by: admin
+2025-09-23 00:20:20 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 00:20:20 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 00:20:20 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 00:20:20 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 00:20:25 | SYSTEM | INFO | Delete project function called by user: admin
+2025-09-23 00:20:25 | SYSTEM | INFO | No API client available, using auth_system to delete project 11
+2025-09-23 00:20:25 | SYSTEM | INFO | DATABASE: Attempting simple database deletion for project 11
+2025-09-23 00:20:25 | SYSTEM | INFO | DATABASE: Checking what records exist in msi_configurations
+2025-09-23 00:20:26 | SYSTEM | INFO | DATABASE: Total msi_configurations records: 0
+2025-09-23 00:20:26 | SYSTEM | INFO | DATABASE: msi_configurations columns: ['config_id', 'component_id', 'unique_id', 'app_name', 'app_version', 'auto_increment_version', 'manufacturer', 'upgrade_code', 'product_code', 'install_folder', 'target_server', 'target_environment', 'component_type', 'iis_website_name', 'iis_app_path', 'iis_app_pool_name', 'iis_port', 'iis_binding_info', 'parent_website', 'parent_webapp', 'app_pool_identity', 'app_pool_dotnet_version', 'app_pool_pipeline_mode', 'app_pool_enable_32bit', 'app_pool_start_mode', 'app_pool_idle_timeout', 'app_pool_recycling_schedule', 'enable_preload', 'enable_anonymous_auth', 'enable_windows_auth', 'custom_headers', 'connection_strings', 'app_settings', 'service_name', 'service_display_name', 'service_description', 'service_start_type', 'service_account', 'service_password', 'service_dependencies', 'features', 'registry_entries', 'environment_variables', 'shortcuts', 'pre_install_script', 'post_install_script', 'pre_uninstall_script', 'post_uninstall_script', 'folder_permissions', 'created_date', 'created_by', 'updated_date', 'updated_by', 'is_template', 'template_name', 'target_server_id', 'backup_server_id']
+2025-09-23 00:20:26 | SYSTEM | INFO | DATABASE: Records with component_id=11: 0
+2025-09-23 00:20:26 | SYSTEM | INFO | DATABASE: msi_configurations project_id deletion: ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'project_id'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-23 00:20:26 | SYSTEM | INFO | DATABASE: ProjectComponents deletion: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectComponents'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-23 00:20:26 | SYSTEM | INFO | DATABASE: ProjectEnvironments deletion: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectEnvironments'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-23 00:20:26 | SYSTEM | INFO | DATABASE: Deleted 1 rows for project 11
+2025-09-23 00:20:26 | SYSTEM | INFO | DATABASE: Project 11 deleted successfully
+2025-09-23 00:20:26 | SYSTEM | INFO | PROJECT_DELETED: Project ID: 11, Deleted by: admin
+2025-09-23 00:20:26 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 00:20:26 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 00:20:26 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 00:20:26 | SYSTEM | INFO | DATABASE: Retrieved 2 projects for user admin
+2025-09-23 00:26:08 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 00:26:08 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 00:26:08 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 00:26:08 | SYSTEM | INFO | DATABASE: Retrieved 2 projects for user admin
+2025-09-23 00:27:02 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 00:27:02 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 00:27:02 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 00:27:02 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 00:31:48 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 00:31:48 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 00:31:48 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 00:31:48 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 00:41:21 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 00:41:21 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 00:41:21 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 00:41:21 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 00:41:42 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 00:41:42 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 00:41:42 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 00:41:42 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 00:41:43 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 00:41:43 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 00:41:43 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 00:41:43 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 00:41:47 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 00:41:47 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 00:41:47 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 00:41:48 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 00:44:48 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 00:44:48 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 00:44:48 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 00:44:49 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 00:54:28 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 00:54:30 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 00:54:30 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 00:54:30 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 00:54:34 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 00:54:34 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 00:54:34 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 00:54:34 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 00:54:39 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 00:54:39 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 00:54:39 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 00:54:40 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 01:04:45 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 01:04:45 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 01:04:45 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 01:04:45 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 01:05:56 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 01:05:56 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 01:05:56 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 01:05:56 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 01:12:28 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 01:12:28 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 01:12:28 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 01:12:28 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 01:12:48 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 01:12:48 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 01:12:48 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 01:12:48 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 01:15:58 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 01:15:59 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 01:15:59 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 01:15:59 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 01:16:00 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 01:16:00 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 01:16:00 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 01:16:01 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 01:16:05 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 01:16:05 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 01:16:05 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 01:16:05 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 01:19:07 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 01:19:07 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 01:19:07 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 01:19:07 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 01:21:02 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 01:21:02 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 01:21:02 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 01:21:02 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 01:21:21 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 01:21:21 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 01:21:21 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 01:21:21 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 01:21:22 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 01:21:22 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 01:21:22 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 01:21:22 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 01:21:25 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 01:21:25 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 01:21:25 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 01:21:25 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 01:25:56 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 01:25:56 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 01:25:56 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 01:25:56 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 01:25:57 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 01:25:57 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 01:25:57 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 01:25:57 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 01:26:00 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 01:26:00 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 01:26:00 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 01:26:01 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 01:26:46 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 01:26:46 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 01:26:46 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 01:26:46 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 01:26:51 | SYSTEM | INFO | Delete project function called by user: admin
+2025-09-23 01:26:51 | SYSTEM | INFO | No API client available, using auth_system to delete project 17
+2025-09-23 01:26:51 | SYSTEM | INFO | DATABASE: Attempting simple database deletion for project 17
+2025-09-23 01:26:52 | SYSTEM | INFO | DATABASE: Checking what records exist in msi_configurations
+2025-09-23 01:26:52 | SYSTEM | INFO | DATABASE: Total msi_configurations records: 0
+2025-09-23 01:26:52 | SYSTEM | INFO | DATABASE: msi_configurations columns: ['config_id', 'component_id', 'unique_id', 'app_name', 'app_version', 'auto_increment_version', 'manufacturer', 'upgrade_code', 'product_code', 'install_folder', 'target_server', 'target_environment', 'component_type', 'iis_website_name', 'iis_app_path', 'iis_app_pool_name', 'iis_port', 'iis_binding_info', 'parent_website', 'parent_webapp', 'app_pool_identity', 'app_pool_dotnet_version', 'app_pool_pipeline_mode', 'app_pool_enable_32bit', 'app_pool_start_mode', 'app_pool_idle_timeout', 'app_pool_recycling_schedule', 'enable_preload', 'enable_anonymous_auth', 'enable_windows_auth', 'custom_headers', 'connection_strings', 'app_settings', 'service_name', 'service_display_name', 'service_description', 'service_start_type', 'service_account', 'service_password', 'service_dependencies', 'features', 'registry_entries', 'environment_variables', 'shortcuts', 'pre_install_script', 'post_install_script', 'pre_uninstall_script', 'post_uninstall_script', 'folder_permissions', 'created_date', 'created_by', 'updated_date', 'updated_by', 'is_template', 'template_name', 'target_server_id', 'backup_server_id']
+2025-09-23 01:26:52 | SYSTEM | INFO | DATABASE: Records with component_id=17: 0
+2025-09-23 01:26:52 | SYSTEM | INFO | DATABASE: msi_configurations project_id deletion: ('42S22', "[42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid column name 'project_id'. (207) (SQLExecDirectW); [42S22] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-23 01:26:52 | SYSTEM | INFO | DATABASE: ProjectComponents deletion: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectComponents'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-23 01:26:52 | SYSTEM | INFO | DATABASE: ProjectEnvironments deletion: ('42S02', "[42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Invalid object name 'ProjectEnvironments'. (208) (SQLExecDirectW); [42S02] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Statement(s) could not be prepared. (8180)")
+2025-09-23 01:26:52 | SYSTEM | INFO | DATABASE: Deleted 1 rows for project 17
+2025-09-23 01:26:52 | SYSTEM | INFO | DATABASE: Project 17 deleted successfully
+2025-09-23 01:26:52 | SYSTEM | INFO | PROJECT_DELETED: Project ID: 17, Deleted by: admin
+2025-09-23 01:26:52 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 01:26:52 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 01:26:52 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 01:26:52 | SYSTEM | INFO | DATABASE: Retrieved 2 projects for user admin
+2025-09-23 01:27:29 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 01:27:29 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 01:27:29 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 01:27:29 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 01:29:01 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 01:29:01 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 01:29:01 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 01:29:01 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 01:29:13 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 01:29:13 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 01:29:13 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 01:29:13 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 01:35:23 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 01:35:24 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 01:35:24 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 01:35:24 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 01:35:24 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 01:35:24 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 01:35:24 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 01:35:24 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 01:35:27 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 01:35:27 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 01:35:27 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 01:35:27 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 08:28:53 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 08:28:53 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 08:28:53 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 08:28:54 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 08:35:30 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 08:35:30 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 08:35:30 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 08:35:30 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 08:35:31 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 08:35:31 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 08:35:31 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 08:35:31 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 08:36:24 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 08:36:24 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 08:36:24 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 08:36:24 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 08:36:43 | SYSTEM | USER_SESSION_START | User: admin, Role: admin
+2025-09-23 08:36:43 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 08:36:43 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 08:36:43 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 08:36:43 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 08:36:51 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 08:36:51 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 08:36:51 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 08:36:51 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 08:44:49 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 08:44:49 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 08:44:49 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 08:44:49 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 08:54:16 | SYSTEM | USER_SESSION_START | User: admin, Role: admin
+2025-09-23 08:54:16 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 08:54:16 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 08:54:16 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 08:54:16 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 08:56:22 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 08:56:22 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 08:56:22 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 08:56:22 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 08:56:28 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 08:56:28 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 08:56:28 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 08:56:28 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 08:57:41 | SYSTEM | USER_SESSION_START | User: admin, Role: admin
+2025-09-23 08:57:42 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 08:57:42 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 08:57:42 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 08:57:42 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 09:00:08 | SYSTEM | USER_SESSION_START | User: admin, Role: admin
+2025-09-23 09:00:09 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 09:00:09 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 09:00:09 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 09:00:09 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 09:25:33 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 09:25:33 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 09:25:33 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 09:25:33 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 09:27:39 | SYSTEM | USER_SESSION_START | User: admin, Role: admin
+2025-09-23 09:27:40 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 09:27:40 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 09:27:40 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 09:27:40 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 09:29:23 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 09:29:23 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 09:29:23 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 09:29:23 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 09:30:43 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 09:30:43 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 09:30:43 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 09:30:43 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 09:30:49 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 09:30:49 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 09:30:49 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 09:30:49 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 09:31:09 | SYSTEM | USER_SESSION_START | User: admin, Role: admin
+2025-09-23 09:31:09 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 09:31:09 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 09:31:09 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 09:31:09 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 09:33:08 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 09:33:08 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 09:33:08 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 09:33:08 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 09:33:47 | SYSTEM | USER_SESSION_START | User: admin, Role: admin
+2025-09-23 09:33:48 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 09:33:48 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 09:33:48 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 09:33:48 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 09:34:20 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 09:34:21 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 09:34:21 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 09:34:21 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 09:34:29 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 09:34:29 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 09:34:29 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 09:34:29 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 09:35:11 | SYSTEM | USER_SESSION_START | User: admin, Role: admin
+2025-09-23 09:35:12 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 09:35:12 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 09:35:12 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 09:35:12 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 09:36:44 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 09:36:44 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 09:36:44 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 09:36:44 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 09:37:22 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 09:37:22 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 09:37:22 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 09:37:22 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 09:37:41 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 09:37:43 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 09:37:43 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 09:37:43 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 09:37:44 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 09:37:44 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 09:37:44 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 09:37:44 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 09:37:48 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 09:37:48 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 09:37:48 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 09:37:48 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 09:38:09 | SYSTEM | EDIT_PROJECT_START | Form submission received with fields: ['project_id', 'project_name', 'project_key', 'project_guid', 'description', 'project_type', 'owner_team', 'component_guid_existing_0', 'component_id_0', 'component_name_existing_0', 'component_type_existing_0', 'component_framework_existing_0', 'component_description_existing_0', 'component_app_name_existing_0', 'component_version_existing_0', 'component_manufacturer_existing_0', 'component_target_server_existing_0', 'component_install_folder_existing_0', 'component_iis_website_existing_0', 'component_app_pool_existing_0']
+2025-09-23 09:38:09 | SYSTEM | EDIT_PROJECT_SESSION_DEBUG | Session contents: username=admin, role=admin, user_id=None
+2025-09-23 09:38:09 | SYSTEM | EDIT_PROJECT | Processing project 18
+2025-09-23 09:46:46 | SYSTEM | EDIT_PROJECT_START | Form submission received with fields: ['project_id', 'project_name', 'project_key', 'project_guid', 'description', 'project_type', 'owner_team', 'component_guid_existing_0', 'component_id_0', 'component_name_existing_0', 'component_type_existing_0', 'component_framework_existing_0', 'component_description_existing_0', 'component_app_name_existing_0', 'component_version_existing_0', 'component_manufacturer_existing_0', 'component_target_server_existing_0', 'component_install_folder_existing_0', 'component_iis_website_existing_0', 'component_app_pool_existing_0']
+2025-09-23 09:46:46 | SYSTEM | EDIT_PROJECT_SESSION_DEBUG | Session contents: username=admin, role=admin, user_id=None
+2025-09-23 09:46:46 | SYSTEM | EDIT_PROJECT | Processing project 18
+2025-09-23 09:47:58 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 09:47:58 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 09:47:58 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 09:47:58 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 09:47:59 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 09:47:59 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 09:47:59 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 09:47:59 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 09:48:02 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 09:48:02 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 09:48:02 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 09:48:02 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 09:48:20 | SYSTEM | EDIT_PROJECT_START | Form submission received with fields: ['project_id', 'project_name', 'project_key', 'project_guid', 'description', 'project_type', 'owner_team', 'component_guid_existing_0', 'component_id_0', 'component_name_existing_0', 'component_type_existing_0', 'component_framework_existing_0', 'component_description_existing_0', 'component_app_name_existing_0', 'component_version_existing_0', 'component_manufacturer_existing_0', 'component_target_server_existing_0', 'component_install_folder_existing_0', 'component_iis_website_existing_0', 'component_app_pool_existing_0']
+2025-09-23 09:48:20 | SYSTEM | EDIT_PROJECT_SESSION_DEBUG | Session contents: username=admin, role=admin, user_id=None
+2025-09-23 09:48:20 | SYSTEM | EDIT_PROJECT | Processing project 18
+2025-09-23 09:48:20 | SYSTEM | EDIT_PROJECT_UPDATE_START | Updating project 18 directly in SQL database
+2025-09-23 09:48:20 | SYSTEM | EDIT_PROJECT_UPDATE_RESULT | Project 18 updated successfully in SQL database
+2025-09-23 09:48:20 | SYSTEM | COMPONENT_COUNT | Project 18 has 1 existing components
+2025-09-23 09:48:20 | SYSTEM | COMPONENT_SEARCH | Looking for new components starting from counter 2
+2025-09-23 09:48:20 | SYSTEM | COMPONENT_FOUND | Found component fields: new_component_name_2=API2, GUID=TESTPROJ-8EC3-36AA-0002
+2025-09-23 09:48:20 | SYSTEM | COMPONENT_PROCESS | Processing new component: API2
+2025-09-23 09:48:20 | SYSTEM | COMPONENT_INSERT | Inserting component API2 into database
+2025-09-23 09:48:20 | SYSTEM | PROJECT_UPDATE_ERROR | Project ID: 18, Error: ('42000', '[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Conversion failed when converting from a character string to uniqueidentifier. (8169) (SQLExecDirectW)')
+2025-09-23 09:48:47 | SYSTEM | EDIT_PROJECT_START | Form submission received with fields: ['project_id', 'project_name', 'project_key', 'project_guid', 'description', 'project_type', 'owner_team', 'component_guid_existing_0', 'component_id_0', 'component_name_existing_0', 'component_type_existing_0', 'component_framework_existing_0', 'component_description_existing_0', 'component_app_name_existing_0', 'component_version_existing_0', 'component_manufacturer_existing_0', 'component_target_server_existing_0', 'component_install_folder_existing_0', 'component_iis_website_existing_0', 'component_app_pool_existing_0']
+2025-09-23 09:48:47 | SYSTEM | EDIT_PROJECT_SESSION_DEBUG | Session contents: username=admin, role=admin, user_id=None
+2025-09-23 09:48:47 | SYSTEM | EDIT_PROJECT | Processing project 18
+2025-09-23 09:48:47 | SYSTEM | EDIT_PROJECT_UPDATE_START | Updating project 18 directly in SQL database
+2025-09-23 09:48:47 | SYSTEM | EDIT_PROJECT_UPDATE_RESULT | Project 18 updated successfully in SQL database
+2025-09-23 09:48:47 | SYSTEM | COMPONENT_COUNT | Project 18 has 1 existing components
+2025-09-23 09:48:47 | SYSTEM | COMPONENT_SEARCH | Looking for new components starting from counter 2
+2025-09-23 09:48:47 | SYSTEM | COMPONENT_SEARCH_END | Field new_component_guid_2 not found in form, ending search
+2025-09-23 09:48:47 | SYSTEM | PROJECT_UPDATED | Project ID: 18, Updated by: admin
+2025-09-23 09:49:05 | SYSTEM | EDIT_PROJECT_START | Form submission received with fields: ['project_id', 'project_name', 'project_key', 'project_guid', 'description', 'project_type', 'owner_team', 'component_guid_existing_0', 'component_id_0', 'component_name_existing_0', 'component_type_existing_0', 'component_framework_existing_0', 'component_description_existing_0', 'component_app_name_existing_0', 'component_version_existing_0', 'component_manufacturer_existing_0', 'component_target_server_existing_0', 'component_install_folder_existing_0', 'component_iis_website_existing_0', 'component_app_pool_existing_0']
+2025-09-23 09:49:05 | SYSTEM | EDIT_PROJECT_SESSION_DEBUG | Session contents: username=admin, role=admin, user_id=None
+2025-09-23 09:49:05 | SYSTEM | EDIT_PROJECT | Processing project 18
+2025-09-23 09:49:05 | SYSTEM | EDIT_PROJECT_UPDATE_START | Updating project 18 directly in SQL database
+2025-09-23 09:49:05 | SYSTEM | EDIT_PROJECT_UPDATE_RESULT | Project 18 updated successfully in SQL database
+2025-09-23 09:49:05 | SYSTEM | COMPONENT_COUNT | Project 18 has 1 existing components
+2025-09-23 09:49:05 | SYSTEM | COMPONENT_SEARCH | Looking for new components starting from counter 2
+2025-09-23 09:49:05 | SYSTEM | COMPONENT_FOUND | Found component fields: new_component_name_2=API2, GUID=TESTPROJ-0257-4E6A-0002
+2025-09-23 09:49:05 | SYSTEM | COMPONENT_PROCESS | Processing new component: API2
+2025-09-23 09:49:05 | SYSTEM | COMPONENT_INSERT | Inserting component API2 into database
+2025-09-23 09:49:05 | SYSTEM | PROJECT_UPDATE_ERROR | Project ID: 18, Error: ('42000', '[42000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Conversion failed when converting from a character string to uniqueidentifier. (8169) (SQLExecDirectW)')
+2025-09-23 09:50:31 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 09:50:31 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 09:50:31 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 09:50:31 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 09:50:57 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 09:50:58 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 09:50:58 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 09:50:58 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 09:51:00 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 09:51:00 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 09:51:00 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 09:51:00 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 09:51:03 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 09:51:03 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 09:51:03 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 09:51:03 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 09:51:22 | SYSTEM | EDIT_PROJECT_START | Form submission received with fields: ['project_id', 'project_name', 'project_key', 'project_guid', 'description', 'project_type', 'owner_team', 'component_guid_existing_0', 'component_id_0', 'component_name_existing_0', 'component_type_existing_0', 'component_framework_existing_0', 'component_description_existing_0', 'component_app_name_existing_0', 'component_version_existing_0', 'component_manufacturer_existing_0', 'component_target_server_existing_0', 'component_install_folder_existing_0', 'component_iis_website_existing_0', 'component_app_pool_existing_0']
+2025-09-23 09:51:22 | SYSTEM | EDIT_PROJECT_SESSION_DEBUG | Session contents: username=admin, role=admin, user_id=None
+2025-09-23 09:51:22 | SYSTEM | EDIT_PROJECT | Processing project 18
+2025-09-23 09:51:22 | SYSTEM | EDIT_PROJECT_UPDATE_START | Updating project 18 directly in SQL database
+2025-09-23 09:51:22 | SYSTEM | EDIT_PROJECT_UPDATE_RESULT | Project 18 updated successfully in SQL database
+2025-09-23 09:51:22 | SYSTEM | COMPONENT_COUNT | Project 18 has 1 existing components
+2025-09-23 09:51:22 | SYSTEM | COMPONENT_SEARCH | Looking for new components starting from counter 2
+2025-09-23 09:51:22 | SYSTEM | COMPONENT_FOUND | Found component fields: new_component_name_2=API2, GUID=TESTPROJ-3F08-185D-0002
+2025-09-23 09:51:22 | SYSTEM | COMPONENT_PROCESS | Processing new component: API2
+2025-09-23 09:51:22 | SYSTEM | COMPONENT_GUID_FIXED | Invalid GUID 'TESTPROJ-3F08-185D-0002' replaced with '57e1b6f0-dfd6-4c97-822b-fbd67d6a8748'
+2025-09-23 09:51:22 | SYSTEM | COMPONENT_INSERT | Inserting component API2 into database
+2025-09-23 09:51:22 | SYSTEM | PROJECT_UPDATE_ERROR | Project ID: 18, Error: ('23000', "[23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]Cannot insert the value NULL into column 'created_by', table 'MSIFactory.dbo.components'; column does not allow nulls. INSERT fails. (515) (SQLExecDirectW); [23000] [Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The statement has been terminated. (3621)")
+2025-09-23 09:53:50 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 09:53:51 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 09:53:51 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 09:53:51 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 09:53:52 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 09:53:52 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 09:53:52 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 09:53:52 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 09:53:54 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 09:53:54 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 09:53:54 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 09:53:54 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 09:54:14 | SYSTEM | EDIT_PROJECT_START | Form submission received with fields: ['project_id', 'project_name', 'project_key', 'project_guid', 'description', 'project_type', 'owner_team', 'component_guid_existing_0', 'component_id_0', 'component_name_existing_0', 'component_type_existing_0', 'component_framework_existing_0', 'component_description_existing_0', 'component_app_name_existing_0', 'component_version_existing_0', 'component_manufacturer_existing_0', 'component_target_server_existing_0', 'component_install_folder_existing_0', 'component_iis_website_existing_0', 'component_app_pool_existing_0']
+2025-09-23 09:54:14 | SYSTEM | EDIT_PROJECT_SESSION_DEBUG | Session contents: username=admin, role=admin, user_id=None
+2025-09-23 09:54:14 | SYSTEM | EDIT_PROJECT | Processing project 18
+2025-09-23 09:54:14 | SYSTEM | EDIT_PROJECT_UPDATE_START | Updating project 18 directly in SQL database
+2025-09-23 09:54:14 | SYSTEM | EDIT_PROJECT_UPDATE_RESULT | Project 18 updated successfully in SQL database
+2025-09-23 09:54:14 | SYSTEM | COMPONENT_COUNT | Project 18 has 1 existing components
+2025-09-23 09:54:14 | SYSTEM | COMPONENT_SEARCH | Looking for new components starting from counter 2
+2025-09-23 09:54:14 | SYSTEM | COMPONENT_FOUND | Found component fields: new_component_name_2=API2, GUID=TESTPROJ-8B90-5B85-0002
+2025-09-23 09:54:14 | SYSTEM | COMPONENT_PROCESS | Processing new component: API2
+2025-09-23 09:54:14 | SYSTEM | COMPONENT_GUID_FIXED | Invalid GUID 'TESTPROJ-8B90-5B85-0002' replaced with 'f55447eb-a44c-44f8-82d3-c8e5c64965d6'
+2025-09-23 09:54:14 | SYSTEM | COMPONENT_INSERT | Inserting component API2 into database
+2025-09-23 09:54:15 | SYSTEM | COMPONENT_SEARCH_END | Field new_component_guid_3 not found in form, ending search
+2025-09-23 09:54:15 | SYSTEM | PROJECT_UPDATED | Project ID: 18, Updated by: admin
+2025-09-23 09:55:09 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 09:55:09 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 09:55:09 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 09:55:09 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 09:56:48 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 09:56:48 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 09:56:48 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 09:56:48 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 10:04:13 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 10:04:13 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 10:04:13 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 10:04:13 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 10:14:29 | SYSTEM | INFO | API server not responding, using fallback auth_system methods
+2025-09-23 10:14:30 | SYSTEM | STARTUP | MSI Factory system started
+2025-09-23 10:14:30 | SYSTEM | INITIALIZATION | System directories created
+2025-09-23 10:14:30 | SYSTEM | INITIALIZATION | Authentication system loaded
+2025-09-23 10:14:33 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 10:14:33 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 10:14:33 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 10:14:33 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 10:14:35 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 10:14:35 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 10:14:35 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 10:14:35 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
+2025-09-23 10:14:52 | SYSTEM | EDIT_PROJECT_START | Form submission received with fields: ['project_id', 'project_name', 'project_key', 'project_guid', 'description', 'project_type', 'owner_team', 'color_primary', 'color_secondary', 'status', 'delete_components']
+2025-09-23 10:14:52 | SYSTEM | EDIT_PROJECT_SESSION_DEBUG | Session contents: username=admin, role=admin, user_id=None
+2025-09-23 10:14:52 | SYSTEM | EDIT_PROJECT | Processing project 18
+2025-09-23 10:14:52 | SYSTEM | EDIT_PROJECT_UPDATE_START | Updating project 18 directly in SQL database
+2025-09-23 10:14:52 | SYSTEM | EDIT_PROJECT_UPDATE_RESULT | Project 18 updated successfully in SQL database
+2025-09-23 10:14:52 | SYSTEM | COMPONENT_COUNT | Project 18 has 2 existing components
+2025-09-23 10:14:52 | SYSTEM | COMPONENT_SEARCH | Looking for new components starting from counter 3
+2025-09-23 10:14:52 | SYSTEM | COMPONENT_SEARCH_END | Field new_component_guid_3 not found in form, ending search
+2025-09-23 10:14:53 | SYSTEM | PROJECT_UPDATED | Project ID: 18, Updated by: admin
+2025-09-23 10:16:07 | SYSTEM | EDIT_PROJECT_START | Form submission received with fields: ['project_id', 'project_name', 'project_key', 'project_guid', 'description', 'project_type', 'owner_team', 'new_component_guid_1', 'new_component_name_1', 'new_component_type_1', 'new_component_framework_1', 'new_component_description_1', 'new_component_app_name_1', 'new_component_version_1', 'new_component_manufacturer_1', 'new_component_target_server_1', 'new_component_install_folder_1', 'new_component_iis_website_1', 'new_component_app_pool_1', 'new_component_port_1']
+2025-09-23 10:16:07 | SYSTEM | EDIT_PROJECT_SESSION_DEBUG | Session contents: username=admin, role=admin, user_id=None
+2025-09-23 10:16:07 | SYSTEM | EDIT_PROJECT | Processing project 18
+2025-09-23 10:16:07 | SYSTEM | EDIT_PROJECT_UPDATE_START | Updating project 18 directly in SQL database
+2025-09-23 10:16:08 | SYSTEM | EDIT_PROJECT_UPDATE_RESULT | Project 18 updated successfully in SQL database
+2025-09-23 10:16:08 | SYSTEM | COMPONENT_COUNT | Project 18 has 0 existing components
+2025-09-23 10:16:08 | SYSTEM | COMPONENT_SEARCH | Looking for new components starting from counter 1
+2025-09-23 10:16:08 | SYSTEM | COMPONENT_FOUND | Found component fields: new_component_name_1=API1, GUID=TESTPROJ-C0FF-528A-0001
+2025-09-23 10:16:08 | SYSTEM | COMPONENT_PROCESS | Processing new component: API1
+2025-09-23 10:16:08 | SYSTEM | COMPONENT_GUID_FIXED | Invalid GUID 'TESTPROJ-C0FF-528A-0001' replaced with '151f7651-3393-4f95-ad79-1ff03e9813af'
+2025-09-23 10:16:08 | SYSTEM | COMPONENT_INSERT | Inserting component API1 into database
+2025-09-23 10:16:08 | SYSTEM | COMPONENT_FOUND | Found component fields: new_component_name_2=API2, GUID=TESTPROJ-B747-0696-0002
+2025-09-23 10:16:08 | SYSTEM | COMPONENT_PROCESS | Processing new component: API2
+2025-09-23 10:16:08 | SYSTEM | COMPONENT_GUID_FIXED | Invalid GUID 'TESTPROJ-B747-0696-0002' replaced with '8931643b-babf-4d6a-99d9-d3936b54928d'
+2025-09-23 10:16:08 | SYSTEM | COMPONENT_INSERT | Inserting component API2 into database
+2025-09-23 10:16:08 | SYSTEM | COMPONENT_SEARCH_END | Field new_component_guid_3 not found in form, ending search
+2025-09-23 10:16:08 | SYSTEM | PROJECT_UPDATED | Project ID: 18, Updated by: admin
+2025-09-23 10:16:20 | SYSTEM | INFO | DATABASE: User admin - SQL user found: True
+2025-09-23 10:16:20 | SYSTEM | INFO | DATABASE: User admin - SQL user_id: 1, role: admin
+2025-09-23 10:16:20 | SYSTEM | INFO | DATABASE: User admin is admin, getting all projects
+2025-09-23 10:16:20 | SYSTEM | INFO | DATABASE: Retrieved 3 projects for user admin
