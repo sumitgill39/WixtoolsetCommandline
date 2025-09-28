@@ -1,0 +1,77 @@
+<div class="card border-light mb-3 component-card" data-component-counter="{{ component_counter }}">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <span>Component {{ component_counter }}</span>
+        <button type="button" class="btn btn-sm btn-outline-light"
+                hx-delete="/htmx/component/remove"
+                hx-target="closest .component-card"
+                hx-swap="outerHTML"
+                hx-confirm="Remove this component?">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="card-body">
+        <input type="hidden" name="component_guid_{{ component_counter }}" value="{{ component_guid }}">
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="component_name_{{ component_counter }}" class="form-label">Component Name *</label>
+                    <input type="text" class="form-control"
+                           id="component_name_{{ component_counter }}"
+                           name="component_name_{{ component_counter }}"
+                           value="{{ defaults.app_name }}"
+                           hx-post="/htmx/component/validate"
+                           hx-target="#validation_{{ component_counter }}"
+                           hx-trigger="blur"
+                           required>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="component_type_{{ component_counter }}" class="form-label">Component Type *</label>
+                    <select class="form-select"
+                            id="component_type_{{ component_counter }}"
+                            name="component_type_{{ component_counter }}"
+                            hx-get="/htmx/component/config-fields"
+                            hx-target="#config_fields_{{ component_counter }}"
+                            hx-include="[name='component_type_{{ component_counter }}']"
+                            required>
+                        <option value="">Select Component Type</option>
+                        {% for value, label in component_types %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="framework_{{ component_counter }}" class="form-label">Framework *</label>
+                    <select class="form-select"
+                            id="framework_{{ component_counter }}"
+                            name="framework_{{ component_counter }}"
+                            required>
+                        <option value="">Select Framework</option>
+                        {% for value, label in frameworks %}
+                        <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="install_folder_{{ component_counter }}" class="form-label">Install Folder</label>
+                    <input type="text" class="form-control"
+                           id="install_folder_{{ component_counter }}"
+                           name="install_folder_{{ component_counter }}"
+                           value="{{ defaults.install_folder }}">
+                </div>
+            </div>
+        </div>
+
+        <div id="validation_{{ component_counter }}"></div>
+        <div id="config_fields_{{ component_counter }}"></div>
+    </div>
+</div>

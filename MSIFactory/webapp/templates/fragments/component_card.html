@@ -1,0 +1,86 @@
+<div class="card mb-3 {{ 'border-success' if is_new else 'border-light' }}" data-component-id="{{ component.component_id }}">
+    <div class="card-header {{ 'bg-success text-white' if is_new else 'bg-light' }} d-flex justify-content-between align-items-center">
+        <div>
+            <h6 class="mb-0">
+                <i class="fas fa-cube me-2"></i>{{ component.component_name }}
+                {% if is_new %}
+                <span class="badge bg-light text-success ms-2">NEW</span>
+                {% endif %}
+            </h6>
+            <small class="text-muted">{{ component.component_type|title }} • {{ component.framework }}</small>
+        </div>
+        <div class="btn-group btn-group-sm">
+            <button type="button" class="btn btn-outline-primary"
+                    hx-get="/htmx/component/edit/{{ component.component_id }}"
+                    hx-target="#component-modal-content"
+                    data-bs-toggle="modal"
+                    data-bs-target="#componentModal">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button type="button" class="btn btn-outline-danger"
+                    hx-get="/htmx/component/delete-confirm/{{ component.component_id }}"
+                    hx-target="#delete-modal-content"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteModal"
+                    title="Delete component">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-8">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">GUID:</dt>
+                    <dd class="col-sm-8"><code class="small">{{ component.component_guid }}</code></dd>
+
+                    <dt class="col-sm-4">Install Path:</dt>
+                    <dd class="col-sm-8"><code class="small">{{ component.install_folder or 'Not specified' }}</code></dd>
+
+                    {% if component.component_type in ['webapp', 'website', 'api'] %}
+                    <dt class="col-sm-4">App Pool:</dt>
+                    <dd class="col-sm-8">{{ component.iis_app_pool_name or 'DefaultAppPool' }}</dd>
+                    {% elif component.component_type == 'service' %}
+                    <dt class="col-sm-4">Service Name:</dt>
+                    <dd class="col-sm-8">{{ component.service_name or 'Not specified' }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="d-flex flex-column align-items-end">
+                    {% set config_status = 'configured' if component.config_id else 'pending' %}
+
+                    <!-- Component Enabled/Disabled Status -->
+                    {% set is_enabled = component.is_enabled if component.is_enabled is defined else true %}
+                    <span class="badge {{ 'bg-success' if is_enabled else 'bg-secondary' }} mb-1">
+                        <i class="fas fa-{{ 'check' if is_enabled else 'times' }} me-1"></i>
+                        {{ 'Enabled' if is_enabled else 'Disabled' }}
+                    </span>
+
+                    <!-- Configuration Status -->
+                    <span class="badge {{ 'bg-info' if config_status == 'configured' else 'bg-warning' }} mb-2">
+                        {{ config_status|title }}
+                    </span>
+
+                    {% if config_status == 'pending' %}
+                    <button class="btn btn-sm btn-primary"
+                            hx-get="/htmx/component/configure/{{ component.component_id }}"
+                            hx-target="#config-modal-content"
+                            data-bs-toggle="modal"
+                            data-bs-target="#configModal">
+                        <i class="fas fa-cog me-1"></i>Configure
+                    </button>
+                    {% else %}
+                    <button class="btn btn-sm btn-outline-secondary"
+                            hx-get="/htmx/component/view-config/{{ component.component_id }}"
+                            hx-target="#config-modal-content"
+                            data-bs-toggle="modal"
+                            data-bs-target="#configModal">
+                        <i class="fas fa-eye me-1"></i>View Config
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

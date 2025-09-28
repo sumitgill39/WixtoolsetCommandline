@@ -314,6 +314,15 @@
         {% block content %}{% endblock %}
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" id="delete-modal-content">
+                <!-- Dynamic content loaded via HTMX -->
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="footer mt-5">
         <div class="container">

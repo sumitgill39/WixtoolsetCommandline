@@ -1,0 +1,339 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}{{ project.project_name }} - Project Details{% endblock %}
+{% block page_title %}Project Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Back Navigation -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('project_dashboard') }}" class="text-decoration-none">
+                            <i class="fas fa-arrow-left me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">{{ project.project_name }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Project Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 bg-gradient" style="background: linear-gradient(135deg, {{ project.color_primary or '#007bff' }}, {{ project.color_secondary or '#0056b3' }});">
+                <div class="card-body text-white">
+                    <div class="d-flex align-items-center">
+                        <div class="project-icon me-3" style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 1.5rem; backdrop-filter: blur(10px);">
+                            {{ project.project_key[:2] }}
+                        </div>
+                        <div class="flex-grow-1">
+                            <h2 class="mb-1">{{ project.project_name }}</h2>
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="badge bg-light bg-opacity-25 text-white">{{ project.project_key }}</span>
+                                <span class="badge bg-light bg-opacity-25 text-white">{{ project.project_type or 'Application' }}</span>
+                                <span class="badge bg-{{ 'success' if project.status == 'active' else 'warning' }} bg-opacity-75">
+                                    {{ project.status|title or 'Active' }}
+                                </span>
+                            </div>
+                            {% if project.description %}
+                            <p class="mt-2 mb-0 opacity-90">{{ project.description }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="text-end">
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-light btn-lg" onclick="alert('MSI Factory Core Engine - Coming Soon!')">
+                                    <i class="fas fa-rocket me-2"></i>Generate MSI
+                                </button>
+                                <button type="button" class="btn btn-light dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
+                                    <span class="visually-hidden">Toggle Dropdown</span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="alert('Build History - Coming Soon!')">
+                                        <i class="fas fa-history me-2"></i>Build History
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="alert('Download Latest - Coming Soon!')">
+                                        <i class="fas fa-download me-2"></i>Download Latest
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" onclick="alert('Project Settings - Coming Soon!')">
+                                        <i class="fas fa-cog me-2"></i>Settings
+                                    </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Information Grid -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <!-- Project Details Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Project Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td class="fw-bold text-muted">Project Key:</td>
+                                    <td><code>{{ project.project_key }}</code></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-muted">Project Type:</td>
+                                    <td><span class="badge bg-secondary">{{ project.project_type or 'Application' }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-muted">Owner Team:</td>
+                                    <td>{{ project.owner_team or 'Not specified' }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-muted">Status:</td>
+                                    <td><span class="badge bg-{{ 'success' if project.status == 'active' else 'warning' }}">{{ project.status|title or 'Active' }}</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                {% if project.project_guid %}
+                                <tr>
+                                    <td class="fw-bold text-muted">Project GUID:</td>
+                                    <td><code class="small">{{ project.project_guid }}</code></td>
+                                </tr>
+                                {% endif %}
+                                <tr>
+                                    <td class="fw-bold text-muted">Created Date:</td>
+                                    <td>{{ project.created_date.strftime('%B %d, %Y') if project.created_date else 'Not available' }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-muted">Created By:</td>
+                                    <td>{{ project.created_by or 'System' }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-muted">Components:</td>
+                                    <td><span class="badge bg-info">{{ components|length }} component{{ 's' if components|length != 1 else '' }}</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Components Section -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-cubes me-2"></i>Components ({{ components|length }})
+                        </h5>
+                        {% if components|length > 0 %}
+                        <small class="text-muted">Project components and configurations</small>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if components %}
+                    <div class="row">
+                        {% for component in components %}
+                        <div class="col-lg-6 mb-3">
+                            <div class="card border-0 bg-light component-card" style="cursor: pointer; transition: all 0.2s ease-in-out;" onclick="window.location.href='{{ url_for('component_detail', component_id=component.component_id) }}'">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-start">
+                                        <div class="component-icon me-3" style="width: 40px; height: 40px; background: linear-gradient(135deg, #28a745, #20c997); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.8rem;">
+                                            {{ component.component_name[:2].upper() }}
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="mb-1 text-primary">{{ component.component_name }}</h6>
+                                                    <p class="text-muted small mb-2">{{ component.component_type or 'Component' }}</p>
+                                                </div>
+                                                <i class="fas fa-external-link-alt text-muted small"></i>
+                                            </div>
+                                            {% if component.description %}
+                                            <p class="small mb-2">{{ component.description }}</p>
+                                            {% endif %}
+                                            <div class="d-flex gap-1 flex-wrap">
+                                                {% if component.framework %}
+                                                <span class="badge bg-info">{{ component.framework }}</span>
+                                                {% endif %}
+                                                {% if component.component_type %}
+                                                <span class="badge bg-secondary">{{ component.component_type }}</span>
+                                                {% endif %}
+                                                <span class="badge bg-{{ 'success' if component.is_enabled else 'warning' }}">
+                                                    {{ 'Enabled' if component.is_enabled else 'Disabled' }}
+                                                </span>
+                                            </div>
+                                            <div class="mt-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-mouse-pointer me-1"></i>Click to view details
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-cubes fa-3x text-muted mb-3"></i>
+                        <h6 class="text-muted">No Components Configured</h6>
+                        <p class="text-muted small">This project doesn't have any components configured yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Quick Actions Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" onclick="alert('MSI Factory Core Engine - Coming Soon!')">
+                            <i class="fas fa-rocket me-2"></i>Generate MSI Package
+                        </button>
+                        <button class="btn btn-outline-success" onclick="alert('Build History - Coming Soon!')">
+                            <i class="fas fa-history me-2"></i>View Build History
+                        </button>
+                        <button class="btn btn-outline-info" onclick="alert('Download Latest - Coming Soon!')">
+                            <i class="fas fa-download me-2"></i>Download Latest Build
+                        </button>
+                        <hr>
+                        <button class="btn btn-outline-secondary" onclick="alert('Project Settings - Coming Soon!')">
+                            <i class="fas fa-cog me-2"></i>Project Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Environments Card -->
+            {% if environments %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-server me-2"></i>Environments ({{ environments|length }})
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for env in environments %}
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="env-icon me-2" style="width: 20px; height: 20px; background: #17a2b8; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-server fa-xs text-white"></i>
+                        </div>
+                        <div>
+                            <div class="fw-semibold small">{{ env.environment_name }}</div>
+                            {% if env.description %}
+                            <div class="text-muted small">{{ env.description }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Project Statistics -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Project Stats
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Components:</span>
+                        <span class="fw-bold">{{ components|length }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Environments:</span>
+                        <span class="fw-bold">{{ environments|length if environments else 0 }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Status:</span>
+                        <span class="badge bg-{{ 'success' if project.status == 'active' else 'warning' }}">{{ project.status|title or 'Active' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Your Access:</span>
+                        <span class="badge bg-primary">{{ 'Admin' if user_role == 'admin' else 'User' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Enhanced styling for project details */
+.project-icon {
+    flex-shrink: 0;
+}
+
+.component-icon {
+    flex-shrink: 0;
+}
+
+.env-icon {
+    flex-shrink: 0;
+}
+
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-1px);
+}
+
+.component-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid #dee2e6;
+}
+
+.component-card:hover .text-primary {
+    color: #0056b3 !important;
+}
+
+.component-card:hover .fa-external-link-alt {
+    color: #007bff !important;
+}
+
+.table-borderless td {
+    padding: 0.5rem 0.75rem;
+    border: none;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .btn-group {
+        width: 100%;
+    }
+
+    .btn-group .btn {
+        flex: 1;
+    }
+}
+</style>
+{% endblock %}

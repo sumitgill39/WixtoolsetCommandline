@@ -1,0 +1,172 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}Edit User Projects - MSI Factory{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-1"><i class="fas fa-project-diagram me-2"></i>Edit User Projects</h2>
+                    <p class="text-muted">Manage project access for user - Python only, no JavaScript</p>
+                </div>
+                <a href="{{ url_for('user_management') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to User Management
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Information Card -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="user-avatar me-3" style="width: 60px; height: 60px; background: linear-gradient(135deg, #3498db, #2c3e50); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 1.2rem;">
+                            {{ user_info.username[:2].upper() if user_info else 'UN' }}
+                        </div>
+                        <div>
+                            <h5 class="mb-1">{{ user_info.username if user_info else user_details.username }}</h5>
+                            <p class="text-muted mb-0">
+                                {{ user_info.email if user_info else (user_details.username + '@company.com') }}
+                            </p>
+                            <small class="text-muted">
+                                Role: <span class="badge bg-primary">{{ user_info.role if user_info else 'user' }}</span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Assignment Form -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-tasks me-2"></i>Project Access Configuration
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('update_user_projects') }}">
+                        <input type="hidden" name="username" value="{{ user_details.username }}">
+
+                        <!-- Admin Access Option -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="all_projects_access" name="all_projects_access"
+                                       {% if user_details.all_projects_access %}checked{% endif %}>
+                                <label class="form-check-label" for="all_projects_access">
+                                    <strong><i class="fas fa-shield-alt me-2"></i>Grant access to all projects (Admin-level access)</strong>
+                                    <br><small class="text-muted">When enabled, user will have access to all current and future projects</small>
+                                </label>
+                            </div>
+                        </div>
+
+                        {% if not user_details.all_projects_access %}
+                        <!-- Individual Project Selection -->
+                        <div class="mb-4">
+                            <h6 class="mb-3">Select Individual Projects:</h6>
+                            {% if all_projects %}
+                            <div class="row">
+                                {% for project in all_projects %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-check border rounded p-3 h-100">
+                                        <input class="form-check-input" type="checkbox" name="project_keys" value="{{ project.project_key }}"
+                                               id="project_{{ project.project_key }}"
+                                               {% if project.project_key in user_details.projects %}checked{% endif %}>
+                                        <label class="form-check-label w-100" for="project_{{ project.project_key }}">
+                                            <div class="d-flex align-items-center">
+                                                <div class="project-icon me-3" style="width: 35px; height: 35px; background: linear-gradient(135deg, {{ project.color_primary or '#007bff' }}, {{ project.color_secondary or '#0056b3' }}); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.8rem;">
+                                                    {{ project.project_key[:2] }}
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <div class="fw-semibold">{{ project.project_name }}</div>
+                                                    <small class="text-muted d-block">{{ project.project_key }}</small>
+                                                    <small class="text-muted">{{ project.owner_team or 'No Team' }} - {{ project.status or 'Active' }}</small>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>No projects available for assignment.
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Current Assignments Display -->
+                        <div class="mb-4">
+                            <h6 class="mb-3">Current Project Assignments:</h6>
+                            {% if user_details.all_projects_access %}
+                            <div class="alert alert-success">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                <strong>All Projects Access Enabled</strong>
+                                <br><small>This user has administrator-level access to all projects</small>
+                            </div>
+                            {% elif user_details.projects %}
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for project_key in user_details.projects %}
+                                <span class="badge bg-primary">{{ project_key }}</span>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>No projects currently assigned to this user.
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('user_management') }}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Update Project Access
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pure CSS for form interactions (no JavaScript) -->
+<style>
+/* Hide individual projects when all_projects_access is checked */
+#all_projects_access:checked ~ .individual-projects {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Visual feedback for selected checkboxes */
+.form-check-input:checked + .form-check-label {
+    background-color: #f8f9fa;
+    border-color: #007bff;
+}
+
+/* Hover effects for project cards */
+.form-check.border:hover {
+    background-color: #f8f9fa;
+    border-color: #007bff !important;
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+/* User avatar styling */
+.user-avatar {
+    background: linear-gradient(135deg, #3498db, #2c3e50) !important;
+}
+</style>
+{% endblock %}

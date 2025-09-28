@@ -1,0 +1,35 @@
+{% if validation %}
+<div class="validation-feedback mt-2">
+    {% if validation.is_valid %}
+        <div class="alert alert-success alert-sm">
+            <i class="fas fa-check-circle me-2"></i>{{ validation.message or 'Validation passed' }}
+        </div>
+    {% else %}
+        <div class="alert alert-danger alert-sm">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            {% if validation.errors %}
+                <ul class="mb-0">
+                    {% for field, errors in validation.errors.items() %}
+                        {% for error in errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            {% else %}
+                {{ validation.message or 'Validation failed' }}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if validation.warnings %}
+        <div class="alert alert-warning alert-sm">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <ul class="mb-0">
+                {% for warning in validation.warnings %}
+                <li>{{ warning }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+</div>
+{% endif %}

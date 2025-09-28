@@ -116,8 +116,8 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="badge bg-{{ 'success' if user.status == 'approved' else 'warning' }}">
-                                        {{ user.status.title() }}
+                                    <span class="badge bg-{{ 'success' if user.is_active else 'danger' }}">
+                                        {{ 'Active' if user.is_active else 'Inactive' }}
                                     </span>
                                 </td>
                                 <td>
@@ -136,9 +136,9 @@
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <button class="btn btn-outline-primary" onclick="editUserProjects('{{ user.username }}')" title="Edit Projects">
+                                        <a href="{{ url_for('edit_user_projects', username=user.username) }}" class="btn btn-outline-primary" title="Edit Projects">
                                             <i class="fas fa-project-diagram"></i>
-                                        </button>
+                                        </a>
                                         <button class="btn btn-outline-info" onclick="viewUserDetails('{{ user.username }}')" title="View Details">
                                             <i class="fas fa-eye"></i>
                                         </button>

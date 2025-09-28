@@ -1,0 +1,114 @@
+<div class="modal-header bg-danger text-white">
+    <h5 class="modal-title">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        Confirm Component Deletion
+    </h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+    <div class="alert alert-warning">
+        <i class="fas fa-warning me-2"></i>
+        <strong>Warning:</strong> This action cannot be undone!
+    </div>
+
+    <h6>Component Details:</h6>
+    <div class="card bg-light mb-3">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-4">Name:</dt>
+                <dd class="col-sm-8"><strong>{{ component.component_name }}</strong></dd>
+
+                <dt class="col-sm-4">Type:</dt>
+                <dd class="col-sm-8">{{ component.component_type|title }}</dd>
+
+                <dt class="col-sm-4">Framework:</dt>
+                <dd class="col-sm-8">{{ component.framework }}</dd>
+
+                <dt class="col-sm-4">Project:</dt>
+                <dd class="col-sm-8">{{ component.project_name }} ({{ component.project_key }})</dd>
+
+                <dt class="col-sm-4">GUID:</dt>
+                <dd class="col-sm-8"><code class="small">{{ component.component_guid }}</code></dd>
+
+                <dt class="col-sm-4">Created:</dt>
+                <dd class="col-sm-8">{{ component.created_date.strftime('%Y-%m-%d %H:%M') if component.created_date else 'Unknown' }} by {{ component.created_by }}</dd>
+            </dl>
+        </div>
+    </div>
+
+    {% if has_configurations %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        <strong>Note:</strong> This component has MSI configurations that will also be deleted.
+    </div>
+    {% endif %}
+
+    <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" id="confirmDeletion" required>
+        <label class="form-check-label" for="confirmDeletion">
+            I understand that deleting <strong>{{ component.component_name }}</strong> will permanently remove all associated data and configurations.
+        </label>
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="confirmationText" class="form-label">
+            Type <code>{{ component.component_name }}</code> to confirm deletion:
+        </label>
+        <input type="text" class="form-control" id="confirmationText"
+               placeholder="Enter component name to confirm"
+               autocomplete="off">
+        <div class="form-text">Component name must match exactly (case-sensitive)</div>
+    </div>
+
+    <div id="deletion-feedback" class="mt-3"></div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+        <i class="fas fa-times me-1"></i>Cancel
+    </button>
+    <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled
+            hx-delete="/htmx/component/delete/{{ component.component_id }}"
+            hx-target="#deletion-feedback"
+            hx-swap="innerHTML">
+        <i class="fas fa-trash me-1"></i>Delete Component
+    </button>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('confirmDeletion');
+    const textInput = document.getElementById('confirmationText');
+    const deleteBtn = document.getElementById('confirmDeleteBtn');
+    const componentName = '{{ component.component_name }}';
+
+    function checkConfirmation() {
+        const isChecked = checkbox.checked;
+        const textMatches = textInput.value === componentName;
+        deleteBtn.disabled = !(isChecked && textMatches);
+
+        if (textMatches) {
+            textInput.classList.remove('is-invalid');
+            textInput.classList.add('is-valid');
+        } else if (textInput.value.length > 0) {
+            textInput.classList.remove('is-valid');
+            textInput.classList.add('is-invalid');
+        } else {
+            textInput.classList.remove('is-valid', 'is-invalid');
+        }
+    }
+
+    checkbox.addEventListener('change', checkConfirmation);
+    textInput.addEventListener('input', checkConfirmation);
+
+    // Handle successful deletion
+    deleteBtn.addEventListener('click', function() {
+        if (!deleteBtn.disabled) {
+            // Disable the button to prevent double-clicks
+            deleteBtn.disabled = true;
+            deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Deleting...';
+        }
+    });
+});
+</script>

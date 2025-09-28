@@ -1,0 +1,133 @@
+{% if component_type %}
+<div class="component-config-fields mt-3">
+    {% if component_type in ['webapp', 'website', 'api'] %}
+    <!-- Web Application Configuration -->
+    <div class="card bg-light">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="fas fa-globe me-2"></i>Web Application Settings</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">IIS Website Name</label>
+                        <input type="text" class="form-control"
+                               name="iis_website_name_{{ component_id }}"
+                               value="Default Web Site">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Application Pool Name</label>
+                        <input type="text" class="form-control"
+                               name="iis_app_pool_name_{{ component_id }}"
+                               value="DefaultAppPool">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">.NET Version</label>
+                        <select class="form-select" name="app_pool_dotnet_version_{{ component_id }}">
+                            <option value="v4.0" selected>v4.0</option>
+                            <option value="v2.0">v2.0</option>
+                            <option value="">No Managed Code</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Pipeline Mode</label>
+                        <select class="form-select" name="app_pool_pipeline_mode_{{ component_id }}">
+                            <option value="Integrated" selected>Integrated</option>
+                            <option value="Classic">Classic</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% elif component_type == 'service' %}
+    <!-- Windows Service Configuration -->
+    <div class="card bg-light">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="fas fa-cogs me-2"></i>Windows Service Settings</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Service Name</label>
+                        <input type="text" class="form-control"
+                               name="service_name_{{ component_id }}"
+                               value="NewService">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Display Name</label>
+                        <input type="text" class="form-control"
+                               name="service_display_name_{{ component_id }}"
+                               value="New Service">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Start Type</label>
+                        <select class="form-select" name="service_start_type_{{ component_id }}">
+                            <option value="Automatic" selected>Automatic</option>
+                            <option value="Manual">Manual</option>
+                            <option value="Disabled">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Service Account</label>
+                        <select class="form-select" name="service_account_{{ component_id }}">
+                            <option value="LocalSystem" selected>Local System</option>
+                            <option value="LocalService">Local Service</option>
+                            <option value="NetworkService">Network Service</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" name="service_description_{{ component_id }}" rows="2">Windows Service</textarea>
+            </div>
+        </div>
+    </div>
+
+    {% elif component_type == 'desktop' %}
+    <!-- Desktop Application Configuration -->
+    <div class="card bg-light">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="fas fa-desktop me-2"></i>Desktop Application Settings</h6>
+        </div>
+        <div class="card-body">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox"
+                       name="desktop_shortcut_{{ component_id }}"
+                       id="desktop_shortcut_{{ component_id }}" checked>
+                <label class="form-check-label" for="desktop_shortcut_{{ component_id }}">
+                    Create Desktop Shortcut
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox"
+                       name="start_menu_{{ component_id }}"
+                       id="start_menu_{{ component_id }}" checked>
+                <label class="form-check-label" for="start_menu_{{ component_id }}">
+                    Add to Start Menu
+                </label>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endif %}

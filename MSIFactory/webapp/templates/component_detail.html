@@ -1,0 +1,356 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}{{ component.component_name }} - Component Details{% endblock %}
+{% block page_title %}Component Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Back Navigation -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('project_dashboard') }}" class="text-decoration-none">
+                            <i class="fas fa-arrow-left me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('project_detail', project_id=project.project_id) }}" class="text-decoration-none">
+                            {{ project.project_name }}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">{{ component.component_name }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Component Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 bg-gradient" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                <div class="card-body text-white">
+                    <div class="d-flex align-items-center">
+                        <div class="component-icon me-3" style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 1.5rem; backdrop-filter: blur(10px);">
+                            {{ component.component_name[:2].upper() }}
+                        </div>
+                        <div class="flex-grow-1">
+                            <h2 class="mb-1">{{ component.component_name }}</h2>
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="badge bg-light bg-opacity-25 text-white">{{ component.component_type or 'Component' }}</span>
+                                <span class="badge bg-light bg-opacity-25 text-white">{{ component.framework or 'Framework' }}</span>
+                                <span class="badge bg-{{ 'success' if component.is_enabled else 'warning' }} bg-opacity-75">
+                                    {{ 'Enabled' if component.is_enabled else 'Disabled' }}
+                                </span>
+                            </div>
+                            {% if component.description %}
+                            <p class="mt-2 mb-0 opacity-90">{{ component.description }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="text-end">
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-light btn-lg" onclick="alert('MSI Generation for Component - Coming Soon!')">
+                                    <i class="fas fa-rocket me-2"></i>Generate MSI
+                                </button>
+                                <button type="button" class="btn btn-light dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
+                                    <span class="visually-hidden">Toggle Dropdown</span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="alert('Component Configuration - Coming Soon!')">
+                                        <i class="fas fa-cog me-2"></i>Configure
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="alert('Test Component - Coming Soon!')">
+                                        <i class="fas fa-vial me-2"></i>Test Component
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="#" onclick="alert('Download Artifacts - Coming Soon!')">
+                                        <i class="fas fa-download me-2"></i>Download Artifacts
+                                    </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Component Information Grid -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <!-- Basic Information Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Basic Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td class="fw-bold text-muted">Component Name:</td>
+                                    <td><code>{{ component.component_name }}</code></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-muted">Component Type:</td>
+                                    <td><span class="badge bg-secondary">{{ component.component_type or 'Not specified' }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-muted">Framework:</td>
+                                    <td><span class="badge bg-info">{{ component.framework or 'Not specified' }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-muted">Status:</td>
+                                    <td><span class="badge bg-{{ 'success' if component.is_enabled else 'warning' }}">{{ 'Enabled' if component.is_enabled else 'Disabled' }}</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                {% if component.component_guid %}
+                                <tr>
+                                    <td class="fw-bold text-muted">Component GUID:</td>
+                                    <td><code class="small">{{ component.component_guid }}</code></td>
+                                </tr>
+                                {% endif %}
+                                <tr>
+                                    <td class="fw-bold text-muted">Created Date:</td>
+                                    <td>{{ component.created_date.strftime('%B %d, %Y') if component.created_date else 'Not available' }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-muted">Created By:</td>
+                                    <td>{{ component.created_by or 'System' }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-muted">Project:</td>
+                                    <td>
+                                        <a href="{{ url_for('project_detail', project_id=project.project_id) }}" class="text-decoration-none">
+                                            {{ project.project_name }} ({{ project.project_key }})
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Application Configuration Card -->
+            {% if component.app_name or component.app_version or component.manufacturer %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-desktop me-2"></i>Application Configuration
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                {% if component.app_name %}
+                                <tr>
+                                    <td class="fw-bold text-muted">Application Name:</td>
+                                    <td>{{ component.app_name }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if component.app_version %}
+                                <tr>
+                                    <td class="fw-bold text-muted">Version:</td>
+                                    <td><span class="badge bg-primary">{{ component.app_version }}</span></td>
+                                </tr>
+                                {% endif %}
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                {% if component.manufacturer %}
+                                <tr>
+                                    <td class="fw-bold text-muted">Manufacturer:</td>
+                                    <td>{{ component.manufacturer }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if component.install_folder %}
+                                <tr>
+                                    <td class="fw-bold text-muted">Install Folder:</td>
+                                    <td><code>{{ component.install_folder }}</code></td>
+                                </tr>
+                                {% endif %}
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Service Configuration Card -->
+            {% if component.service_name or component.service_display_name or component.port %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cogs me-2"></i>Service Configuration
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                {% if component.service_name %}
+                                <tr>
+                                    <td class="fw-bold text-muted">Service Name:</td>
+                                    <td><code>{{ component.service_name }}</code></td>
+                                </tr>
+                                {% endif %}
+                                {% if component.service_display_name %}
+                                <tr>
+                                    <td class="fw-bold text-muted">Display Name:</td>
+                                    <td>{{ component.service_display_name }}</td>
+                                </tr>
+                                {% endif %}
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                {% if component.port %}
+                                <tr>
+                                    <td class="fw-bold text-muted">Port:</td>
+                                    <td><span class="badge bg-success">{{ component.port }}</span></td>
+                                </tr>
+                                {% endif %}
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- IIS Configuration Card -->
+            {% if component.iis_website_name or component.iis_app_pool_name %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-server me-2"></i>IIS Configuration
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            {% if component.iis_website_name %}
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td class="fw-bold text-muted">Website Name:</td>
+                                    <td><code>{{ component.iis_website_name }}</code></td>
+                                </tr>
+                            </table>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            {% if component.iis_app_pool_name %}
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td class="fw-bold text-muted">App Pool Name:</td>
+                                    <td><code>{{ component.iis_app_pool_name }}</code></td>
+                                </tr>
+                            </table>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Quick Actions Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" onclick="alert('Generate Component MSI - Coming Soon!')">
+                            <i class="fas fa-rocket me-2"></i>Generate Component MSI
+                        </button>
+                        <button class="btn btn-outline-success" onclick="alert('Test Component - Coming Soon!')">
+                            <i class="fas fa-vial me-2"></i>Test Component
+                        </button>
+                        <button class="btn btn-outline-info" onclick="alert('View Logs - Coming Soon!')">
+                            <i class="fas fa-file-alt me-2"></i>View Component Logs
+                        </button>
+                        <hr>
+                        <button class="btn btn-outline-secondary" onclick="alert('Component Settings - Coming Soon!')">
+                            <i class="fas fa-cog me-2"></i>Component Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Component Statistics -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Component Stats
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Type:</span>
+                        <span class="fw-bold">{{ component.component_type or 'Unknown' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Framework:</span>
+                        <span class="fw-bold">{{ component.framework or 'Unknown' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Status:</span>
+                        <span class="badge bg-{{ 'success' if component.is_enabled else 'warning' }}">{{ 'Enabled' if component.is_enabled else 'Disabled' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Your Access:</span>
+                        <span class="badge bg-primary">{{ 'Admin' if user_role == 'admin' else 'User' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Enhanced styling for component details */
+.component-icon {
+    flex-shrink: 0;
+}
+
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-1px);
+}
+
+.table-borderless td {
+    padding: 0.5rem 0.75rem;
+    border: none;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .btn-group {
+        width: 100%;
+    }
+
+    .btn-group .btn {
+        flex: 1;
+    }
+}
+</style>
+{% endblock %}

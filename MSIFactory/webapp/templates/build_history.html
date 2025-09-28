@@ -1,0 +1,196 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}Build History - MSI Factory{% endblock %}
+
+{% block header_title %}Build History{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2"></i>MSI Build History
+                    </h5>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-secondary btn-sm" onclick="refreshHistory()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if builds %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Build ID</th>
+                                        <th>Project</th>
+                                        <th>Component</th>
+                                        <th>Version</th>
+                                        <th>Status</th>
+                                        <th>Started</th>
+                                        <th>Duration</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for build in builds %}
+                                    <tr>
+                                        <td>
+                                            <code>{{ build.build_id }}</code>
+                                        </td>
+                                        <td>
+                                            <strong>{{ build.project_name }}</strong>
+                                            <br><small class="text-muted">{{ build.project_key }}</small>
+                                        </td>
+                                        <td>{{ build.component_name or 'N/A' }}</td>
+                                        <td>{{ build.version }}</td>
+                                        <td>
+                                            {% if build.status == 'completed' %}
+                                                <span class="badge bg-success">{{ build.status.title() }}</span>
+                                            {% elif build.status == 'failed' %}
+                                                <span class="badge bg-danger">{{ build.status.title() }}</span>
+                                            {% elif build.status == 'in_progress' %}
+                                                <span class="badge bg-primary">In Progress</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ build.status.title() }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ build.started_date.strftime('%Y-%m-%d %H:%M') if build.started_date else 'N/A' }}
+                                        </td>
+                                        <td>
+                                            {% if build.duration %}
+                                                {{ build.duration }}
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-info" onclick="viewBuildDetails('{{ build.build_id }}')">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                {% if build.status == 'completed' %}
+                                                <button class="btn btn-outline-success" onclick="downloadMSI('{{ build.build_id }}')">
+                                                    <i class="fas fa-download"></i>
+                                                </button>
+                                                {% endif %}
+                                                {% if build.status == 'failed' %}
+                                                <button class="btn btn-outline-warning" onclick="retryBuild('{{ build.build_id }}')">
+                                                    <i class="fas fa-redo"></i>
+                                                </button>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Build History</h4>
+                            <p class="text-muted">Build history will appear here once you start generating MSI packages.</p>
+                            <a href="{{ url_for('generate_msi') if url_for else '/generate-msi' }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Start Your First Build
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Build Details Modal -->
+<div class="modal fade" id="buildDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Build Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="buildDetailsContent">
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function refreshHistory() {
+    location.reload();
+}
+
+function viewBuildDetails(buildId) {
+    const modal = new bootstrap.Modal(document.getElementById('buildDetailsModal'));
+    const content = document.getElementById('buildDetailsContent');
+
+    content.innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    `;
+
+    modal.show();
+
+    // Simulate loading build details
+    setTimeout(() => {
+        content.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Build Information</h6>
+                    <dl class="row">
+                        <dt class="col-sm-4">Build ID:</dt>
+                        <dd class="col-sm-8"><code>${buildId}</code></dd>
+                        <dt class="col-sm-4">Status:</dt>
+                        <dd class="col-sm-8"><span class="badge bg-success">Completed</span></dd>
+                        <dt class="col-sm-4">Started:</dt>
+                        <dd class="col-sm-8">2024-01-15 14:30:00</dd>
+                        <dt class="col-sm-4">Completed:</dt>
+                        <dd class="col-sm-8">2024-01-15 14:35:23</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <h6>Build Output</h6>
+                    <div class="bg-dark text-light p-3 rounded" style="font-family: monospace; font-size: 0.85em; max-height: 200px; overflow-y: auto;">
+                        <div>MSI Factory Build Log</div>
+                        <div>========================</div>
+                        <div>Starting build process...</div>
+                        <div>✓ Project validation passed</div>
+                        <div>✓ Components validated</div>
+                        <div>✓ MSI package generated</div>
+                        <div>✓ Build completed successfully</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }, 1000);
+}
+
+function downloadMSI(buildId) {
+    // Implement MSI download functionality
+    alert('Download functionality would be implemented here for build: ' + buildId);
+}
+
+function retryBuild(buildId) {
+    if (confirm('Are you sure you want to retry this build?')) {
+        // Implement retry functionality
+        alert('Retry functionality would be implemented here for build: ' + buildId);
+    }
+}
+</script>
+{% endblock %}

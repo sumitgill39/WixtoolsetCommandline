@@ -1,0 +1,83 @@
+<div class="modal-header">
+    <h5 class="modal-title">
+        <i class="fas fa-project-diagram me-2"></i>
+        Manage Projects for {{ user.first_name }} {{ user.last_name }}
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+    <form id="userProjectsForm"
+          hx-post="/htmx/user/update-projects/{{ user.username }}"
+          hx-target="#user-projects-feedback"
+          hx-swap="innerHTML">
+
+        <div class="mb-4">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox"
+                       id="allProjectsAccess" name="all_projects"
+                       {{ 'checked' if has_all_access }}
+                       onchange="toggleProjectList(this)">
+                <label class="form-check-label fw-bold" for="allProjectsAccess">
+                    <i class="fas fa-globe me-1"></i>
+                    Grant access to ALL projects (including future projects)
+                </label>
+                <div class="form-text">
+                    When enabled, user will have access to all current and future projects automatically.
+                </div>
+            </div>
+        </div>
+
+        <div id="individualProjectsSection" {{ 'style="display: none;"' if has_all_access }}>
+            <h6 class="mb-3">Individual Project Access</h6>
+
+            {% if all_projects %}
+            <div class="row">
+                {% for project in all_projects %}
+                <div class="col-md-6 mb-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox"
+                               id="project_{{ project.project_id }}"
+                               name="projects"
+                               value="{{ project.project_key }}"
+                               {{ 'checked' if project.project_key in user_projects and not has_all_access }}>
+                        <label class="form-check-label" for="project_{{ project.project_id }}">
+                            <strong>{{ project.project_key }}</strong> - {{ project.project_name }}
+                            <br>
+                            <small class="text-muted">{{ project.project_type }}</small>
+                        </label>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-3">
+                <i class="fas fa-folder-open fa-2x text-muted mb-2"></i>
+                <p class="text-muted">No projects available</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div id="user-projects-feedback" class="mt-3"></div>
+    </form>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    <button type="submit" form="userProjectsForm" class="btn btn-primary">
+        <i class="fas fa-save me-1"></i>Save Changes
+    </button>
+</div>
+
+<script>
+function toggleProjectList(checkbox) {
+    const projectsSection = document.getElementById('individualProjectsSection');
+    if (checkbox.checked) {
+        projectsSection.style.display = 'none';
+        // Uncheck all individual project checkboxes
+        projectsSection.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+    } else {
+        projectsSection.style.display = 'block';
+    }
+}
+</script>

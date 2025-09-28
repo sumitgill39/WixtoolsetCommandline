@@ -1,180 +1,309 @@
 {% extends "base_sidebar.html" %}
 
 {% block title %}Dashboard - MSI Factory{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="card">
-    <h2 style="color: #2c3e50; margin-bottom: 1rem;">
-        👋 Welcome, {{ session.first_name }} {{ session.last_name }}!
-    </h2>
-    
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-        <div style="background: #3498db; color: white; padding: 1rem; border-radius: 8px; text-align: center;">
-            <h3 style="margin: 0; font-size: 2rem;">{{ applications|length }}</h3>
-            <p style="margin: 0;">Applications</p>
-        </div>
-        
-        <div style="background: #27ae60; color: white; padding: 1rem; border-radius: 8px; text-align: center;">
-            <h3 style="margin: 0; font-size: 2rem;">{{ session.role|title }}</h3>
-            <p style="margin: 0;">Role</p>
-        </div>
-        
-        <div style="background: #f39c12; color: white; padding: 1rem; border-radius: 8px; text-align: center;">
-            <h3 style="margin: 0; font-size: 2rem;">Active</h3>
-            <p style="margin: 0;">Status</p>
-        </div>
-        
-        <div style="background: #9b59b6; color: white; padding: 1rem; border-radius: 8px; text-align: center;">
-            <h3 style="margin: 0; font-size: 2rem;">{{ session.email.split('@')[1] }}</h3>
-            <p style="margin: 0;">Domain</p>
-        </div>
-    </div>
-    
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-        <div>
-            <h3 style="color: #34495e;">👤 User Profile</h3>
-            <table class="table">
-                <tr>
-                    <td><strong>Username:</strong></td>
-                    <td>{{ session.username }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Email:</strong></td>
-                    <td>{{ session.email }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Full Name:</strong></td>
-                    <td>{{ session.first_name }} {{ session.last_name }}</td>
-                </tr>
-                <tr>
-                    <td><strong>Role:</strong></td>
-                    <td>
-                        <span style="background: {% if session.role == 'admin' %}#e74c3c{% else %}#3498db{% endif %}; 
-                                     color: white; padding: 2px 8px; border-radius: 3px; font-size: 0.8rem;">
-                            {{ session.role|title }}
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>Access Level:</strong></td>
-                    <td>
-                        {% if '*' in session.approved_apps %}
-                            <span style="color: #27ae60;">🌟 All Applications</span>
-                        {% else %}
-                            <span style="color: #f39c12;">📋 Specific Applications</span>
-                        {% endif %}
-                    </td>
-                </tr>
-            </table>
-        </div>
-        
-        <div>
-            <h3 style="color: #34495e;">🔐 Access Summary</h3>
-            <table class="table">
-                <tr>
-                    <td><strong>Approved Apps:</strong></td>
-                    <td>
-                        {% if '*' in session.approved_apps %}
-                            All Applications
-                        {% else %}
-                            {{ session.approved_apps|join(', ') }}
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>Can Create MSI:</strong></td>
-                    <td><span style="color: #27ae60;">✅ Yes</span></td>
-                </tr>
-                <tr>
-                    <td><strong>Can View Reports:</strong></td>
-                    <td><span style="color: #27ae60;">✅ Yes</span></td>
-                </tr>
-                <tr>
-                    <td><strong>Admin Access:</strong></td>
-                    <td>
-                        {% if session.role == 'admin' %}
-                            <span style="color: #27ae60;">✅ Yes</span>
-                        {% else %}
-                            <span style="color: #95a5a6;">❌ No</span>
-                        {% endif %}
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </div>
-</div>
-
-<div class="card">
-    <h3 style="color: #2c3e50; margin-bottom: 1rem;">
-        🏭 Your Applications
-    </h3>
-    
-    {% if applications %}
-        <div class="app-grid">
-            {% for app in applications %}
-            <div class="app-card" style="border-left: 4px solid #3498db;">
-                <h4 style="color: #2c3e50;">{{ app.app_short_key }}</h4>
-                <h5 style="color: #34495e; margin-bottom: 0.5rem;">{{ app.app_name }}</h5>
-                <p style="font-size: 0.9rem; color: #666;">{{ app.description }}</p>
-                
-                <div style="margin: 1rem 0; padding: 0.5rem; background: #f8f9fa; border-radius: 4px; font-size: 0.8rem;">
-                    <strong>Owner Team:</strong> {{ app.owner_team }}<br>
-                    <strong>Status:</strong> 
-                    <span style="color: {% if app.status == 'active' %}#27ae60{% else %}#e74c3c{% endif %};">
-                        {{ app.status|title }}
-                    </span>
+<div class="container-fluid">
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="mb-1">Welcome, {{ session.username }}!</h2>
+                    <p class="text-muted mb-0">Manage and generate MSI packages for your assigned projects</p>
                 </div>
-                
-                <div style="margin-top: 1rem;">
-                    <button class="btn" style="width: 100%;" onclick="alert('MSI Factory Core Engine - Coming Soon!')">
-                        🚀 Generate MSI
-                    </button>
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-primary me-2">{{ session.role|title }}</span>
+                    <span class="badge bg-success">Active</span>
                 </div>
             </div>
-            {% endfor %}
         </div>
-    {% else %}
-        <div style="text-align: center; padding: 3rem; background: #f8f9fa; border-radius: 8px;">
-            <h4 style="color: #7f8c8d;">No Applications Available</h4>
-            <p style="color: #95a5a6;">You don't have access to any applications yet.</p>
-            <a href="{{ url_for('access_request', username=session.username) }}" class="btn btn-success">
-                📝 Request Application Access
-            </a>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title mb-0">Available Projects</h6>
+                            <h3 class="mb-0">{{ applications|length }}</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-cube fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title mb-0">Access Level</h6>
+                            <h3 class="mb-0">{{ session.role|title }}</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-user-shield fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title mb-0">Status</h6>
+                            <h3 class="mb-0">Active</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-3">
+            <div class="card border-0 bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="card-title mb-0">Quick Actions</h6>
+                            <h3 class="mb-0">Ready</h3>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-tools fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Projects Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-cube me-2"></i>Your Projects
+                        </h5>
+                        {% if applications|length > 0 %}
+                        <small class="text-muted">{{ applications|length }} project{{ 's' if applications|length != 1 else '' }} available</small>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if applications %}
+                    <div class="row">
+                        {% for app in applications %}
+                        <div class="col-lg-6 col-xl-4 mb-4">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <div class="card-header bg-light border-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex align-items-center">
+                                            <div class="project-icon me-2" style="width: 35px; height: 35px; background: linear-gradient(135deg, {{ app.color_primary or '#007bff' }}, {{ app.color_secondary or '#0056b3' }}); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.9rem;">
+                                                {{ app.project_key[:2] }}
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-bold">{{ app.project_key }}</h6>
+                                                <small class="text-muted">{{ app.project_type or 'Application' }}</small>
+                                            </div>
+                                        </div>
+                                        <span class="badge bg-{{ 'success' if app.status == 'active' else 'secondary' }}">
+                                            {{ app.status|title or 'Active' }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ app.project_name }}</h6>
+                                    <p class="card-text text-muted small">
+                                        {{ app.description[:100] + '...' if app.description and app.description|length > 100 else app.description or 'No description available' }}
+                                    </p>
+                                    <div class="mb-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-users me-1"></i>{{ app.owner_team or 'No Team' }}
+                                        </small>
+                                        {% if app.components and app.components|length > 0 %}
+                                        <div class="mt-2">
+                                            <small class="text-muted">
+                                                <i class="fas fa-cubes me-1"></i>{{ app.components|length }} component{{ 's' if app.components|length != 1 else '' }}
+                                            </small>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% if app.components and app.components|length > 0 %}
+                                    <div class="mb-3">
+                                        <h6 class="small fw-bold text-muted mb-2">Components:</h6>
+                                        <div class="d-flex flex-wrap gap-1">
+                                            {% for component in app.components[:3] %}
+                                            <span class="badge bg-light text-dark border">
+                                                {{ component.component_name }}
+                                            </span>
+                                            {% endfor %}
+                                            {% if app.components|length > 3 %}
+                                            <span class="badge bg-secondary">
+                                                +{{ app.components|length - 3 }} more
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="card-footer bg-transparent border-0">
+                                    <div class="d-grid gap-2">
+                                        <div class="btn-group" role="group">
+                                            <a href="#" class="btn btn-primary" onclick="alert('MSI Factory Core Engine - Coming Soon!')">
+                                                <i class="fas fa-rocket me-1"></i>Generate MSI
+                                            </a>
+                                            <button type="button" class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
+                                                <span class="visually-hidden">Toggle Dropdown</span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="{{ url_for('project_detail', project_id=app.project_id) }}">
+                                                    <i class="fas fa-info-circle me-2"></i>View Details
+                                                </a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="alert('Build History - Coming Soon!')">
+                                                    <i class="fas fa-history me-2"></i>Build History
+                                                </a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="alert('Project Settings - Coming Soon!')">
+                                                    <i class="fas fa-cog me-2"></i>Settings
+                                                </a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item" href="#" onclick="alert('Download Latest - Coming Soon!')">
+                                                    <i class="fas fa-download me-2"></i>Download Latest
+                                                </a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <div class="mb-4">
+                            <i class="fas fa-cube fa-4x text-muted"></i>
+                        </div>
+                        <h5 class="text-muted mb-3">No Projects Available</h5>
+                        <p class="text-muted mb-4">You don't have access to any projects yet. Contact your system administrator to request access to specific projects.</p>
+                        <a href="{{ url_for('user_management') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-envelope me-2"></i>Request Access
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if applications %}
+    <!-- Quick Actions Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-0 bg-light h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-rocket fa-2x text-primary mb-3"></i>
+                                    <h6>Batch Generate</h6>
+                                    <p class="text-muted small">Generate MSI packages for all projects</p>
+                                    <button class="btn btn-outline-primary btn-sm" onclick="alert('Batch Generation - Coming Soon!')">
+                                        Start Batch
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-0 bg-light h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-chart-bar fa-2x text-success mb-3"></i>
+                                    <h6>View Reports</h6>
+                                    <p class="text-muted small">Check MSI generation history and logs</p>
+                                    <a href="{{ url_for('build_history') }}" class="btn btn-outline-success btn-sm">
+                                        View Reports
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-0 bg-light h-100">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-cog fa-2x text-warning mb-3"></i>
+                                    <h6>Settings</h6>
+                                    <p class="text-muted small">Configure preferences and notifications</p>
+                                    <button class="btn btn-outline-warning btn-sm" onclick="alert('User Settings - Coming Soon!')">
+                                        Open Settings
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     {% endif %}
 </div>
 
-<div class="card">
-    <h3 style="color: #2c3e50; margin-bottom: 1rem;">
-        🎯 Quick Actions
-    </h3>
-    
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
-        <div style="padding: 1rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
-            <h4 style="color: #3498db;">📦 Generate MSI</h4>
-            <p style="font-size: 0.9rem; color: #666;">Create MSI packages for your applications</p>
-            <button class="btn" onclick="alert('MSI Factory - Coming Soon!')">Start Generation</button>
-        </div>
-        
-        <div style="padding: 1rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
-            <h4 style="color: #27ae60;">📊 View Reports</h4>
-            <p style="font-size: 0.9rem; color: #666;">Check MSI generation history and logs</p>
-            <button class="btn" onclick="alert('Reports - Coming Soon!')">View Reports</button>
-        </div>
-        
-        <div style="padding: 1rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
-            <h4 style="color: #f39c12;">⚙️ Settings</h4>
-            <p style="font-size: 0.9rem; color: #666;">Configure your preferences and notifications</p>
-            <button class="btn" onclick="alert('Settings - Coming Soon!')">Open Settings</button>
-        </div>
-        
-        {% if session.role == 'admin' %}
-        <div style="padding: 1rem; border: 1px solid #ddd; border-radius: 8px; text-align: center;">
-            <h4 style="color: #e74c3c;">👨‍💼 Admin Panel</h4>
-            <p style="font-size: 0.9rem; color: #666;">Manage users and access requests</p>
-            <a href="{{ url_for('admin') }}" class="btn btn-danger">Open Admin Panel</a>
-        </div>
-        {% endif %}
-    </div>
-</div>
+<style>
+/* Professional styling enhancements */
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.project-icon {
+    flex-shrink: 0;
+}
+
+.btn-group .dropdown-menu {
+    border: 1px solid #dee2e6;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.dropdown-item {
+    padding: 0.5rem 1rem;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.card-footer {
+    padding: 1rem;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .btn-group {
+        width: 100%;
+    }
+
+    .btn-group .btn {
+        flex: 1;
+    }
+}
+</style>
 {% endblock %}

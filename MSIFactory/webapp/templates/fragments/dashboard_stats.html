@@ -1,0 +1,75 @@
+<div class="row">
+    <div class="col-md-3 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h3 class="mb-0">{{ stats.total_projects }}</h3>
+                        <p class="mb-0">Active Projects</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-project-diagram fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h3 class="mb-0">{{ stats.active_components }}</h3>
+                        <p class="mb-0">Components</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-cubes fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h3 class="mb-0">{{ stats.configured_components }}</h3>
+                        <p class="mb-0">Configured</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-cog fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h3 class="mb-0">{{ stats.pending_builds }}</h3>
+                        <p class="mb-0">Pending Builds</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-hammer fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-3">
+    <button class="btn btn-outline-secondary btn-sm"
+            hx-get="/htmx/stats/refresh"
+            hx-target="closest .row"
+            hx-swap="outerHTML">
+        <i class="fas fa-sync-alt me-1"></i>Refresh
+    </button>
+    <small class="text-muted ms-2">Last updated: {{ moment().format('HH:mm:ss') if moment else '' }}</small>
+</div>

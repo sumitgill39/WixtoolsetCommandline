@@ -185,7 +185,6 @@ BEGIN
     CREATE TABLE components (
         component_id INT PRIMARY KEY IDENTITY(1,1),
         component_guid UNIQUEIDENTIFIER DEFAULT NEWID(),
-        unique_guid UNIQUEIDENTIFIER DEFAULT NEWID(),
         project_id INT NOT NULL,
         component_name VARCHAR(100) NOT NULL,
         component_type VARCHAR(20) NOT NULL CHECK (component_type IN ('webapp', 'website', 'service', 'scheduler', 'api', 'desktop', 'library')),

@@ -8,6 +8,7 @@ echo ============================================================
 echo.
 
 echo [1] Killing any existing Python processes...
+cls
 taskkill /F /IM python.exe 2>nul
 taskkill /F /IM py.exe 2>nul
 timeout /t 2 /nobreak >nul
