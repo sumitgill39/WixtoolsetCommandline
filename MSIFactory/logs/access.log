@@ -896,3 +896,21 @@
 2025-09-28 21:04:27 | INFO | RESPONSE | GET /component-configuration | Status: 200 | Time: 0.177s
 2025-09-28 21:04:29 | INFO | REQUEST | GET /project-management | IP: 127.0.0.1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0
 2025-09-28 21:04:29 | INFO | RESPONSE | GET /project-management | Status: 200 | Time: 0.100s
+2025-09-28 21:34:01 | INFO | REQUEST | GET / | IP: 127.0.0.1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0
+2025-09-28 21:34:01 | INFO | RESPONSE | GET / | Status: 302 | Time: 0.027s
+2025-09-28 21:34:01 | INFO | REQUEST | GET /login | IP: 127.0.0.1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0
+2025-09-28 21:34:02 | INFO | RESPONSE | GET /login | Status: 200 | Time: 0.792s
+2025-09-28 21:34:04 | INFO | REQUEST | GET /favicon.ico | IP: 127.0.0.1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0
+2025-09-28 21:34:05 | INFO | RESPONSE | GET /favicon.ico | Status: 404 | Time: 0.828s
+2025-09-28 21:34:06 | INFO | REQUEST | POST /login | IP: 127.0.0.1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0
+2025-09-28 21:34:09 | INFO | RESPONSE | POST /login | Status: 302 | Time: 2.916s
+2025-09-28 21:34:09 | INFO | REQUEST | GET /dashboard | IP: 127.0.0.1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0
+2025-09-28 21:34:09 | INFO | RESPONSE | GET /dashboard | Status: 200 | Time: 0.233s
+2025-09-28 21:34:13 | INFO | REQUEST | GET /project-management | IP: 127.0.0.1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0
+2025-09-28 21:34:13 | INFO | RESPONSE | GET /project-management | Status: 200 | Time: 0.254s
+2025-09-28 21:34:17 | INFO | REQUEST | GET /edit-project/7 | IP: 127.0.0.1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0
+2025-09-28 21:34:19 | INFO | RESPONSE | GET /edit-project/7 | Status: 200 | Time: 2.077s
+2025-09-28 21:34:47 | INFO | REQUEST | POST /edit-project | IP: 127.0.0.1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0
+2025-09-28 21:34:47 | INFO | RESPONSE | POST /edit-project | Status: 302 | Time: 0.194s
+2025-09-28 21:34:47 | INFO | REQUEST | GET /edit-project/7 | IP: 127.0.0.1 | User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0
+2025-09-28 21:34:47 | INFO | RESPONSE | GET /edit-project/7 | Status: 200 | Time: 0.122s
