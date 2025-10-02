@@ -1,0 +1,33 @@
+# JFrog Multi-threaded Polling System - Python Dependencies
+
+# Web Application Framework
+Flask==2.3.3
+Flask-SQLAlchemy==3.0.5
+Flask-Login==0.6.2
+Flask-WTF==1.1.1
+Jinja2==3.1.2
+
+# Database connectivity
+pyodbc>=4.0.39
+SQLAlchemy==2.0.21
+
+# HTTP requests for JFrog API
+requests>=2.31.0
+
+# Environment variables
+python-dotenv==1.0.0
+
+# Date and time handling
+python-dateutil==2.8.2
+
+# Security
+Werkzeug==2.3.7
+
+# Standard library (included with Python, listed for reference)
+# threading
+# concurrent.futures
+# zipfile
+# hashlib
+# pathlib
+# logging
+# datetime

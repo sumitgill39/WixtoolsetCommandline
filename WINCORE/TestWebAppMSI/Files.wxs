@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <!-- Files.wxs - Auto-generated from WebFiles -->
+  <Fragment>
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Directory Id="Dir_assets" Name="assets">
+        <Directory Id="Dir_assets_images" Name="images">
+          <Directory Id="Dir_assets_images_icons" Name="icons" />
+        </Directory>
+      </Directory>
+      <Directory Id="Dir_css" Name="css">
+        <Directory Id="Dir_css__tmp" Name="_tmp" />
+      </Directory>
+      <Directory Id="Dir_data" Name="data">
+        <Directory Id="Dir_data_json" Name="json" />
+      </Directory>
+      <Directory Id="Dir_scripts" Name="scripts">
+        <Directory Id="Dir_scripts_libs" Name="libs">
+          <Directory Id="Dir_scripts_libs_vendor" Name="vendor" />
+        </Directory>
+      </Directory>
+    </DirectoryRef>
+    <ComponentGroup Id="WebApplicationFiles" Directory="INSTALLFOLDER">
+      <Component Id="File_index_html_0" Guid="E15D5211-4C6B-016B-C290-4044C96E3D46">
+        <File Id="File_index_html_F_0" Source="WebFiles/index.html" Name="index.html" />
+      </Component>
+      <Component Id="File_web_config_1" Guid="BDD6BFCB-5474-FC7E-BB8C-EE1ECCEA2058">
+        <File Id="File_web_config_F_1" Source="WebFiles/web.config" Name="web.config" />
+      </Component>
+      <Component Id="File_logo_png_2" Guid="FC5F4674-A787-DFD0-7611-28D2EB76911C" Directory="Dir_assets_images">
+        <File Id="File_logo_png_F_2" Source="WebFiles/assets/images/logo.png" Name="logo.png" />
+      </Component>
+      <Component Id="EmptyDir_icons_0" Guid="23A4BA2B-74B0-F8EC-195F-D5A17D9E225B" Directory="Dir_assets_images_icons">
+        <CreateFolder Directory="Dir_assets_images_icons" />
+      </Component>
+      <Component Id="File_styles_css_3" Guid="D58D4EE3-C1D8-E074-493F-B7E6AD4DC1C9" Directory="Dir_css">
+        <File Id="File_styles_css_F_3" Source="WebFiles/css/styles.css" Name="styles.css" />
+      </Component>
+      <Component Id="EmptyDir__tmp_1" Guid="774A64B0-4B60-AD03-57B2-921AAA9B8FF9" Directory="Dir_css__tmp">
+        <CreateFolder Directory="Dir_css__tmp" />
+      </Component>
+      <Component Id="File_config_json_4" Guid="809BD481-A9D4-6815-CD43-3083A7436569" Directory="Dir_data_json">
+        <File Id="File_config_json_F_4" Source="WebFiles/data/json/config.json" Name="config.json" />
+      </Component>
+      <Component Id="File_jquery_js_5" Guid="A114248E-F996-A146-A412-4AEBF9BB95F0" Directory="Dir_scripts_libs">
+        <File Id="File_jquery_js_F_5" Source="WebFiles/scripts/libs/jquery.js" Name="jquery.js" />
+      </Component>
+      <Component Id="EmptyDir_vendor_2" Guid="256A80D1-61C7-015E-9174-021FDA4AA188" Directory="Dir_scripts_libs_vendor">
+        <CreateFolder Directory="Dir_scripts_libs_vendor" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

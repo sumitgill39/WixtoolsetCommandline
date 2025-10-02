@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Configuration - JFrog Polling System{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>⚙️ System Configuration</h2>
+
+    <form method="POST" action="{{ url_for('update_config') }}">
+        <h3 style="margin-top: 1.5rem; margin-bottom: 1rem; color: #2c3e50;">JFrog Settings</h3>
+
+        <div class="form-group">
+            <label for="JFrogBaseURL">JFrog Base URL</label>
+            <input type="text" id="JFrogBaseURL" name="JFrogBaseURL"
+                   value="{{ config.get('JFrogBaseURL', '') }}"
+                   placeholder="https://jfrog.company.com/artifactory">
+        </div>
+
+        <div class="form-group">
+            <label for="SSP_API_URL">SSP API URL</label>
+            <input type="text" id="SSP_API_URL" name="SSP_API_URL"
+                   value="{{ config.get('SSP_API_URL', '') }}"
+                   placeholder="https://ssp-api.company.com/credentials">
+            <small style="color: #7f8c8d;">Self-Service Portal API endpoint</small>
+        </div>
+
+        <div class="form-group">
+            <label for="SSP_API_TOKEN">SSP API Token</label>
+            <input type="password" id="SSP_API_TOKEN" name="SSP_API_TOKEN"
+                   placeholder="Enter new token to update">
+            <small style="color: #7f8c8d;">Leave blank to keep current token</small>
+        </div>
+
+        <div class="form-group">
+            <label for="SSP_ENV">Environment</label>
+            <input type="text" id="SSP_ENV" name="SSP_ENV"
+                   value="{{ config.get('SSP_ENV', 'PROD') }}"
+                   readonly>
+            <small style="color: #7f8c8d;">Environment for SSP API</small>
+        </div>
+
+        <div class="form-group">
+            <label for="SSP_APP_NAME">Application Name</label>
+            <input type="text" id="SSP_APP_NAME" name="SSP_APP_NAME"
+                   value="{{ config.get('SSP_APP_NAME', 'WINCORE') }}"
+                   readonly>
+            <small style="color: #7f8c8d;">Application name for SSP API</small>
+        </div>
+
+        <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: #2c3e50;">System Settings</h3>
+
+        <div class="form-group">
+            <label for="BaseDrive">Base Drive Path</label>
+            <input type="text" id="BaseDrive" name="BaseDrive"
+                   value="{{ config.get('BaseDrive', 'C:\\WINCORE') }}"
+                   placeholder="C:\WINCORE">
+            <small style="color: #7f8c8d;">Path where artifacts will be stored</small>
+        </div>
+
+        <div class="form-group">
+            <label for="MaxConcurrentThreads">Max Concurrent Threads</label>
+            <input type="number" id="MaxConcurrentThreads" name="MaxConcurrentThreads"
+                   value="{{ config.get('MaxConcurrentThreads', '100') }}"
+                   min="1" max="10000">
+            <small style="color: #7f8c8d;">Maximum number of polling threads (1-10000)</small>
+        </div>
+
+        <div class="form-group">
+            <label for="MaxBuildsToKeep">Max Builds to Keep</label>
+            <input type="number" id="MaxBuildsToKeep" name="MaxBuildsToKeep"
+                   value="{{ config.get('MaxBuildsToKeep', '5') }}"
+                   min="1" max="100">
+            <small style="color: #7f8c8d;">Number of builds to keep per component/branch</small>
+        </div>
+
+        <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn-success">💾 Save Configuration</button>
+            <a href="{{ url_for('test_connection') }}" class="btn btn-primary">🔌 Test JFrog Connection</a>
+        </div>
+    </form>
+</div>
+
+<div class="card">
+    <h2>📋 Current Configuration</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Setting</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for key, value in config.items() %}
+            <tr>
+                <td><strong>{{ key }}</strong></td>
+                <td>{{ value if value else 'Not set' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

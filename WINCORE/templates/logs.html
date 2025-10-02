@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Logs - JFrog Polling System{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>📝 Polling Logs</h2>
+
+    <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center;">
+        <label for="log-level" style="margin: 0;">Filter by Level:</label>
+        <select id="log-level" onchange="window.location.href='{{ url_for('logs') }}?level=' + this.value">
+            <option value="all" {% if current_level == 'all' %}selected{% endif %}>All Levels</option>
+            <option value="DEBUG" {% if current_level == 'DEBUG' %}selected{% endif %}>DEBUG</option>
+            <option value="INFO" {% if current_level == 'INFO' %}selected{% endif %}>INFO</option>
+            <option value="WARNING" {% if current_level == 'WARNING' %}selected{% endif %}>WARNING</option>
+            <option value="ERROR" {% if current_level == 'ERROR' %}selected{% endif %}>ERROR</option>
+            <option value="CRITICAL" {% if current_level == 'CRITICAL' %}selected{% endif %}>CRITICAL</option>
+        </select>
+    </div>
+
+    {% if logs %}
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date/Time</th>
+                        <th>Level</th>
+                        <th>Operation</th>
+                        <th>Component ID</th>
+                        <th>Build</th>
+                        <th>Duration (ms)</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td style="white-space: nowrap;">
+                            {{ log.log_date.strftime('%Y-%m-%d %H:%M:%S') if log.log_date else 'N/A' }}
+                        </td>
+                        <td>
+                            {% if log.log_level == 'ERROR' or log.log_level == 'CRITICAL' %}
+                                <span class="badge badge-danger">{{ log.log_level }}</span>
+                            {% elif log.log_level == 'WARNING' %}
+                                <span class="badge badge-warning">{{ log.log_level }}</span>
+                            {% elif log.log_level == 'INFO' %}
+                                <span class="badge badge-info">{{ log.log_level }}</span>
+                            {% else %}
+                                <span class="badge">{{ log.log_level }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ log.operation_type or '-' }}</td>
+                        <td>{{ log.component_id or '-' }}</td>
+                        <td style="white-space: nowrap;">
+                            {% if log.build_date and log.build_number %}
+                                Build{{ log.build_date }}.{{ log.build_number }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>{{ log.duration_ms or '-' }}</td>
+                        <td style="max-width: 400px; overflow: hidden; text-overflow: ellipsis;">
+                            {{ log.log_message }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div style="margin-top: 1rem; text-align: center; color: #7f8c8d;">
+            <p>Showing {{ logs|length }} log entries</p>
+        </div>
+    {% else %}
+        <p style="color: #7f8c8d; text-align: center; padding: 2rem;">No logs found</p>
+    {% endif %}
+</div>
+{% endblock %}

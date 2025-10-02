@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - JFrog Polling System{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>📊 Dashboard</h2>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Active Components</h3>
+            <div class="stat-value">{{ stats.active_components }}</div>
+        </div>
+
+        <div class="stat-card">
+            <h3>Polling Status</h3>
+            <div class="stat-value">
+                {% if stats.polling_status == 'Running' %}
+                    <span style="color: #27ae60;">● Running</span>
+                {% else %}
+                    <span style="color: #e74c3c;">● Stopped</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <h3>Downloaded Builds</h3>
+            <div class="stat-value">{{ stats.build_summary.downloaded or 0 }}</div>
+        </div>
+
+        <div class="stat-card">
+            <h3>Failed Downloads</h3>
+            <div class="stat-value">{{ stats.build_summary.failed or 0 }}</div>
+        </div>
+    </div>
+
+    <div style="margin-top: 2rem;">
+        <h3 style="margin-bottom: 1rem;">Quick Actions</h3>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            {% if stats.polling_status == 'Running' %}
+                <a href="{{ url_for('stop_polling') }}" class="btn btn-danger">⏸ Stop Polling</a>
+            {% else %}
+                <a href="{{ url_for('start_polling') }}" class="btn btn-success">▶ Start Polling</a>
+            {% endif %}
+            <a href="{{ url_for('run_single_poll') }}" class="btn btn-primary">🔄 Run Single Poll</a>
+            <a href="{{ url_for('run_cleanup') }}" class="btn btn-warning">🧹 Run Cleanup</a>
+            <a href="{{ url_for('test_connection') }}" class="btn btn-primary">🔌 Test JFrog Connection</a>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>📝 Recent Activity</h2>
+    {% if stats.recent_logs %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Level</th>
+                    <th>Operation</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in stats.recent_logs %}
+                <tr>
+                    <td>{{ log.log_date.strftime('%Y-%m-%d %H:%M:%S') if log.log_date else 'N/A' }}</td>
+                    <td>
+                        {% if log.log_level == 'ERROR' %}
+                            <span class="badge badge-danger">{{ log.log_level }}</span>
+                        {% elif log.log_level == 'WARNING' %}
+                            <span class="badge badge-warning">{{ log.log_level }}</span>
+                        {% elif log.log_level == 'INFO' %}
+                            <span class="badge badge-info">{{ log.log_level }}</span>
+                        {% else %}
+                            <span class="badge">{{ log.log_level }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ log.operation_type or 'N/A' }}</td>
+                    <td>{{ log.log_message[:100] }}{% if log.log_message|length > 100 %}...{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p style="color: #7f8c8d; text-align: center; padding: 2rem;">No recent activity</p>
+    {% endif %}
+
+    <div style="margin-top: 1rem;">
+        <a href="{{ url_for('logs') }}" class="btn btn-primary">View All Logs →</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,3 @@
+- Add to Memoery : "We need to use wixtool set v6 version"
+- add to Memoery : do not use any java script just python.
+- to memorize : always write a python code in modrate way where user can understand the code easly.

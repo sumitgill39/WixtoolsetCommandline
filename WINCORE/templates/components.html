@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Components - JFrog Polling System{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>📦 Components</h2>
+
+    {% if components %}
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component Name</th>
+                        <th>Project</th>
+                        <th>Component GUID</th>
+                        <th>Latest Build</th>
+                        <th>Download Status</th>
+                        <th>Extraction Status</th>
+                        <th>Polling</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for component in components %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('component_detail', component_id=component.component_id) }}"
+                               style="color: #3498db; text-decoration: none; font-weight: 500;">
+                                {{ component.component_name }}
+                            </a>
+                        </td>
+                        <td>{{ component.project_name }} ({{ component.project_key }})</td>
+                        <td style="font-family: monospace; font-size: 0.85rem;">
+                            {{ component.component_guid }}
+                        </td>
+                        <td>
+                            {% if component.latest_build_date and component.latest_build_number %}
+                                Build{{ component.latest_build_date }}.{{ component.latest_build_number }}
+                            {% else %}
+                                <span style="color: #7f8c8d;">Not tracked</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if component.download_status == 'completed' %}
+                                <span class="badge badge-success">Completed</span>
+                            {% elif component.download_status == 'failed' %}
+                                <span class="badge badge-danger">Failed</span>
+                            {% elif component.download_status == 'downloading' %}
+                                <span class="badge badge-info">Downloading</span>
+                            {% else %}
+                                <span class="badge">{{ component.download_status or 'Pending' }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if component.extraction_status == 'completed' %}
+                                <span class="badge badge-success">Completed</span>
+                            {% elif component.extraction_status == 'failed' %}
+                                <span class="badge badge-danger">Failed</span>
+                            {% elif component.extraction_status == 'extracting' %}
+                                <span class="badge badge-info">Extracting</span>
+                            {% else %}
+                                <span class="badge">{{ component.extraction_status or 'Pending' }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if component.polling_enabled %}
+                                <span class="badge badge-success">Enabled</span>
+                            {% else %}
+                                <span class="badge badge-danger">Disabled</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('toggle_component', component_id=component.component_id) }}"
+                               class="btn btn-primary" style="font-size: 0.8rem; padding: 0.3rem 0.8rem;">
+                                {% if component.polling_enabled %}Disable{% else %}Enable{% endif %}
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div style="margin-top: 1rem; color: #7f8c8d;">
+            <p>Total Components: {{ components|length }}</p>
+        </div>
+    {% else %}
+        <p style="color: #7f8c8d; text-align: center; padding: 2rem;">No components found</p>
+    {% endif %}
+</div>
+{% endblock %}
