@@ -30,6 +30,29 @@ class DatabaseHelper:
         """Return the connection string for SQL Server"""
         return self.connection_string
 
+    def execute_query(self, query: str, params: tuple = None) -> Optional[List[Dict]]:
+        """Execute a query and return results as list of dictionaries"""
+        try:
+            cursor = self.connection.cursor()
+            if params:
+                cursor.execute(query, params)
+            else:
+                cursor.execute(query)
+
+            # If the query returns results
+            if cursor.description:
+                columns = [column[0] for column in cursor.description]
+                results = []
+                for row in cursor.fetchall():
+                    results.append(dict(zip(columns, row)))
+                return results
+            
+            return None
+
+        except Exception as e:
+            logger.error(f"Query execution failed: {str(e)}")
+            raise
+
     def get_ssp_config(self) -> Tuple[Optional[str], Optional[str]]:
         """Get SSP API configuration"""
         try:
@@ -48,6 +71,127 @@ class DatabaseHelper:
             return None, None
 
     def update_ssp_config(self, api_url: str, api_token: Optional[str] = None) -> bool:
+        """Update SSP API configuration"""
+        try:
+            cursor = self.connection.cursor()
+            
+            # If token is not provided, only update URL
+            if api_token:
+                cursor.execute("""
+                    INSERT INTO [ssp_config] ([api_url], [api_token])
+                    VALUES (?, ?)
+                """, (api_url, api_token))
+            else:
+                # Get existing token
+                _, existing_token = self.get_ssp_config()
+                if existing_token:
+                    cursor.execute("""
+                        INSERT INTO [ssp_config] ([api_url], [api_token])
+                        VALUES (?, ?)
+                    """, (api_url, existing_token))
+                else:
+                    return False
+
+            self.connection.commit()
+            return True
+        except Exception as e:
+            logger.error(f"Error updating SSP config: {str(e)}")
+            return False
+
+    def get_component_info(self, component_id: int) -> Optional[Dict]:
+        """Get component and project information"""
+        try:
+            cursor = self.connection.cursor()
+            query = """
+                SELECT 
+                    c.component_id,
+                    c.component_name,
+                    c.polling_enabled,
+                    p.project_key,
+                    p.project_name,
+                    (SELECT TOP 1 branch_name 
+                     FROM component_branches 
+                     WHERE component_id = c.component_id) as default_branch
+                FROM components c
+                INNER JOIN projects p ON c.project_id = p.project_id
+                WHERE c.component_id = ? AND c.is_enabled = 1
+            """
+            cursor.execute(query, (component_id,))
+            
+            row = cursor.fetchone()
+            if row:
+                return {
+                    'component_id': row.component_id,
+                    'component_name': row.component_name,
+                    'project_key': row.project_key,
+                    'project_name': row.project_name,
+                    'default_branch': row.default_branch or 'main',
+                    'polling_enabled': row.polling_enabled
+                }
+            return None
+        except Exception as e:
+            logger.error(f"Error getting component info: {str(e)}")
+            return None
+
+    def get_branch_pattern(self, component_id: int, branch: str = None) -> Optional[str]:
+        """Get URL pattern for component/branch"""
+        try:
+            cursor = self.connection.cursor()
+            if branch:
+                query = """
+                    SELECT path_pattern_override
+                    FROM component_branches
+                    WHERE component_id = ? AND branch_name = ?
+                """
+                cursor.execute(query, (component_id, branch))
+            else:
+                query = """
+                    SELECT TOP 1 path_pattern_override
+                    FROM component_branches
+                    WHERE component_id = ?
+                """
+                cursor.execute(query, (component_id,))
+            
+            row = cursor.fetchone()
+            return row.path_pattern_override if row else None
+        except Exception as e:
+            logger.error(f"Error getting branch pattern: {str(e)}")
+            return None
+
+    def get_latest_build_number(self, component_id: int) -> Optional[int]:
+        """Get latest build number for component"""
+        try:
+            cursor = self.connection.cursor()
+            query = """
+                SELECT TOP 1 build_number
+                FROM jfrog_build_tracking
+                WHERE component_id = ?
+                ORDER BY build_number DESC
+            """
+            cursor.execute(query, (component_id,))
+            
+            row = cursor.fetchone()
+            return int(row.build_number) if row else None
+        except Exception as e:
+            logger.error(f"Error getting latest build number: {str(e)}")
+            return None
+
+    def get_system_config(self, key: str) -> Optional[str]:
+        """Get system configuration value by key"""
+        try:
+            cursor = self.connection.cursor()
+            query = """
+                SELECT config_value
+                FROM jfrog_system_config
+                WHERE config_key = ? AND is_enabled = 1
+            """
+            cursor.execute(query, (key,))
+            
+            row = cursor.fetchone()
+            return row.config_value if row else None
+        except Exception as e:
+            logger.error(f"Error getting system config: {str(e)}")
+            return None
         """Update SSP API configuration"""
         try:
             cursor = self.connection.cursor()

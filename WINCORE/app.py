@@ -10,6 +10,8 @@ from db_helper import DatabaseHelper
 from jfrog_config import JFrogConfig
 from polling_engine import PollingEngine
 from cleanup_manager import CleanupManager
+from jfrog_url_builder import JFrogUrlBuilder
+from ssp_client import SSPClient
 
 app = Flask(__name__)
 app.secret_key = 'jfrog-polling-secret-key-change-in-production'
@@ -23,13 +25,15 @@ polling_thread = None
 
 def init_app():
     """Initialize application components"""
-    global db, jfrog_config, polling_engine, cleanup_manager
+    global db, jfrog_config, polling_engine, cleanup_manager, url_builder, ssp_client
 
     db = DatabaseHelper()
     if db.connect():
+        ssp_client = SSPClient()
         jfrog_config = JFrogConfig(db)
         polling_engine = PollingEngine(db)
         cleanup_manager = CleanupManager(db)
+        url_builder = JFrogUrlBuilder(db, ssp_client)
         return True
     return False
 
@@ -68,6 +72,52 @@ def dashboard():
     }
 
     return render_template('dashboard.html', stats=stats)
+
+@app.route('/url-preview')
+def url_preview_page():
+    """URL Preview Page"""
+    if not db:
+        init_app()
+
+    # Get all active components with project info
+    query = """
+        SELECT 
+            c.component_id,
+            c.component_name,
+            p.project_name
+        FROM components c
+        INNER JOIN projects p ON c.project_id = p.project_id
+        WHERE c.is_enabled = 1
+        ORDER BY p.project_name, c.component_name
+    """
+    components = db.execute_query(query)
+
+    return render_template('url_preview.html', components=components)
+
+@app.route('/api/component/<int:component_id>/jfrog_url_preview')
+def preview_jfrog_url(component_id):
+    """Preview JFrog URL for component"""
+    if not db:
+        init_app()
+
+    try:
+        branch = request.args.get('branch')
+        build_number = request.args.get('build')
+        if build_number:
+            build_number = int(build_number)
+
+        url_info = url_builder.build_url(
+            component_id=component_id,
+            branch=branch,
+            build_number=build_number
+        )
+
+        # Don't include auth info in response
+        url_info.pop('auth', None)
+        return jsonify(url_info)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
 
 @app.route('/config')
 def config():

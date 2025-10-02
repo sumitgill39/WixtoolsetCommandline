@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}JFrog URL Preview{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>🔎 JFrog URL Preview</h2>
+    
+    <div class="form-group">
+        <label for="componentSelect">Component:</label>
+        <select id="componentSelect" onchange="loadComponentDetails()">
+            <option value="">Select Component</option>
+            {% for component in components %}
+            <option value="{{ component.component_id }}">
+                {{ component.project_name }} - {{ component.component_name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="branchInput">Branch:</label>
+        <input type="text" id="branchInput" placeholder="main">
+    </div>
+
+    <div class="form-group">
+        <label for="buildInput">Build Number (optional):</label>
+        <input type="number" id="buildInput" placeholder="Leave empty for next build number">
+    </div>
+
+    <button onclick="previewUrl()" class="btn btn-primary">Preview URL</button>
+
+    <div id="previewResult" class="mt-4" style="display: none;">
+        <h3>Preview Results</h3>
+        <div class="preview-section">
+            <strong>Pattern Used:</strong>
+            <pre id="patternText"></pre>
+        </div>
+        <div class="preview-section">
+            <strong>Generated URL:</strong>
+            <pre id="urlText"></pre>
+        </div>
+        <div class="preview-section">
+            <strong>Build Info:</strong>
+            <pre id="buildInfo"></pre>
+        </div>
+    </div>
+</div>
+
+<script>
+function loadComponentDetails() {
+    // Future enhancement: Load branch list for selected component
+}
+
+function previewUrl() {
+    const componentId = document.getElementById('componentSelect').value;
+    const branch = document.getElementById('branchInput').value;
+    const build = document.getElementById('buildInput').value;
+
+    if (!componentId) {
+        alert('Please select a component');
+        return;
+    }
+
+    let url = `/api/component/${componentId}/jfrog_url_preview?`;
+    if (branch) url += `&branch=${encodeURIComponent(branch)}`;
+    if (build) url += `&build=${encodeURIComponent(build)}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+
+            document.getElementById('previewResult').style.display = 'block';
+            document.getElementById('patternText').textContent = data.pattern;
+            document.getElementById('urlText').textContent = data.url;
+            document.getElementById('buildInfo').textContent = JSON.stringify(data.build_info, null, 2);
+        })
+        .catch(error => {
+            alert('Error fetching preview: ' + error);
+        });
+}
+</script>
+
+<style>
+.preview-section {
+    margin-top: 1rem;
+}
+.preview-section pre {
+    background: #f5f5f5;
+    padding: 1rem;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+</style>
+{% endblock %}

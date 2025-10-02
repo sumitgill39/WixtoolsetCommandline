@@ -270,6 +270,7 @@
             <li><a href="{{ url_for('components') }}" {% if request.endpoint == 'components' %}class="active"{% endif %}>Components</a></li>
             <li><a href="{{ url_for('logs') }}" {% if request.endpoint == 'logs' %}class="active"{% endif %}>Logs</a></li>
             <li><a href="{{ url_for('config') }}" {% if request.endpoint == 'config' %}class="active"{% endif %}>Configuration</a></li>
+            <li><a href="{{ url_for('url_preview_page') }}" {% if request.endpoint == 'url_preview_page' %}class="active"{% endif %}>URL Preview</a></li>
         </ul>
     </nav>
 
