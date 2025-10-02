@@ -1,0 +1,30 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Log files
+*.log
+MSIFactory/logs/*.log
+
+# Build artifacts
+*.msi
+*.wixpdb
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment files
+.env
+venv/
+env/
+
+# Database files
+*.db
+*.sqlite
+
+MSIFactory/nul

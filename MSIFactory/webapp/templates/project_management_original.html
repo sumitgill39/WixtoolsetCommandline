@@ -1,0 +1,453 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}Project Management - CelerDeploy{% endblock %}
+{% block page_title %}Project Management{% endblock %}
+
+{% block content %}
+<style>
+    /* Modern Project Management Theme */
+    /* Statistics Cards */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        width: 100%;
+    }
+
+    @media (max-width: 1200px) {
+        .stats-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .stat-card {
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+        border: 1px solid rgba(255,255,255,0.25);
+        backdrop-filter: blur(8px);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 40px rgba(102, 126, 234, 0.15);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.5rem;
+        opacity: 0.8;
+    }
+
+    /* Enhanced Cards */
+    .project-card {
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        border: 1px solid rgba(102, 126, 234, 0.15);
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        backdrop-filter: blur(8px);
+        animation: fadeIn 0.3s ease-out;
+        margin-bottom: 1rem;
+    }
+
+    .project-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+        border-color: rgba(102, 126, 234, 0.25);
+    }
+
+    .project-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .project-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(4px);
+    }
+
+    .project-header * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .project-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 1.2rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        flex-shrink: 0;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .table-modern {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        border: none;
+    }
+
+    .table-modern thead th {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: none;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        color: #495057;
+        padding: 1rem;
+    }
+
+    .table-modern tbody tr {
+        border: none;
+        transition: all 0.2s ease;
+    }
+
+    .table-modern tbody tr:hover {
+        background: linear-gradient(145deg, #f8f9fa 0%, #ffffff 100%);
+        transform: scale(1.01);
+    }
+
+    .table-modern tbody td {
+        border: none;
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .badge {
+        border-radius: 12px;
+        padding: 0.5rem 0.8rem;
+        font-weight: 500;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .badge-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .badge-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+    }
+
+    .badge-warning {
+        background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        color: white;
+    }
+
+    .badge-secondary {
+        background: linear-gradient(135deg, #6c757d 0%, #adb5bd 100%);
+        color: white;
+    }
+
+    .btn {
+        border-radius: 12px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        border: none;
+        padding: 0.5rem 1rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.35);
+    }
+
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    .card-header {
+        background: linear-gradient(145deg, #f8f9fa 0%, #ffffff 100%);
+        border-bottom: 1px solid rgba(102, 126, 234, 0.15);
+        border-radius: 16px 16px 0 0 !important;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+    }
+
+    .input-group-text {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 0 8px 8px 0;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .stats-container {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+        }
+
+        .table-responsive {
+            border-radius: 16px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<!-- Dashboard Statistics -->
+<div class="container-fluid" style="padding: 1rem;">
+    <div class="stats-container">
+        <div class="stat-card">
+            <h3 class="stat-number">{{ all_projects|length if all_projects else 0 }}</h3>
+            <p class="stat-label">Total Projects</p>
+            <i class="fas fa-folder position-absolute top-0 end-0 m-3" style="font-size: 2.5rem; opacity: 0.15; color: #667eea;"></i>
+        </div>
+        <div class="stat-card">
+            <h3 class="stat-number">{{ all_projects|selectattr('status', 'equalto', 'active')|list|length if all_projects else 0 }}</h3>
+            <p class="stat-label">Active Projects</p>
+            <i class="fas fa-check-circle position-absolute top-0 end-0 m-3" style="font-size: 2.5rem; opacity: 0.15; color: #28a745;"></i>
+        </div>
+        <div class="stat-card">
+            <h3 class="stat-number">{{ all_projects|selectattr('status', 'equalto', 'archived')|list|length if all_projects else 0 }}</h3>
+            <p class="stat-label">Archived Projects</p>
+            <i class="fas fa-archive position-absolute top-0 end-0 m-3" style="font-size: 2.5rem; opacity: 0.15; color: #ffc107;"></i>
+        </div>
+        <div class="stat-card">
+            <h3 class="stat-number">{{ all_projects|map(attribute='owner_team')|unique|list|length if all_projects else 0 }}</h3>
+            <p class="stat-label">Teams</p>
+            <i class="fas fa-users position-absolute top-0 end-0 m-3" style="font-size: 2.5rem; opacity: 0.15; color: #17a2b8;"></i>
+        </div>
+    </div>
+</div>
+
+<!-- Projects Table View -->
+<div class="container-fluid" style="padding: 1rem;">
+    <div class="card project-card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-list me-2"></i>All Projects</h5>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="input-group" style="width: 300px;">
+                        <input type="text" class="form-control" id="projectSearch" placeholder="Search projects...">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    </div>
+                    <a href="{{ url_for('add_project_page') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Add New Project
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if all_projects %}
+            <div class="table-responsive">
+                <table class="table table-modern table-hover">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-project-diagram me-2"></i>Project Name</th>
+                            <th><i class="fas fa-key me-2"></i>Key</th>
+                            <th><i class="fas fa-tag me-2"></i>Type</th>
+                            <th><i class="fas fa-traffic-light me-2"></i>Status</th>
+                            <th><i class="fas fa-user me-2"></i>Owner</th>
+                            <th><i class="fas fa-calendar me-2"></i>Created</th>
+                            <th><i class="fas fa-cogs me-2"></i>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for project in all_projects %}
+                        <tr data-project-name="{{ project.project_name|lower }}" data-project-key="{{ project.project_key|lower }}">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="project-icon me-3" style="background: linear-gradient(135deg, {{ project.color_primary or '#667eea' }}, {{ project.color_secondary or '#764ba2' }});">
+                                        {{ project.project_key[:2] if project.project_key else 'PR' }}
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">{{ project.project_name }}</div>
+                                        <small class="text-muted">{{ project.description[:50] + '...' if project.description and project.description|length > 50 else project.description or 'No description' }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge badge-primary">{{ project.project_key }}</span>
+                            </td>
+                            <td>
+                                <span class="badge badge-secondary">{{ project.project_type|title if project.project_type else 'WebApp' }}</span>
+                            </td>
+                            <td>
+                                <span class="badge badge-{{ 'success' if project.status == 'active' else 'warning' if project.status == 'archived' else 'secondary' }}">
+                                    <i class="fas fa-{{ 'check' if project.status == 'active' else 'archive' if project.status == 'archived' else 'pause' }} me-1"></i>
+                                    {{ project.status|title if project.status else 'Unknown' }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-user-circle me-2 text-muted"></i>
+                                    {{ project.owner_team or 'Unassigned' }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-calendar-alt me-2 text-muted"></i>
+                                    {{ project.created_date.strftime('%Y-%m-%d') if project.created_date else 'Unknown' }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="#" class="btn btn-sm btn-outline-primary" title="View Details" onclick="viewProject({{ project.project_id }})">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('edit_project_page', project_id=project.project_id) }}" class="btn btn-sm btn-outline-secondary" title="Edit Project">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="#" class="btn btn-sm btn-outline-danger" title="Delete Project" onclick="deleteProject({{ project.project_id }})">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-folder-plus fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">No Projects Found</h5>
+                <p class="text-muted">Create your first project to get started with MSI package management.</p>
+                <a href="{{ url_for('add_project_page') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>Add New Project
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Search functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('projectSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const projectRows = document.querySelectorAll('tbody tr[data-project-name]');
+
+            projectRows.forEach(row => {
+                const projectName = row.getAttribute('data-project-name');
+                const projectKey = row.getAttribute('data-project-key');
+                const ownerText = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
+
+                if (projectName.includes(searchTerm) ||
+                    projectKey.includes(searchTerm) ||
+                    ownerText.includes(searchTerm)) {
+                    row.style.display = 'table-row';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+
+// Project action functions
+function viewProject(projectId) {
+    window.location.href = `/project/${projectId}`;
+}
+
+function deleteProject(projectId) {
+    if (confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
+        fetch(`/api/projects/${projectId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error deleting project: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Error deleting project: ' + error.message);
+        });
+    }
+}
+</script>
+{% endblock %}

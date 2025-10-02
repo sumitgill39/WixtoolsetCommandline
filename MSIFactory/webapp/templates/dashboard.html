@@ -1,6 +1,6 @@
 {% extends "base_sidebar.html" %}
 
-{% block title %}Dashboard - MSI Factory{% endblock %}
+{% block title %}Dashboard - CelerDeploy{% endblock %}
 {% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
@@ -158,29 +158,9 @@
                                 </div>
                                 <div class="card-footer bg-transparent border-0">
                                     <div class="d-grid gap-2">
-                                        <div class="btn-group" role="group">
-                                            <a href="#" class="btn btn-primary" onclick="alert('MSI Factory Core Engine - Coming Soon!')">
-                                                <i class="fas fa-rocket me-1"></i>Generate MSI
-                                            </a>
-                                            <button type="button" class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
-                                                <span class="visually-hidden">Toggle Dropdown</span>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="{{ url_for('project_detail', project_id=app.project_id) }}">
-                                                    <i class="fas fa-info-circle me-2"></i>View Details
-                                                </a></li>
-                                                <li><a class="dropdown-item" href="#" onclick="alert('Build History - Coming Soon!')">
-                                                    <i class="fas fa-history me-2"></i>Build History
-                                                </a></li>
-                                                <li><a class="dropdown-item" href="#" onclick="alert('Project Settings - Coming Soon!')">
-                                                    <i class="fas fa-cog me-2"></i>Settings
-                                                </a></li>
-                                                <li><hr class="dropdown-divider"></li>
-                                                <li><a class="dropdown-item" href="#" onclick="alert('Download Latest - Coming Soon!')">
-                                                    <i class="fas fa-download me-2"></i>Download Latest
-                                                </a></li>
-                                            </ul>
-                                        </div>
+                                        <a href="{{ url_for('project_detail', project_id=app.project_id) }}" class="btn btn-outline-primary">
+                                            <i class="fas fa-info-circle me-2"></i>View Details
+                                        </a>
                                     </div>
                                 </div>
                             </div>

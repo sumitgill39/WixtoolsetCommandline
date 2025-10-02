@@ -1,0 +1,223 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}Edit Component - CelerDeploy{% endblock %}
+{% block page_title %}Edit Component{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Edit Component: {{ component.component_name }}</h5>
+                    <a href="{{ url_for('component_configuration') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Components
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- Project Information -->
+                <div class="alert alert-info mb-4" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-project-diagram me-3"></i>
+                        <div>
+                            <strong>Project:</strong> {{ component.project_name }}
+                            <span class="badge bg-secondary ms-2">{{ component.project_key }}</span>
+                            <div class="small text-muted mt-1">Component belongs to this project</div>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ url_for('edit_component', component_id=component.component_id) }}">
+                    <!-- Basic Information -->
+                    <h6 class="border-bottom pb-2 mb-3">Basic Information</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="component_name" class="form-label">Component Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="component_name" name="component_name"
+                                   value="{{ component.component_name }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="component_type" class="form-label">Component Type <span class="text-danger">*</span></label>
+                            <select name="component_type" id="component_type" class="form-select" required>
+                                <option value="webapp" {% if component.component_type == 'webapp' %}selected{% endif %}>Web App</option>
+                                <option value="website" {% if component.component_type == 'website' %}selected{% endif %}>Website</option>
+                                <option value="service" {% if component.component_type == 'service' %}selected{% endif %}>Windows Service</option>
+                                <option value="api" {% if component.component_type == 'api' %}selected{% endif %}>API Service</option>
+                                <option value="scheduler" {% if component.component_type == 'scheduler' %}selected{% endif %}>Scheduler</option>
+                                <option value="desktop" {% if component.component_type == 'desktop' %}selected{% endif %}>Desktop App</option>
+                                <option value="library" {% if component.component_type == 'library' %}selected{% endif %}>Library/DLL</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="framework" class="form-label">Framework <span class="text-danger">*</span></label>
+                            <select name="framework" id="framework" class="form-select" required>
+                                <option value="">Select Framework</option>
+                                <option value="netframework" {% if component.framework == 'netframework' %}selected{% endif %}>.NET Framework</option>
+                                <option value="netcore" {% if component.framework == 'netcore' %}selected{% endif %}>.NET Core/.NET 5+</option>
+                                <option value="python" {% if component.framework == 'python' %}selected{% endif %}>Python</option>
+                                <option value="nodejs" {% if component.framework == 'nodejs' %}selected{% endif %}>Node.js</option>
+                                <option value="react" {% if component.framework == 'react' %}selected{% endif %}>React</option>
+                                <option value="angular" {% if component.framework == 'angular' %}selected{% endif %}>Angular</option>
+                                <option value="vue" {% if component.framework == 'vue' %}selected{% endif %}>Vue.js</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="component_guid" class="form-label">Component GUID <span class="text-muted">(System Generated)</span></label>
+                            <input type="text" class="form-control bg-light" id="component_guid" name="component_guid"
+                                   value="{{ component.component_guid or '' }}" readonly>
+                            <div class="form-text">System-generated unique identifier - cannot be modified</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="2">{{ component.description or '' }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Component Status</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="is_enabled" name="is_enabled" value="1"
+                                       {% if component.is_enabled %}checked{% endif %}>
+                                <label class="form-check-label" for="is_enabled">
+                                    Enable Component
+                                </label>
+                                <div class="form-text">Controls whether this component is active for deployment</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="alert alert-info small">
+                                <i class="fas fa-info-circle me-1"></i>
+                                <strong>Status:</strong> {{ 'Enabled' if component.is_enabled else 'Disabled' }}
+                                <br><small class="text-muted">{{ 'Component is active and ready for deployment' if component.is_enabled else 'Component is disabled and will not be included in deployments' }}</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MSI Package Information -->
+                    <h6 class="border-bottom pb-2 mb-3 mt-4">MSI Package Information</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="app_name" class="form-label">Application Name</label>
+                            <input type="text" class="form-control" id="app_name" name="app_name"
+                                   value="{{ component.app_name or '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="app_version" class="form-label">Version</label>
+                            <input type="text" class="form-control" id="app_version" name="app_version"
+                                   value="{{ component.app_version or '1.0.0.0' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="manufacturer" class="form-label">Manufacturer</label>
+                            <input type="text" class="form-control" id="manufacturer" name="manufacturer"
+                                   value="{{ component.manufacturer or '' }}">
+                        </div>
+                    </div>
+
+                    <!-- Deployment Configuration -->
+                    <h6 class="border-bottom pb-2 mb-3 mt-4">Deployment Configuration</h6>
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="install_folder" class="form-label">Install Folder</label>
+                            <input type="text" class="form-control" id="install_folder" name="install_folder"
+                                   value="{{ component.install_folder or '' }}">
+                        </div>
+                    </div>
+
+                    <!-- IIS Configuration (shown for web components) -->
+                    <div id="iis_section">
+                        <h6 class="border-bottom pb-2 mb-3 mt-4">IIS Configuration</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="iis_website_name" class="form-label">Website Name</label>
+                                <input type="text" class="form-control" id="iis_website_name" name="iis_website_name"
+                                       value="{{ component.iis_website_name or '' }}" placeholder="Default Web Site">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="iis_app_pool_name" class="form-label">Application Pool</label>
+                                <input type="text" class="form-control" id="iis_app_pool_name" name="iis_app_pool_name"
+                                       value="{{ component.iis_app_pool_name or '' }}" placeholder="AppPool">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="port" class="form-label">Port</label>
+                                <input type="number" class="form-control" id="port" name="port"
+                                       value="{{ component.port or '' }}" placeholder="80" min="1" max="65535">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Windows Service Configuration (shown for service components) -->
+                    <div id="service_section">
+                        <h6 class="border-bottom pb-2 mb-3 mt-4">Windows Service Configuration</h6>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="service_name" class="form-label">Service Name</label>
+                                <input type="text" class="form-control" id="service_name" name="service_name"
+                                       value="{{ component.service_name or '' }}" placeholder="MyWindowsService">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="service_display_name" class="form-label">Service Display Name</label>
+                                <input type="text" class="form-control" id="service_display_name" name="service_display_name"
+                                       value="{{ component.service_display_name or '' }}" placeholder="My Windows Service">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="{{ url_for('component_configuration') }}" class="btn btn-secondary">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Update Component
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+// Show/hide sections based on component type selection
+document.addEventListener('DOMContentLoaded', function() {
+    const componentType = document.getElementById('component_type');
+    const iisSection = document.getElementById('iis_section');
+    const serviceSection = document.getElementById('service_section');
+
+    function toggleSections() {
+        const type = componentType.value;
+
+        // Show IIS section for web components
+        if (type === 'webapp' || type === 'website' || type === 'api') {
+            iisSection.style.display = 'block';
+            serviceSection.style.display = 'none';
+        }
+        // Show Service section for Windows services
+        else if (type === 'service') {
+            iisSection.style.display = 'none';
+            serviceSection.style.display = 'block';
+        }
+        // Hide both for other types
+        else {
+            iisSection.style.display = 'none';
+            serviceSection.style.display = 'none';
+        }
+    }
+
+    componentType.addEventListener('change', toggleSections);
+
+    // Set initial state based on current component type
+    toggleSections();
+
+
+</script>
+{% endblock %}

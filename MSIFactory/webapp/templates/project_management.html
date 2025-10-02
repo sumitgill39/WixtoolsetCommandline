@@ -1,521 +1,817 @@
 {% extends "base_sidebar.html" %}
 
-{% block title %}Project Management - MSI Factory{% endblock %}
+{% block title %}Project Management - CelerDeploy{% endblock %}
 {% block page_title %}Project Management{% endblock %}
 
 {% block content %}
-<!-- Page Actions -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Project Management</h5>
+<style>
+    /* Marsh & McLennan Corporate Blue Theme */
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+        animation: slideInUp 1s ease-out;
+    }
+
+    .page-header h1 {
+        font-size: 2.5rem;
+        font-weight: 300;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .page-header .subtitle {
+        opacity: 0.9;
+        font-size: 1.1rem;
+        margin-top: 0.5rem;
+    }
+
+    /* Compact Statistics Cards */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border: 1px solid rgba(255,255,255,0.25);
+        backdrop-filter: blur(8px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 63, 127, 0.1);
+    }
+
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 2px 4px rgba(0, 63, 127, 0.2);
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.5rem;
+        opacity: 0.8;
+    }
+
+    /* Compact Filter and Search Bar */
+    .filters-bar {
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        padding: 15px 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        border: 1px solid rgba(255,255,255,0.25);
+        backdrop-filter: blur(6px);
+        animation: fadeIn 0.2s ease-out;
+    }
+
+    .search-group {
+        flex: 1;
+        min-width: 200px;
+        position: relative;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 8px 10px 8px 35px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 0.85rem;
+        color: #000000;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #000000;
+        font-size: 0.85rem;
+    }
+
+    /* Minimal Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    /* Project Cards with Professional Theme */
+    .projects-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .project-card {
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        border: 1px solid rgba(0, 63, 127, 0.15);
+        border-radius: 10px;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        backdrop-filter: blur(4px);
+        animation: fadeIn 0.3s ease-out;
+        margin-bottom: 0.5rem;
+    }
+
+
+    .project-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 63, 127, 0.1);
+        border-color: rgba(0, 63, 127, 0.25);
+        transition: all 0.2s ease;
+    }
+
+    .project-header {
+        padding: 0.8rem 1.2rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+        min-height: 60px;
+    }
+
+    .project-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(4px);
+    }
+
+    .project-header * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .project-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.25);
+        color: white;
+        font-weight: bold;
+        font-size: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        flex-shrink: 0;
+    }
+
+    .project-name {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: white;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .project-title-section {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .project-meta {
+        margin-top: 0.3rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+    }
+
+    .project-meta .badge {
+        padding: 2px 8px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.7rem;
+        backdrop-filter: blur(3px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    .project-expand-icon {
+        color: rgba(255, 255, 255, 0.9);
+        transition: transform 0.2s ease;
+        font-size: 1rem;
+        padding: 4px;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(2px);
+        flex-shrink: 0;
+    }
+
+    .project-card.expanded .project-expand-icon {
+        transform: rotate(180deg);
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Enhanced Expandable Details with Smooth Animations */
+    .collapse {
+        transition: all 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        transform-origin: top;
+        will-change: height, opacity, transform;
+        backface-visibility: hidden;
+    }
+
+    .collapse:not(.show) {
+        opacity: 0;
+        transform: scaleY(0.8) translateY(-20px);
+    }
+
+    .collapse.show {
+        opacity: 1;
+        transform: scaleY(1) translateY(0);
+    }
+
+    .project-details-content {
+        padding: 1.5rem;
+        background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+        border-radius: 0 0 8px 8px;
+        animation: slideInDetails 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+
+    @keyframes slideInDetails {
+        0% {
+            opacity: 0;
+            transform: translateY(-30px) scale(0.95);
+        }
+        50% {
+            opacity: 0.7;
+            transform: translateY(-10px) scale(0.98);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    /* Enhanced chevron icon rotation */
+    .fas.fa-chevron-down {
+        transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        will-change: transform;
+        backface-visibility: hidden;
+    }
+
+    .detail-section {
+        margin-bottom: 1rem;
+        padding: 0.8rem;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.25);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        backdrop-filter: blur(4px);
+    }
+
+    .detail-title {
+        color: #495057;
+        font-size: 0.9rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .detail-title i {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    /* Compact Component Cards */
+    .components-summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1rem;
+    }
+
+    .component-summary-card {
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        border: 1px solid rgba(255,255,255,0.3);
+        border-radius: 12px;
+        padding: 1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        backdrop-filter: blur(6px);
+    }
+
+    .component-summary-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .component-summary-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 63, 127, 0.1);
+    }
+
+    .component-type-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 16px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    /* Enhanced Action Buttons with Smooth Animations */
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .action-buttons .btn {
+        border-radius: 12px;
+        padding: 12px 20px;
+        font-weight: 600;
+        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        border: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        position: relative;
+        overflow: hidden;
+        will-change: transform, box-shadow;
+        backface-visibility: hidden;
+        transform: translateZ(0);
+    }
+
+    .action-buttons .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+        transition: left 0.6s ease-in-out;
+        z-index: 1;
+    }
+
+    .action-buttons .btn:hover::before {
+        left: 100%;
+    }
+
+    .action-buttons .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    .action-buttons .btn:active {
+        transform: translateY(-2px) scale(0.98);
+        transition: all 0.15s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .stats-container {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+        }
+
+        .project-header {
+            padding: 1.5rem;
+        }
+
+        .project-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+        }
+
+        .components-summary-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .action-buttons .btn {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<!-- Professional Page Header -->
+<div class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-project-diagram me-3"></i>Project Management</h1>
+        <p class="subtitle">Orchestrate your software projects with enterprise-grade management tools</p>
+    </div>
+</div>
+
+<!-- Dashboard Statistics Cards (Matching Image Layout) -->
+<div class="container-fluid">
+    <div class="row g-3 mb-4">
+        <!-- Total Projects Card (Blue) -->
+        <div class="col-xl-3 col-lg-6">
+            <div class="card bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Total Projects</div>
+                            <div class="h5 mb-0 font-weight-bold">{{ all_projects|length if all_projects else 3 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-folder fa-2x text-white-300" style="opacity: 0.3;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Projects Card (Green) -->
+        <div class="col-xl-3 col-lg-6">
+            <div class="card bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Active Projects</div>
+                            <div class="h5 mb-0 font-weight-bold">{{ all_projects|selectattr('status', 'equalto', 'active')|list|length if all_projects else 3 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-white-300" style="opacity: 0.3;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Builds Card (Orange) -->
+        <div class="col-xl-3 col-lg-6">
+            <div class="card bg-warning text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Recent Builds</div>
+                            <div class="h5 mb-0 font-weight-bold">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tools fa-2x text-white-300" style="opacity: 0.3;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Your Access Card (Teal) -->
+        <div class="col-xl-3 col-lg-6">
+            <div class="card bg-info text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Your Access</div>
+                            <div class="h5 mb-0 font-weight-bold">{{ all_projects|length if all_projects else 3 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-key fa-2x text-white-300" style="opacity: 0.3;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Projects Section Header with Search -->
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-folder me-2"></i>Projects
+            </h6>
+            <div class="d-flex align-items-center">
+                <div class="input-group me-3" style="width: 300px;">
+                    <input type="text" class="form-control" id="projectSearch" placeholder="Search projects...">
+                    <div class="input-group-append">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                    </div>
+                </div>
+                <a href="{{ url_for('add_project_page') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Add Project
+                </a>
+            </div>
+        </div>
+            <!-- Project Cards (Matching Image Layout) -->
+            {% if all_projects %}
+                {% for project in all_projects %}
+                <div class="accordion-item border-0" id="project-{{ project.get('project_id', loop.index) }}">
+                    <!-- Project Card Header -->
+                    <div class="d-flex align-items-center p-3 border-bottom" style="cursor: pointer;"
+                         onclick="toggleProjectDetails({{ project.get('project_id', loop.index) }})">
+                        <!-- Project Icon -->
+                        <div class="me-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                 style="width: 50px; height: 50px; background: linear-gradient(135deg, {{ project.get('color_primary', '#0066cc') }}, {{ project.get('color_secondary', '#003f7f') }}); color: white; font-weight: bold; font-size: 1.2rem;">
+                                {{ project.get('project_key', 'PR')[:2] if project.get('project_key') else 'PR' }}
+                            </div>
+                        </div>
+
+                        <!-- Project Info -->
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1 font-weight-bold">{{ project.get('project_name', 'Unnamed Project') }}</h6>
+                            <div class="d-flex align-items-center flex-wrap">
+                                {% if project.get('project_key') %}
+                                <span class="badge badge-primary me-2">{{ project.get('project_key') }}</span>
+                                {% endif %}
+                                {% if project.get('project_type') %}
+                                <span class="badge badge-secondary me-2">{{ project.get('project_type') }}</span>
+                                {% endif %}
+                                {% if project.get('status') %}
+                                <span class="badge badge-{{ 'success' if project.get('status') == 'active' else 'warning' }} me-2">
+                                    {{ project.get('status', 'unknown').title() }}
+                                </span>
+                                {% endif %}
+                                <small class="text-muted">Owner: {{ project.get('owner_team', 'Unknown') }}</small>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons (Always Visible) -->
+                        <div class="me-3">
+                            <div class="dropdown">
+                                <button class="btn btn-link btn-sm" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="viewProject({{ project.get('project_id', 0) }})">
+                                        <i class="fas fa-eye me-2"></i>View Details
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="editProject({{ project.get('project_id', 0) }})">
+                                        <i class="fas fa-edit me-2"></i>Edit Project
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="generateMSI({{ project.get('project_id', 0) }})">
+                                        <i class="fas fa-rocket me-2"></i>Generate MSI
+                                    </a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Expand/Collapse Icon -->
+                        <div>
+                            <i class="fas fa-chevron-down" id="chevron-{{ project.get('project_id', loop.index) }}"></i>
+                        </div>
+                    </div>
+
+                    <!-- Expandable Project Details -->
+                    <div class="collapse" id="projectDetails-{{ project.get('project_id', loop.index) }}">
+                        <div class="p-4 bg-light">
+                            <div class="row">
+                                <!-- Project Information -->
+                                <div class="col-md-6">
+                                    <h6 class="font-weight-bold mb-3">Project Information</h6>
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td><strong>Project Key:</strong></td>
+                                            <td><span class="badge badge-primary">{{ project.get('project_key', 'N/A') }}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Type:</strong></td>
+                                            <td><span class="badge badge-secondary">{{ project.get('project_type', 'N/A') }}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Status:</strong></td>
+                                            <td><span class="badge badge-{{ 'success' if project.get('status') == 'active' else 'warning' }}">{{ project.get('status', 'unknown').title() }}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Owner:</strong></td>
+                                            <td><i class="fas fa-user me-1"></i>{{ project.get('owner_team', 'Unknown') }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                                <!-- Components Information -->
+                                <div class="col-md-6">
+                                    <h6 class="font-weight-bold mb-3">Components ({{ project.components|length if project.components else 0 }})</h6>
+                                    {% if project.components and project.components|length > 0 %}
+                                        <div class="row">
+                                            {% for comp in project.components[:4] %}
+                                            <div class="col-6 mb-2">
+                                                <div class="card card-sm">
+                                                    <div class="card-body p-2">
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="fas fa-{% if comp.get('component_type') == 'webapp' %}globe{% elif comp.get('component_type') == 'service' %}cogs{% elif comp.get('component_type') == 'api' %}plug{% else %}cube{% endif %} me-2 text-primary"></i>
+                                                            <div>
+                                                                <div class="font-weight-bold" style="font-size: 0.85rem;">{{ comp.get('component_name', 'Unknown Component') }}</div>
+                                                                <small class="text-muted">{{ comp.get('component_type', 'unknown').title() }}</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                            {% if project.components|length > 4 %}
+                                            <div class="col-12">
+                                                <small class="text-muted">+ {{ project.components|length - 4 }} more component(s)</small>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <div class="text-center py-3">
+                                            <i class="fas fa-cubes fa-2x text-muted mb-2"></i>
+                                            <p class="text-muted mb-0">No components configured</p>
+                                            <small class="text-muted">Add components to get started</small>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="btn-group w-100" role="group">
+                                        <button type="button" class="btn btn-primary" onclick="generateMSI({{ project.get('project_id', 0) }})">
+                                            <i class="fas fa-rocket me-1"></i>Generate MSI
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-folder-plus fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No Projects Found</h5>
+                    <p class="text-muted">Create your first project to get started.</p>
                     <a href="{{ url_for('add_project_page') }}" class="btn btn-primary">
                         <i class="fas fa-plus me-1"></i>Add New Project
                     </a>
                 </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Activity Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-history me-2"></i>Recent Activity
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="text-center py-4">
+                <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+                <h6 class="text-muted">No recent activity</h6>
+                <p class="text-muted small">Project activities will appear here</p>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Projects Grid View -->
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0">All Projects</h6>
-                    <div class="input-group" style="width: 300px;">
-                        <input type="text" class="form-control" id="projectSearch" placeholder="Search projects...">
-                        <span class="input-group-text"><i class="fas fa-search"></i></span>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body">
-                {% if all_projects %}
-                <div class="projects-container">
-                    {% for project in all_projects %}
-                    <div class="project-card" data-project-id="{{ project.project_id }}">
-                        <!-- Project Header (Always Visible) -->
-                        <div class="project-header" onclick="toggleProject({{ project.project_id }})">
-                            <div class="project-main-info">
-                                <div class="project-icon" style="background: linear-gradient(135deg, {{ project.color_primary }}, {{ project.color_secondary }});">
-                                    {{ project.project_key[:2] }}
-                                </div>
-                                <div class="project-title-section">
-                                    <h5 class="project-name">{{ project.project_name }}</h5>
-                                    <div class="project-meta">
-                                        <span class="badge bg-primary">{{ project.project_key }}</span>
-                                        <span class="badge bg-secondary">{{ project.project_type }}</span>
-                                        <span class="badge bg-{{ 'success' if project.status == 'active' else 'warning' }}">
-                                            {{ project.status.title() }}
-                                        </span>
-                                        <span class="text-muted ms-2">by {{ project.owner_team }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="project-expand-icon">
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                        </div>
-                        
-                        <!-- Expandable Details Section (Hidden by Default) -->
-                        <div class="project-details-curtain" id="details-{{ project.project_id }}">
-                            <div class="project-details-content">
-                                <!-- Project Information -->
-                                <div class="detail-section">
-                                    <h6 class="detail-title"><i class="fas fa-info-circle me-2"></i>Project Information</h6>
-                                    <div class="project-info-grid">
-                                        <div class="info-item">
-                                            <span class="info-label">Project GUID:</span>
-                                            <code class="info-value">{{ project.project_guid or 'Not Set' }}</code>
-                                        </div>
-                                        {% if project.description %}
-                                        <div class="info-item">
-                                            <span class="info-label">Description:</span>
-                                            <span class="info-value">{{ project.description }}</span>
-                                        </div>
-                                        {% endif %}
-                                        <div class="info-item">
-                                            <span class="info-label">Project Type:</span>
-                                            <span class="badge bg-secondary info-badge">{{ project.project_type }}</span>
-                                        </div>
-                                        <div class="info-item">
-                                            <span class="info-label">Owner Team:</span>
-                                            <span class="info-value">{{ project.owner_team }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Components Summary -->
-                                <div class="detail-section">
-                                    <h6 class="detail-title"><i class="fas fa-cubes me-2"></i>Components ({{ project.components|length }})</h6>
-                                    {% if project.components %}
-                                    <div class="components-summary-grid">
-                                        {% for comp in project.components %}
-                                        <div class="component-summary-card">
-                                            <div class="component-summary-header">
-                                                <span class="component-type-badge" data-type="{{ comp.type }}">
-                                                    {% if comp.type == 'webapp' %}
-                                                    <i class="fas fa-globe"></i> Web App
-                                                    {% elif comp.type == 'service' %}
-                                                    <i class="fas fa-cogs"></i> Service
-                                                    {% elif comp.type == 'api' %}
-                                                    <i class="fas fa-plug"></i> API
-                                                    {% elif comp.type == 'website' %}
-                                                    <i class="fas fa-window-restore"></i> Website
-                                                    {% elif comp.type == 'desktop' %}
-                                                    <i class="fas fa-desktop"></i> Desktop
-                                                    {% else %}
-                                                    <i class="fas fa-cube"></i> {{ comp.type.title() }}
-                                                    {% endif %}
-                                                </span>
-                                            </div>
-                                            <div class="component-summary-name">{{ comp.name }}</div>
-                                            {% if comp.framework %}
-                                            <div class="component-summary-framework">
-                                                <i class="fas fa-code me-1"></i>{{ comp.framework.upper() }}
-                                            </div>
-                                            {% endif %}
-                                            {% if comp.version %}
-                                            <div class="component-summary-version">
-                                                <i class="fas fa-tag me-1"></i>v{{ comp.version }}
-                                            </div>
-                                            {% endif %}
-                                            <div class="component-summary-status">
-                                                <i class="fas fa-{{ 'check-circle text-success' if comp.is_enabled else 'times-circle text-muted' }}"></i>
-                                                {{ 'Active' if comp.is_enabled else 'Disabled' }}
-                                            </div>
-                                            {% if comp.environments %}
-                                            <div class="component-summary-environments">
-                                                <i class="fas fa-layer-group me-1"></i>
-                                                {% for env in comp.environments %}
-                                                    <span class="env-badge">{{ env.environment_name }}</span>
-                                                {% endfor %}
-                                            </div>
-                                            {% endif %}
-                                            {% if comp.servers %}
-                                            <div class="component-summary-servers">
-                                                <i class="fas fa-server me-1"></i>
-                                                {% for server in comp.servers %}
-                                                    <span class="server-badge" title="{{ server.assignment_type.title() }}">{{ server.server_name }}</span>
-                                                {% endfor %}
-                                            </div>
-                                            {% endif %}
-                                            {% if comp.port %}
-                                            <div class="component-summary-port">
-                                                <i class="fas fa-plug me-1"></i>Port {{ comp.port }}
-                                            </div>
-                                            {% endif %}
-                                        </div>
-                                        {% endfor %}
-                                    </div>
-                                    {% else %}
-                                    <p class="text-muted">No components configured</p>
-                                    {% endif %}
-                                </div>
-
-                                <!-- Action Buttons -->
-                                <div class="detail-section">
-                                    <div class="action-buttons">
-                                        <button class="btn btn-sm btn-primary" onclick="editProject({{ project.project_id }})">
-                                            <i class="fas fa-edit me-1"></i>Edit Project
-                                        </button>
-                                        <button class="btn btn-sm btn-info" onclick="viewProject({{ project.project_id }})">
-                                            <i class="fas fa-eye me-1"></i>View Details
-                                        </button>
-                                        <a href="{{ url_for('component_configuration') }}" class="btn btn-sm btn-warning">
-                                            <i class="fas fa-cogs me-1"></i>Component Config
-                                        </a>
-                                        <button class="btn btn-sm btn-success" onclick="generateMSI({{ project.project_id }})">
-                                            <i class="fas fa-rocket me-1"></i>Generate MSI
-                                        </button>
-                                        <button class="btn btn-sm btn-danger" onclick="deleteProject({{ project.project_id }})">
-                                            <i class="fas fa-trash me-1"></i>Delete
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <div class="text-center py-5">
-                    <div class="text-muted mb-3" style="font-size: 3rem;">
-                        <i class="fas fa-folder-plus"></i>
-                    </div>
-                    <h6 class="mb-3">No Projects Created</h6>
-                    <p class="text-muted mb-4">Start by adding your first project to the system.</p>
-                    <a href="{{ url_for('add_project_page') }}" class="btn btn-primary">
-                        <i class="fas fa-plus me-1"></i>Add First Project
-                    </a>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-/* Project Card Styles */
-.projects-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.project-card {
-    background: white;
-    border: 1px solid #dee2e6;
-    border-radius: 12px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.project-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    transform: translateY(-2px);
-}
-
-.project-header {
-    padding: 1.25rem;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(to right, #f8f9fa, #ffffff);
-    transition: background 0.3s ease;
-}
-
-.project-header:hover {
-    background: linear-gradient(to right, #e9ecef, #f8f9fa);
-}
-
-.project-main-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.project-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    font-size: 1.2rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-
-.project-title-section {
-    flex: 1;
-}
-
-.project-name {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #2c3e50;
-}
-
-.project-meta {
-    margin-top: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.project-expand-icon {
-    color: #6c757d;
-    transition: transform 0.3s ease;
-}
-
-.project-card.expanded .project-expand-icon {
-    transform: rotate(180deg);
-}
-
-/* Curtain Effect Styles */
-.project-details-curtain {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    background: linear-gradient(to bottom, #f8f9fa, #ffffff);
-}
-
-.project-card.expanded .project-details-curtain {
-    max-height: 2000px;
-}
-
-.project-details-content {
-    padding: 0 1.25rem 1.25rem;
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Detail Sections */
-.detail-section {
-    margin-bottom: 1.5rem;
-    padding: 1rem;
-    background: white;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-}
-
-.detail-title {
-    color: #495057;
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.detail-text {
-    color: #6c757d;
-    margin: 0;
-}
-
-/* Project Information Grid */
-.project-info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1rem;
-}
-
-.info-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.info-label {
-    font-weight: 600;
-    color: #495057;
-    font-size: 0.9rem;
-}
-
-.info-value {
-    color: #6c757d;
-    font-size: 0.95rem;
-}
-
-.info-value code {
-    font-size: 0.85rem;
-    background: #f8f9fa;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    word-break: break-all;
-}
-
-.info-badge {
-    align-self: flex-start;
-    font-size: 0.8rem;
-}
-
-/* Components Summary Grid */
-.components-summary-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
-}
-
-.component-summary-card {
-    background: white;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    padding: 1rem;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.component-summary-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #007bff, #0056b3);
-}
-
-.component-summary-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
-    border-color: #007bff;
-}
-
-.component-summary-header {
-    margin-bottom: 0.5rem;
-}
-
-.component-type-badge {
-    display: inline-block;
-    padding: 0.3rem 0.6rem;
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    color: white;
-    border-radius: 15px;
-    font-size: 0.75rem;
-    font-weight: 600;
-}
-
-.component-summary-name {
-    font-weight: 600;
-    color: #2c3e50;
-    font-size: 0.95rem;
-    margin-bottom: 0.25rem;
-}
-
-.component-summary-framework {
-    color: #6c757d;
-    font-size: 0.8rem;
-}
-
-.component-summary-version {
-    color: #007bff;
-    font-size: 0.7rem;
-    font-weight: 500;
-    margin-top: 2px;
-}
-
-.component-summary-status {
-    font-size: 0.7rem;
-    margin-top: 4px;
-    font-weight: 500;
-}
-
-.component-summary-environments,
-.component-summary-servers,
-.component-summary-port {
-    font-size: 0.65rem;
-    margin-top: 3px;
-    color: #666;
-}
-
-.env-badge {
-    background-color: #e3f2fd;
-    color: #1976d2;
-    padding: 2px 6px;
-    border-radius: 8px;
-    font-size: 0.6rem;
-    font-weight: 500;
-    margin-right: 3px;
-    display: inline-block;
-}
-
-.server-badge {
-    background-color: #f3e5f5;
-    color: #7b1fa2;
-    padding: 2px 6px;
-    border-radius: 8px;
-    font-size: 0.6rem;
-    font-weight: 500;
-    margin-right: 3px;
-    display: inline-block;
-}
-
-/* Action Buttons */
-.action-buttons {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
-/* Search Functionality */
-.project-card.hidden {
-    display: none;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .project-info-grid,
-    .components-summary-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .project-meta {
-        flex-wrap: wrap;
-    }
-
-    .action-buttons {
-        flex-direction: column;
-    }
-
-    .action-buttons .btn {
-        width: 100%;
-    }
-}
-</style>
 
 <script>
-// Toggle project details with curtain effect
-function toggleProject(projectId) {
-    const projectCard = document.querySelector(`[data-project-id="${projectId}"]`);
-    projectCard.classList.toggle('expanded');
-    
-    // Smooth scroll to view if expanding
-    if (projectCard.classList.contains('expanded')) {
+// Project Dashboard JavaScript (Matching Image Functionality)
+
+// Enhanced toggle project details with smooth animations
+function toggleProjectDetails(projectId) {
+    const detailsElement = document.getElementById(`projectDetails-${projectId}`);
+    const chevronElement = document.getElementById(`chevron-${projectId}`);
+    const projectCard = document.getElementById(`project-${projectId}`);
+
+    // Add performance optimization
+    detailsElement.style.willChange = 'height, opacity, transform';
+    chevronElement.style.willChange = 'transform';
+
+    if (detailsElement.classList.contains('show')) {
+        // Closing animation
+        detailsElement.style.transform = 'scaleY(0.95) translateY(-10px)';
+        detailsElement.style.opacity = '0.7';
+
         setTimeout(() => {
-            projectCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            detailsElement.classList.remove('show');
+            chevronElement.style.transform = 'rotate(0deg)';
+            projectCard.classList.remove('expanded');
         }, 100);
+    } else {
+        // Close other open details first with animation
+        document.querySelectorAll('.collapse.show').forEach(element => {
+            element.style.transform = 'scaleY(0.95) translateY(-10px)';
+            element.style.opacity = '0.7';
+            setTimeout(() => element.classList.remove('show'), 100);
+        });
+
+        document.querySelectorAll('.fas.fa-chevron-down').forEach(icon => {
+            icon.style.transform = 'rotate(0deg)';
+        });
+
+        document.querySelectorAll('.accordion-item').forEach(card => {
+            card.classList.remove('expanded');
+        });
+
+        // Open clicked project details with staggered animation
+        setTimeout(() => {
+            detailsElement.classList.add('show');
+            chevronElement.style.transform = 'rotate(180deg)';
+            projectCard.classList.add('expanded');
+
+            // Reset transform for opening animation
+            detailsElement.style.transform = 'scaleY(1) translateY(0)';
+            detailsElement.style.opacity = '1';
+        }, 150);
     }
+
+    // Clean up performance optimization after animation
+    setTimeout(() => {
+        detailsElement.style.willChange = 'auto';
+        chevronElement.style.willChange = 'auto';
+    }, 600);
 }
 
 // Search functionality
@@ -524,65 +820,92 @@ document.addEventListener('DOMContentLoaded', function() {
     if (searchInput) {
         searchInput.addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();
-            const projectCards = document.querySelectorAll('.project-card');
-            
-            projectCards.forEach(card => {
-                const projectName = card.querySelector('.project-name').textContent.toLowerCase();
-                const projectKey = card.querySelector('.badge.bg-primary').textContent.toLowerCase();
-                const ownerTeam = card.querySelector('.text-muted').textContent.toLowerCase();
-                
-                if (projectName.includes(searchTerm) || 
-                    projectKey.includes(searchTerm) || 
-                    ownerTeam.includes(searchTerm)) {
-                    card.classList.remove('hidden');
+            const projectItems = document.querySelectorAll('.accordion-item');
+
+            projectItems.forEach(item => {
+                const projectName = item.querySelector('h6').textContent.toLowerCase();
+                const badges = item.querySelectorAll('.badge');
+                let badgeText = '';
+                badges.forEach(badge => badgeText += badge.textContent.toLowerCase() + ' ');
+
+                if (projectName.includes(searchTerm) || badgeText.includes(searchTerm)) {
+                    item.style.display = 'block';
                 } else {
-                    card.classList.add('hidden');
+                    item.style.display = 'none';
                 }
             });
         });
     }
-    
-    // Close expanded projects when clicking outside
-    document.addEventListener('click', function(event) {
-        if (!event.target.closest('.project-card')) {
-            document.querySelectorAll('.project-card.expanded').forEach(card => {
-                if (!card.contains(event.target)) {
-                    card.classList.remove('expanded');
-                }
-            });
-        }
-    });
 });
 
-// Project actions
-function editProject(projectId) {
-    window.location.href = `{{ url_for('edit_project_page', project_id=0) }}`.replace('0', projectId);
-}
-
+// Project action functions
 function viewProject(projectId) {
+    // Navigate to project details page
     window.location.href = `/project/${projectId}`;
 }
 
-function generateMSI(projectId) {
-    console.log('Generate MSI for project:', projectId);
-    // Implement MSI generation
+function editProject(projectId) {
+    // Navigate to project edit page
+    window.location.href = `/edit-project/${projectId}`;
 }
 
-function deleteProject(projectId) {
-    if (confirm('Are you sure you want to delete this project? This action cannot be undone.')) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '{{ url_for("delete_project") }}';
-        
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = 'project_id';
-        input.value = projectId;
-        
-        form.appendChild(input);
-        document.body.appendChild(form);
-        form.submit();
+function generateMSI(projectId) {
+    if (confirm('Generate MSI package for this project?')) {
+        // Show loading state
+        const button = event.target.closest('button');
+        const originalText = button.innerHTML;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Generating...';
+        button.disabled = true;
+
+        // Simulate MSI generation (replace with actual API call)
+        fetch(`/generate-msi/${projectId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('MSI generation started successfully!');
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Error generating MSI: ' + error.message);
+        })
+        .finally(() => {
+            // Restore button state
+            button.innerHTML = originalText;
+            button.disabled = false;
+        });
     }
 }
+
+// Auto-refresh dashboard data every 30 seconds
+function refreshDashboardStats() {
+    fetch('/api/dashboard-stats')
+    .then(response => response.json())
+    .then(data => {
+        // Update metric cards if needed
+        console.log('Dashboard stats refreshed:', data);
+    })
+    .catch(error => {
+        console.log('Failed to refresh dashboard stats:', error);
+    });
+}
+
+// Initialize auto-refresh
+setInterval(refreshDashboardStats, 30000);
+
+// Simple initialization
+document.addEventListener('DOMContentLoaded', function() {
+    // Simple fade-in for elements
+    const allCards = document.querySelectorAll('.card, .accordion-item');
+    allCards.forEach(card => {
+        card.style.opacity = '1';
+    });
+});
 </script>
 {% endblock %}

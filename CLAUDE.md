@@ -2,3 +2,5 @@
 - add to memor : do not use any java script just python.
 - to memorize : always write a python code in modrate way where user can understand the code easly.
 - you need to create a single SQL script in which you need to add the operation, like creating different tables if required. in future if you need to update the table use the same SQL query to update the create table query.
+- IMPORTANT BUSINESS DECISION: Always use SOFT DELETE for components and projects. Components are deleted by setting is_enabled = 0, which hides them from UI while preserving database records for audit trails and data recovery. This is the approved business practice for this MSI Factory application.
+- USER ROLES SYSTEM: Three-tier role system - Admin (full access), PowerUser (Technical Project Managers with component CRUD permissions), User (read-only). PowerUsers can Add/Update/Delete/Enable-Disable Components but have limited admin powers.

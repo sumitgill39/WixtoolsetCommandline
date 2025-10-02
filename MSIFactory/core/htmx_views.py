@@ -393,41 +393,54 @@ def register_htmx_routes(app, components):
             log_error(f"Error generating component delete confirmation: {e}")
             return '<div class="alert alert-danger">Error loading confirmation dialog</div>', 500
 
-    @app.route('/htmx/component/delete/<int:component_id>', methods=['DELETE'])
-    def htmx_delete_component(component_id):
+    @app.route('/htmx/component/toggle-status/<int:component_id>', methods=['POST'])
+    def htmx_toggle_component_status(component_id):
         """
-        Delete component via HTMX with proper validation
+        Toggle component status (Active/Inactive) via HTMX
         """
-        if 'username' not in session or session.get('role') != 'admin':
-            return '<div class="alert alert-danger">Unauthorized</div>', 401
+        if 'username' not in session:
+            return '<div class="alert alert-danger">Please log in</div>', 401
+
+        # Check permissions - PowerUsers and Admins can toggle status
+        user_role = session.get('role', 'user')
+        if user_role not in ['admin', 'poweruser']:
+            return '<div class="alert alert-danger">Insufficient permissions</div>', 403
 
         try:
-            # Get component details before deletion for logging
-            from core.project_manager import get_component_details, remove_component_from_project
-            component = get_component_details(component_id)
+            from core.component_manager import ComponentManager
+            component_manager = ComponentManager()
 
+            # Get current component status
+            component = component_manager.get_component(component_id)
             if not component:
                 return '<div class="alert alert-danger">Component not found</div>', 404
 
-            # Check for dependencies
-            dependencies = check_component_dependencies(component_id)
-            if dependencies['has_dependencies']:
-                return render_template('fragments/component_delete_error.html',
-                                     component=component,
-                                     dependencies=dependencies)
+            # Toggle the status
+            current_status = component.get('is_enabled', True)
+            new_status = not current_status
 
-            # Perform deletion
-            success, message = remove_component_from_project(component_id)
+            # Update component status
+            success, message = component_manager.toggle_component_status(
+                component_id,
+                new_status,
+                session.get('username', 'system')
+            )
 
             if success:
-                log_info(f"Component '{component['component_name']}' deleted by {session.get('username')}")
-                return '<div class="alert alert-success"><i class="fas fa-check-circle me-2"></i>Component deleted successfully</div>'
+                status_text = "activated" if new_status else "deactivated"
+                log_info(f"Component '{component['component_name']}' {status_text} by {session.get('username')}")
+
+                # Return updated component card
+                updated_component = component_manager.get_component(component_id)
+                return render_template('fragments/component_card.html',
+                                     component=updated_component,
+                                     is_new=False)
             else:
                 return f'<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>{message}</div>'
 
         except Exception as e:
-            log_error(f"Error deleting component via HTMX: {e}")
-            return '<div class="alert alert-danger">Error deleting component</div>', 500
+            log_error(f"Error toggling component status via HTMX: {e}")
+            return '<div class="alert alert-danger">Error updating component status</div>', 500
 
     @app.route('/htmx/stats/refresh')
     def htmx_refresh_stats():

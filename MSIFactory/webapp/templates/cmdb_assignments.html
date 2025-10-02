@@ -1,6 +1,6 @@
 {% extends "base_sidebar.html" %}
 
-{% block title %}Server Assignments - MSI Factory CMDB{% endblock %}
+{% block title %}Server Assignments - CelerDeploy CMDB{% endblock %}
 {% block page_title %}Server Assignments{% endblock %}
 
 {% block content %}
@@ -251,7 +251,7 @@ document.getElementById('project_id').addEventListener('change', function() {
     environmentSelect.innerHTML = '<option value="">Loading...</option>';
 
     if (projectId) {
-        fetch(`/api/project/${projectId}/environments`)
+        fetch(`/api/projects/${projectId}/environments`)
             .then(response => response.json())
             .then(data => {
                 let html = '<option value="">Select Environment</option>';

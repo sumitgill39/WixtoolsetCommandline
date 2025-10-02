@@ -109,7 +109,7 @@ BEGIN
         middle_name VARCHAR(50),
         last_name VARCHAR(50) NOT NULL,
         status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'inactive', 'denied')),
-        role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('user', 'admin')),
+        role VARCHAR(20) DEFAULT 'user' CHECK (role IN ('user', 'admin', 'poweruser')),
         created_date DATETIME DEFAULT GETDATE(),
         approved_date DATETIME,
         approved_by VARCHAR(50),
@@ -698,6 +698,71 @@ BEGIN
 END
 ELSE
     PRINT '  Component environments table already exists.';
+GO
+
+-- ============================================================
+-- AUTHORIZATION SYSTEM TABLES (Three-Tier Role Management)
+-- ============================================================
+
+PRINT '';
+PRINT 'Creating authorization system tables...';
+
+-- User Permissions Table (Granular permission definitions)
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='user_permissions' AND xtype='U')
+BEGIN
+    PRINT '  Creating user_permissions table...';
+    CREATE TABLE user_permissions (
+        permission_id INT PRIMARY KEY IDENTITY(1,1),
+        permission_name VARCHAR(100) NOT NULL UNIQUE,
+        permission_description VARCHAR(255),
+        module_name VARCHAR(50) NOT NULL, -- components, projects, users, msi, cmdb
+        action_type VARCHAR(50) NOT NULL, -- create, read, update, delete, enable_disable
+        is_active BIT DEFAULT 1,
+        created_date DATETIME DEFAULT GETDATE()
+    );
+    PRINT '  User permissions table created successfully.';
+END
+ELSE
+    PRINT '  User permissions table already exists.';
+GO
+
+-- Role Permissions Mapping Table
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='role_permissions' AND xtype='U')
+BEGIN
+    PRINT '  Creating role_permissions table...';
+    CREATE TABLE role_permissions (
+        role_permission_id INT PRIMARY KEY IDENTITY(1,1),
+        role_name VARCHAR(20) NOT NULL,
+        permission_id INT NOT NULL,
+        is_granted BIT DEFAULT 1,
+        created_date DATETIME DEFAULT GETDATE(),
+        FOREIGN KEY (permission_id) REFERENCES user_permissions(permission_id),
+        UNIQUE(role_name, permission_id)
+    );
+    PRINT '  Role permissions table created successfully.';
+END
+ELSE
+    PRINT '  Role permissions table already exists.';
+GO
+
+-- User Permission Audit Table
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='user_permission_audit' AND xtype='U')
+BEGIN
+    PRINT '  Creating user_permission_audit table...';
+    CREATE TABLE user_permission_audit (
+        audit_id INT PRIMARY KEY IDENTITY(1,1),
+        user_id INT NOT NULL,
+        old_role VARCHAR(20),
+        new_role VARCHAR(20),
+        changed_by VARCHAR(50),
+        change_reason VARCHAR(255),
+        change_date DATETIME DEFAULT GETDATE(),
+        FOREIGN KEY (user_id) REFERENCES users(user_id)
+    );
+    PRINT '  User permission audit table created successfully.';
+END
+ELSE
+    PRINT '  User permission audit table already exists.';
 GO
 
 -- ============================================================
@@ -1540,6 +1605,51 @@ BEGIN
 END
 GO
 
+-- Authorization System View
+IF NOT EXISTS (SELECT * FROM sys.views WHERE name = 'v_user_permissions')
+BEGIN
+    EXEC('
+    CREATE VIEW v_user_permissions
+    AS
+    SELECT
+        u.user_id,
+        u.username,
+        u.role,
+        up.permission_name,
+        up.module_name,
+        up.action_type,
+        up.permission_description
+    FROM users u
+    JOIN role_permissions rp ON u.role = rp.role_name
+    JOIN user_permissions up ON rp.permission_id = up.permission_id
+    WHERE u.is_active = 1 AND rp.is_granted = 1 AND up.is_active = 1
+    ');
+    PRINT '  View v_user_permissions created successfully.';
+END
+GO
+
+-- Authorization Permission Check Function
+IF EXISTS (SELECT * FROM sys.objects WHERE type = 'FN' AND name = 'CheckUserPermission')
+    DROP FUNCTION CheckUserPermission;
+GO
+
+CREATE FUNCTION dbo.CheckUserPermission(
+    @username VARCHAR(50),
+    @permission_name VARCHAR(100)
+)
+RETURNS BIT
+AS
+BEGIN
+    DECLARE @hasPermission BIT = 0;
+
+    SELECT @hasPermission = 1
+    FROM v_user_permissions
+    WHERE username = @username AND permission_name = @permission_name;
+
+    RETURN ISNULL(@hasPermission, 0);
+END
+GO
+
 -- ============================================================
 -- INSERT SAMPLE DATA
 -- ============================================================
@@ -1561,6 +1671,76 @@ BEGIN
     INSERT INTO users (username, email, first_name, last_name, status, role, created_date, approved_date, approved_by, is_active)
     VALUES ('john.doe', 'john.doe@company.com', 'John', 'Doe', 'approved', 'user', GETDATE(), GETDATE(), 'admin', 1);
     PRINT '  Sample user created.';
+END
+
+-- Insert core permissions for authorization system
+IF NOT EXISTS (SELECT * FROM user_permissions WHERE permission_name = 'component_create')
+BEGIN
+    PRINT '  Creating authorization system permissions...';
+    INSERT INTO user_permissions (permission_name, permission_description, module_name, action_type) VALUES
+    -- Component Management Permissions
+    ('component_create', 'Create new components', 'components', 'create'),
+    ('component_read', 'View component details', 'components', 'read'),
+    ('component_update', 'Update component information', 'components', 'update'),
+    ('component_delete', 'Delete components (soft delete)', 'components', 'delete'),
+    ('component_enable_disable', 'Enable or disable components', 'components', 'enable_disable'),
+
+    -- Project Management Permissions
+    ('project_create', 'Create new projects', 'projects', 'create'),
+    ('project_read', 'View project details', 'projects', 'read'),
+    ('project_update', 'Update project information', 'projects', 'update'),
+    ('project_delete', 'Delete projects', 'projects', 'delete'),
+
+    -- User Management Permissions
+    ('user_create', 'Create new users', 'users', 'create'),
+    ('user_read', 'View user details', 'users', 'read'),
+    ('user_update', 'Update user information', 'users', 'update'),
+    ('user_delete', 'Delete users', 'users', 'delete'),
+    ('user_role_manage', 'Manage user roles and permissions', 'users', 'role_manage'),
+
+    -- MSI Generation Permissions
+    ('msi_generate', 'Generate MSI packages', 'msi', 'create'),
+    ('msi_configure', 'Configure MSI settings', 'msi', 'update'),
+    ('msi_view', 'View MSI status and logs', 'msi', 'read'),
+
+    -- CMDB Management Permissions
+    ('cmdb_create', 'Create CMDB entries', 'cmdb', 'create'),
+    ('cmdb_read', 'View CMDB information', 'cmdb', 'read'),
+    ('cmdb_update', 'Update CMDB entries', 'cmdb', 'update'),
+    ('cmdb_delete', 'Delete CMDB entries', 'cmdb', 'delete'),
+
+    -- System Administration Permissions
+    ('system_logs', 'View system logs', 'system', 'read'),
+    ('system_settings', 'Manage system settings', 'system', 'update');
+
+    -- Assign permissions to roles
+    -- USER ROLE (Read-only access)
+    INSERT INTO role_permissions (role_name, permission_id)
+    SELECT 'user', permission_id FROM user_permissions WHERE action_type = 'read';
+
+    -- POWERUSER ROLE (Technical Project Managers - Component CRUD + some project access)
+    INSERT INTO role_permissions (role_name, permission_id)
+    SELECT 'poweruser', permission_id FROM user_permissions
+    WHERE permission_name IN (
+        'component_create', 'component_read', 'component_update', 'component_delete', 'component_enable_disable',
+        'project_read', 'project_update',
+        'msi_generate', 'msi_configure', 'msi_view',
+        'cmdb_read', 'cmdb_update'
+    );
+
+    -- ADMIN ROLE (Full access to everything)
+    INSERT INTO role_permissions (role_name, permission_id)
+    SELECT 'admin', permission_id FROM user_permissions;
+
+    PRINT '  Authorization permissions and role mappings created successfully.';
+END
+
+-- Insert sample PowerUser (Technical Project Manager)
+IF NOT EXISTS (SELECT * FROM users WHERE username = 'tech.pm')
+BEGIN
+    INSERT INTO users (username, email, first_name, last_name, role, status, created_date, approved_date, approved_by, is_active)
+    VALUES ('tech.pm', 'tech.pm@msifactory.com', 'Technical', 'Project Manager', 'poweruser', 'approved', GETDATE(), GETDATE(), 'admin', 1);
+    PRINT '  Sample PowerUser created.';
 END
 
 -- Insert sample project
@@ -1700,6 +1880,9 @@ PRINT 'Installation Date: ' + CONVERT(VARCHAR, GETDATE(), 120);
 PRINT '';
 PRINT 'Features Successfully Installed:';
 PRINT '  ✓ Enhanced user management with security features';
+PRINT '  ✓ Three-tier role-based authorization system (Admin, PowerUser, User)';
+PRINT '  ✓ PowerUser role for Technical Project Managers with component CRUD permissions';
+PRINT '  ✓ Granular permission management with audit trail';
 PRINT '  ✓ Multi-component project support with unique GUIDs';
 PRINT '  ✓ Dynamic environment configurations';
 PRINT '  ✓ GitFlow branch tracking and artifact polling';
@@ -1719,6 +1902,7 @@ PRINT '  ✓ Project-server assignment management';
 PRINT '  ✓ Component-server deployment mapping';
 PRINT '  ✓ Server change audit trail';
 PRINT '  ✓ CMDB views and reporting';
+PRINT '  ✓ Authorization permission checking functions';
 PRINT '';
 PRINT 'This script is IDEMPOTENT - can be run multiple times safely!';
 PRINT '';

@@ -1,133 +1,604 @@
 {% extends "base.html" %}
 
-{% block title %}Access Request - MSI Factory{% endblock %}
+{% block title %}Access Request - CelerDeploy{% endblock %}
 
 {% block content %}
-<div class="card" style="max-width: 600px; margin: 2rem auto;">
-    <h2 style="text-align: center; margin-bottom: 2rem; color: #2c3e50;">
-        📝 Request Access to MSI Factory
-    </h2>
-    
-    <div class="alert alert-info" style="margin-bottom: 2rem;">
-        <strong>New User Detected!</strong> Please fill out this form to request access. 
-        An admin will review your request and approve/deny access.
-    </div>
-    
-    <form method="POST">
-        <h3 style="color: #34495e; margin-bottom: 1rem;">Personal Information</h3>
-        
-        <div class="form-group">
-            <label for="username">Username:</label>
-            {% if username == 'new_user' %}
-            <input type="text"
-                   id="username"
-                   name="username"
-                   required
-                   placeholder="Enter your desired username">
-            {% else %}
-            <input type="text"
-                   id="username"
-                   name="username"
-                   value="{{ username }}"
-                   readonly
-                   style="background-color: #f8f9fa;">
-            {% endif %}
-        </div>
-        
-        <div class="form-group">
-            <label for="email">Email Address:</label>
-            <input type="email" 
-                   id="email" 
-                   name="email" 
-                   required 
-                   placeholder="your.email@company.com">
-        </div>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
-            <div class="form-group">
-                <label for="first_name">First Name:</label>
-                <input type="text" 
-                       id="first_name" 
-                       name="first_name" 
-                       required 
-                       placeholder="John">
-            </div>
-            
-            <div class="form-group">
-                <label for="middle_name">Middle Name:</label>
-                <input type="text" 
-                       id="middle_name" 
-                       name="middle_name" 
-                       placeholder="Michael">
-            </div>
-            
-            <div class="form-group">
-                <label for="last_name">Last Name:</label>
-                <input type="text" 
-                       id="last_name" 
-                       name="last_name" 
-                       required 
-                       placeholder="Doe">
-            </div>
-        </div>
-        
-        <h3 style="color: #34495e; margin: 2rem 0 1rem 0;">Application Access</h3>
-        
-        <div class="form-group">
-            <label for="app_short_key">Application Short Key:</label>
-            <select id="app_short_key" name="app_short_key" required>
-                <option value="">Select an application...</option>
-                {% for app in applications %}
-                <option value="{{ app.app_short_key }}">
-                    {{ app.app_short_key }} - {{ app.app_name }}
-                </option>
-                {% endfor %}
-            </select>
-            <small style="color: #666; font-size: 0.9rem; margin-top: 0.5rem; display: block;">
-                Select the application you need access to. This will be verified against our application registry.
-            </small>
-        </div>
-        
-        <div class="form-group">
-            <label for="reason">Reason for Access:</label>
-            <textarea id="reason" 
-                     name="reason" 
-                     rows="4" 
-                     required 
-                     placeholder="Please explain why you need access to this application. Include your role, team, and how you plan to use the MSI Factory."></textarea>
-        </div>
-        
-        <div class="form-group" style="margin-top: 2rem;">
-            <button type="submit" class="btn btn-success" style="width: 100%; padding: 1rem;">
-                📤 Submit Access Request
-            </button>
-        </div>
-        
-        <div class="form-group">
-            <a href="{{ url_for('login') }}" class="btn" style="width: 100%; text-align: center;">
-                ← Back to Login
-            </a>
-        </div>
-    </form>
-</div>
+<style>
+    /* Professional CelerDeploy Registration Theme */
+    .registration-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
 
-<div class="card" style="max-width: 800px; margin: 2rem auto;">
-    <h3 style="color: #2c3e50; margin-bottom: 1rem;">
-        ℹ️ Available Applications
-    </h3>
-    
-    <div class="app-grid">
-        {% for app in applications %}
-        <div class="app-card">
-            <h4 style="color: #3498db;">{{ app.app_short_key }}</h4>
-            <h5 style="color: #2c3e50; margin-bottom: 0.5rem;">{{ app.app_name }}</h5>
-            <p style="font-size: 0.9rem;">{{ app.description }}</p>
-            <p style="font-size: 0.8rem; color: #7f8c8d;">
-                <strong>Team:</strong> {{ app.owner_team }}<br>
-                <strong>Status:</strong> {{ app.status }}
+    .registration-card {
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.15);
+        max-width: 800px;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, #003f7f 0%, #0066cc 100%);
+        color: white;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23ffffff" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    }
+
+    .page-header h1 {
+        font-size: 2.2rem;
+        font-weight: 300;
+        margin: 0 0 0.5rem 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .page-header .subtitle {
+        font-size: 1rem;
+        opacity: 0.9;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-container {
+        padding: 2.5rem;
+    }
+
+    .alert-welcome {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border: 1px solid rgba(3, 102, 214, 0.2);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        color: #1565c0;
+    }
+
+    .alert-welcome strong {
+        color: #0d47a1;
+    }
+
+    .section-header {
+        color: #003f7f;
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin: 2rem 0 1.5rem 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e3f2fd;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 0.95rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        border: 2px solid #e3f2fd;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #fafafa;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #0066cc;
+        box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        background: white;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .role-selection {
+        background: linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%);
+        border: 2px solid #dee2e6;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .role-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .role-option {
+        background: white;
+        border: 2px solid #e3f2fd;
+        border-radius: 10px;
+        padding: 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .role-option:hover {
+        border-color: #0066cc;
+        box-shadow: 0 4px 12px rgba(0, 102, 204, 0.1);
+    }
+
+    .role-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .role-option input[type="radio"]:checked + .role-content {
+        background: linear-gradient(135deg, #003f7f 0%, #0066cc 100%);
+        color: white;
+    }
+
+    .role-content {
+        border-radius: 6px;
+        padding: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .role-title {
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .role-description {
+        font-size: 0.85rem;
+        opacity: 0.9;
+        line-height: 1.4;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 10px;
+        width: 100%;
+        margin-top: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+    }
+
+    .btn-back {
+        background: transparent;
+        color: #6c757d;
+        border: 2px solid #dee2e6;
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        display: block;
+        text-align: center;
+        margin-top: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-back:hover {
+        background: #f8f9fa;
+        border-color: #adb5bd;
+        text-decoration: none;
+    }
+
+    .apps-section {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        margin-top: 2rem;
+        overflow: hidden;
+    }
+
+    .apps-header {
+        background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+        color: white;
+        padding: 1.5rem 2rem;
+        text-align: center;
+    }
+
+    .app-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        padding: 2rem;
+    }
+
+    .app-card {
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .app-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        border-color: #0066cc;
+    }
+
+    .help-text {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+        font-style: italic;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .role-options {
+            grid-template-columns: 1fr;
+        }
+
+        .registration-card {
+            margin: 1rem;
+        }
+
+        .form-container {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+<div class="registration-container">
+    <div class="registration-card">
+        <div class="page-header">
+            <h1><i class="fas fa-user-plus me-3"></i>Request Access to CelerDeploy</h1>
+            <p class="subtitle">Complete your registration to join the CelerDeploy platform</p>
+        </div>
+
+        <div class="form-container">
+            <div class="alert-welcome">
+                <strong><i class="fas fa-info-circle me-2"></i>Welcome to CelerDeploy!</strong>
+                Please complete this form to request access. An administrator will review your request and assign the appropriate role based on your requirements.
+                {% if auto_populated_data.username %}
+                <br><br>
+                <i class="fas fa-magic me-2"></i><strong>Auto-Detection:</strong> We've automatically detected your Windows username and suggested an email address. You can modify these fields if needed.
+                {% endif %}
+            </div>
+
+            <form method="POST">
+                <div class="section-header">
+                    <i class="fas fa-user"></i> Personal Information
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    {% if username == 'new_user' %}
+                    <input type="text"
+                           id="username"
+                           name="username"
+                           value="{{ auto_populated_data.username if auto_populated_data.username else '' }}"
+                           required
+                           placeholder="Enter your desired username">
+                    {% else %}
+                    <input type="text"
+                           id="username"
+                           name="username"
+                           value="{{ username }}"
+                           readonly
+                           style="background-color: #f1f3f4;">
+                    {% endif %}
+                    <div class="help-text">
+                        {% if username == 'new_user' and auto_populated_data.username %}
+                        Auto-detected from Windows logon: <strong>{{ auto_populated_data.username }}</strong>
+                        {% else %}
+                        Choose a unique username for the system
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Corporate Email Address:</label>
+                    <input type="email"
+                           id="email"
+                           name="email"
+                           value="{{ auto_populated_data.suggested_email if auto_populated_data.suggested_email else '' }}"
+                           required
+                           placeholder="your.email@company.com">
+                    <div class="help-text">
+                        {% if auto_populated_data.suggested_email %}
+                        Suggested email: <strong>{{ auto_populated_data.suggested_email }}</strong> (you can modify this)
+                        {% else %}
+                        Use your corporate email address for verification
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first_name">First Name:</label>
+                        <input type="text"
+                               id="first_name"
+                               name="first_name"
+                               required
+                               placeholder="John">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="middle_name">Middle Name:</label>
+                        <input type="text"
+                               id="middle_name"
+                               name="middle_name"
+                               placeholder="Michael">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="last_name">Last Name:</label>
+                        <input type="text"
+                               id="last_name"
+                               name="last_name"
+                               required
+                               placeholder="Doe">
+                    </div>
+                </div>
+
+                <div class="section-header">
+                    <i class="fas fa-user-shield"></i> Role Selection
+                </div>
+
+                <div class="role-selection">
+                    <label style="font-weight: 600; color: #003f7f; margin-bottom: 0.5rem;">
+                        Select the role that best matches your requirements:
+                    </label>
+                    <div class="help-text" style="margin-bottom: 1rem;">
+                        Choose the appropriate access level. Administrators will review and may adjust your role assignment.
+                    </div>
+
+                    <div class="role-options">
+                        <label class="role-option">
+                            <input type="radio" name="requested_role" value="user" checked>
+                            <div class="role-content">
+                                <div class="role-title"><i class="fas fa-user"></i> Standard User</div>
+                                <div class="role-description">
+                                    View-only access to projects, components, and MSI status.
+                                    Perfect for stakeholders and viewers.
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="role-option">
+                            <input type="radio" name="requested_role" value="poweruser">
+                            <div class="role-content">
+                                <div class="role-title"><i class="fas fa-user-tie"></i> PowerUser</div>
+                                <div class="role-description">
+                                    Technical Project Manager role with component CRUD permissions,
+                                    project updates, and MSI generation capabilities.
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="role-option">
+                            <input type="radio" name="requested_role" value="admin">
+                            <div class="role-content">
+                                <div class="role-title"><i class="fas fa-crown"></i> Administrator</div>
+                                <div class="role-description">
+                                    Full system access including user management, system settings,
+                                    and all operational permissions. (Requires approval)
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="section-header">
+                    <i class="fas fa-building"></i> Department & Access Requirements
+                </div>
+                <div class="form-group">
+                    <label for="department">Department/Team:</label>
+                    <input type="text"
+                           id="department"
+                           name="department"
+                           required
+                           placeholder="e.g., Development Team, QA Team, DevOps">
+                    <div class="help-text">Enter your department or team name</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="app_short_key">Primary Application Access:</label>
+                    <select id="app_short_key" name="app_short_key" required>
+                        <option value="">Select primary application...</option>
+                        {% for app in applications %}
+                        <option value="{{ app.app_short_key }}">
+                            {{ app.app_short_key }} - {{ app.app_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <div class="help-text">
+                        Select the main application you'll be working with. You can request additional access later.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="manager_email">Manager/Supervisor Email:</label>
+                    <input type="email"
+                           id="manager_email"
+                           name="manager_email"
+                           placeholder="manager@company.com">
+                    <div class="help-text">Optional: Manager email for verification purposes</div>
+                </div>
+
+                <div class="section-header">
+                    <i class="fas fa-clipboard-list"></i> Access Justification
+                </div>
+
+                <div class="form-group">
+                    <label for="reason">Business Justification:</label>
+                    <textarea id="reason"
+                             name="reason"
+                             rows="5"
+                             required
+                             placeholder="Please provide a detailed justification for your access request:&#10;&#10;• Your role and responsibilities&#10;• Which projects you'll be working on&#10;• How you plan to use the CelerDeploy system&#10;• Any specific permissions you require&#10;&#10;For PowerUser requests, include your Technical Project Manager responsibilities."></textarea>
+                    <div class="help-text">
+                        Provide clear business justification. PowerUser and Admin requests require detailed explanations.
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 2.5rem;">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane me-2"></i>
+                        Submit Access Request
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <a href="{{ url_for('login') }}" class="btn-back">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Login
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Available Applications Section -->
+    <div class="apps-section">
+        <div class="apps-header">
+            <h3 style="margin: 0;">
+                <i class="fas fa-apps me-2"></i>Available Applications
+            </h3>
+            <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">
+                Overview of applications in the CelerDeploy system
             </p>
         </div>
-        {% endfor %}
+
+        <div class="app-grid">
+            {% for app in applications %}
+            <div class="app-card">
+                <h4 style="color: #0066cc; margin: 0 0 0.5rem 0;">
+                    <i class="fas fa-cube me-2"></i>{{ app.app_short_key }}
+                </h4>
+                <h5 style="color: #2c3e50; margin: 0 0 1rem 0;">{{ app.app_name }}</h5>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem; line-height: 1.4;">
+                    {{ app.description }}
+                </p>
+                <div style="padding: 0.8rem; background: #f8f9fa; border-radius: 6px; font-size: 0.85rem;">
+                    <div style="margin-bottom: 0.3rem;">
+                        <strong style="color: #495057;">Team:</strong>
+                        <span style="color: #6c757d;">{{ app.owner_team }}</span>
+                    </div>
+                    <div>
+                        <strong style="color: #495057;">Status:</strong>
+                        <span class="badge" style="background: {% if app.status == 'active' %}#28a745{% else %}#6c757d{% endif %}; color: white; padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.75rem;">
+                            {{ app.status.title() }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 </div>
+
+<script>
+    // Enhanced form interactions
+    document.addEventListener('DOMContentLoaded', function() {
+        // Role selection visual feedback
+        const roleOptions = document.querySelectorAll('.role-option input[type="radio"]');
+        roleOptions.forEach(option => {
+            option.addEventListener('change', function() {
+                // Update visual selection
+                document.querySelectorAll('.role-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.closest('.role-option').classList.add('selected');
+            });
+        });
+
+        // Form validation feedback
+        const form = document.querySelector('form');
+        const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+
+        inputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.value.trim() === '') {
+                    this.style.borderColor = '#dc3545';
+                } else {
+                    this.style.borderColor = '#28a745';
+                }
+            });
+        });
+
+        // Email validation
+        const emailInput = document.getElementById('email');
+        emailInput.addEventListener('blur', function() {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (this.value && !emailRegex.test(this.value)) {
+                this.style.borderColor = '#dc3545';
+                this.setCustomValidity('Please enter a valid email address');
+            } else {
+                this.style.borderColor = this.value ? '#28a745' : '#e3f2fd';
+                this.setCustomValidity('');
+            }
+        });
+
+        // Character counter for reason textarea
+        const reasonTextarea = document.getElementById('reason');
+        const maxLength = 500;
+
+        reasonTextarea.addEventListener('input', function() {
+            const remaining = maxLength - this.value.length;
+            let counter = document.getElementById('reason-counter');
+
+            if (!counter) {
+                counter = document.createElement('div');
+                counter.id = 'reason-counter';
+                counter.className = 'help-text';
+                counter.style.textAlign = 'right';
+                this.parentNode.appendChild(counter);
+            }
+
+            counter.textContent = `${this.value.length}/${maxLength} characters`;
+            counter.style.color = remaining < 50 ? '#dc3545' : '#6c757d';
+
+            if (remaining < 0) {
+                this.value = this.value.substring(0, maxLength);
+            }
+        });
+    });
+</script>
 {% endblock %}

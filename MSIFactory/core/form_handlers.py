@@ -42,8 +42,8 @@ class ProjectFormHandler:
             # Extract components data
             components_data = self._extract_components_data(form_data, project_data['project_key'])
 
-            # Extract environments data
-            environments_data = self._extract_environments_data(form_data)
+            # Environment functionality disabled
+            environments_data = []
 
             # Pre-process and validate data
             project_data = self._preprocess_project_data(project_data)
@@ -277,7 +277,7 @@ class ComponentFormHandler:
 
     def process_add_component(self, form_data, project_id, project_key):
         """
-        Process add component request
+        Process add component request with all MSI configuration fields
         Replaces JavaScript addNewComponent AJAX
         """
         try:
@@ -286,18 +286,46 @@ class ComponentFormHandler:
                 'component_name': form_data.get('component_name', '').strip(),
                 'component_type': form_data.get('component_type', ''),
                 'framework': form_data.get('framework', ''),
+                'description': form_data.get('description', '').strip(),
+
+                # MSI Package Information
+                'app_name': form_data.get('app_name', '').strip(),
+                'app_version': form_data.get('app_version', '1.0.0.0'),
+                'manufacturer': form_data.get('manufacturer', 'Your Company').strip(),
+
+                # Deployment Configuration
+                'target_server': form_data.get('target_server', '').strip(),
+                'install_folder': form_data.get('install_folder', '').strip(),
+
+                # Artifact Configuration
+                'artifact_url': form_data.get('artifact_url', '').strip(),
                 'artifact_source': form_data.get('artifact_source', ''),
-                'component_guid': generate_project_component_guid(project_key, 1)  # Will be properly numbered in DB
+
+                # IIS Configuration (for web components)
+                'iis_website_name': form_data.get('iis_website_name', '').strip(),
+                'iis_app_pool_name': form_data.get('iis_app_pool_name', '').strip(),
+                'port': self._safe_int_conversion(form_data.get('port')),
+
+                # Windows Service Configuration
+                'service_name': form_data.get('service_name', '').strip(),
+                'service_display_name': form_data.get('service_display_name', '').strip(),
+
+                # Component GUID (if provided, otherwise ComponentManager will generate)
+                'component_guid': form_data.get('component_guid', '').strip(),
+                # Component status - default to disabled (False) unless explicitly enabled
+                'is_enabled': bool(form_data.get('is_enabled'))
             }
 
-            # Generate defaults
-            defaults = generate_default_values(
-                component_data['component_type'],
-                component_data['component_name'],
-                project_key
-            )
+            # Set default values if not provided
+            if not component_data['app_name']:
+                component_data['app_name'] = component_data['component_name']
 
-            component_data.update(defaults)
+            # Generate default install folder if not provided
+            if not component_data['install_folder']:
+                component_data['install_folder'] = generate_install_path(
+                    component_data['component_type'],
+                    component_data['component_name']
+                )
 
             log_info(f"Processed add component form: {component_data['component_name']}")
             return {
@@ -311,6 +339,15 @@ class ComponentFormHandler:
                 'success': False,
                 'error': f"Component processing error: {str(e)}"
             }
+
+    def _safe_int_conversion(self, value):
+        """Safely convert string to int, return None if invalid"""
+        if not value or value == '':
+            return None
+        try:
+            return int(value)
+        except (ValueError, TypeError):
+            return None
 
     def process_component_config(self, form_data):
         """

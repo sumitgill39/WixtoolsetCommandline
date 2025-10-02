@@ -591,7 +591,6 @@ def get_all_components_from_database():
             FROM components c
             INNER JOIN projects p ON c.project_id = p.project_id
             LEFT JOIN msi_configurations mc ON c.component_id = mc.component_id
-            WHERE c.is_enabled = 1
             ORDER BY p.project_name, c.component_name
         """)
 
@@ -634,6 +633,67 @@ def get_all_components_from_database():
     except Exception as e:
         log_error(f"DATABASE: Error getting all components: {str(e)}")
         return []
+
+def get_component_by_id_from_database(component_id):
+    """Get a single component by ID with full details"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT
+                c.component_id, c.component_name, c.component_type, c.framework,
+                c.artifact_source, c.created_date, c.created_by, c.is_enabled,
+                c.component_guid, c.description, c.app_name, c.app_version,
+                c.manufacturer, c.install_folder, c.iis_website_name,
+                c.iis_app_pool_name, c.port, c.service_name, c.service_display_name,
+                p.project_name, p.project_key, p.project_id,
+                mc.config_id, mc.target_server, mc.target_environment
+            FROM components c
+            INNER JOIN projects p ON c.project_id = p.project_id
+            LEFT JOIN msi_configurations mc ON c.component_id = mc.component_id
+            WHERE c.component_id = ?
+        """, (component_id,))
+
+        row = cursor.fetchone()
+
+        if row:
+            component = {
+                'component_id': row[0],
+                'component_name': row[1],
+                'component_type': row[2] or 'Application',
+                'framework': row[3],
+                'artifact_source': row[4],
+                'created_date': row[5],
+                'created_by': row[6],
+                'is_enabled': row[7],
+                'component_guid': row[8],
+                'description': row[9],
+                'app_name': row[10],
+                'app_version': row[11],
+                'manufacturer': row[12],
+                'install_folder': row[13],
+                'iis_website_name': row[14],
+                'iis_app_pool_name': row[15],
+                'port': row[16],
+                'service_name': row[17],
+                'service_display_name': row[18],
+                'project_name': row[19],
+                'project_key': row[20],
+                'project_id': row[21],
+                'config_id': row[22],
+                'target_server': row[23],
+                'target_environment': row[24]
+            }
+            conn.close()
+            return component
+        else:
+            conn.close()
+            return None
+
+    except Exception as e:
+        log_error(f"DATABASE: Error getting component {component_id}: {str(e)}")
+        return None
 
 def debug_user_project_access(username, auth_system):
     """Debug function to check user's project access"""
@@ -936,7 +996,7 @@ def get_detailed_projects():
                     c.target_server,
                     c.deployment_strategy
                 FROM components c
-                WHERE c.project_id = ? AND c.is_enabled = 1
+                WHERE c.project_id = ?
                 ORDER BY c.component_name
             """, (project_id,))
 
@@ -1027,3 +1087,161 @@ def get_detailed_projects():
         import traceback
         traceback.print_exc()
         return []
+
+def get_component_branches(component_id):
+    """Get all branches for a specific component"""
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    SELECT branch_id, component_id, branch_name, current_version, last_build_date,
+                           last_build_number, branch_status, auto_build, description, is_active,
+                           created_date, created_by, updated_date, updated_by,
+                           major_version, minor_version, patch_version, build_number, path_pattern_override
+                    FROM component_branches
+                    WHERE component_id = ? AND is_active = 1
+                    ORDER BY branch_name
+                """, (component_id,))
+
+                rows = cursor.fetchall()
+                branches = []
+
+                for row in rows:
+                    branch = {
+                        'branch_id': row[0],
+                        'component_id': row[1],
+                        'branch_name': row[2],
+                        'current_version': row[3],
+                        'last_build_date': row[4].isoformat() if row[4] else None,
+                        'last_build_number': row[5],
+                        'branch_status': row[6],
+                        'auto_build': bool(row[7]),
+                        'description': row[8],
+                        'is_active': bool(row[9]),
+                        'created_date': row[10].isoformat() if row[10] else None,
+                        'created_by': row[11],
+                        'updated_date': row[12].isoformat() if row[12] else None,
+                        'updated_by': row[13],
+                        'major_version': row[14],
+                        'minor_version': row[15],
+                        'patch_version': row[16],
+                        'build_number': row[17],
+                        'path_pattern_override': row[18]
+                    }
+                    branches.append(branch)
+
+                return branches
+
+    except Exception as e:
+        log_error(f"Error fetching component branches: {str(e)}")
+        return []
+
+def add_component_branch(component_id, branch_name, branch_status, created_by):
+    """Add a new branch for a component"""
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cursor:
+                # Check if branch already exists
+                cursor.execute("""
+                    SELECT COUNT(*) FROM component_branches
+                    WHERE component_id = ? AND branch_name = ? AND is_active = 1
+                """, (component_id, branch_name))
+
+                if cursor.fetchone()[0] > 0:
+                    return False, f"Branch '{branch_name}' already exists for this component"
+
+                # Insert new branch
+                cursor.execute("""
+                    INSERT INTO component_branches
+                    (component_id, branch_name, current_version, branch_status, auto_build,
+                     is_active, created_date, created_by, major_version, minor_version,
+                     patch_version, build_number)
+                    VALUES (?, ?, 1, ?, 0, 1, GETDATE(), ?, 1, 0, 0, 0)
+                """, (component_id, branch_name, branch_status, created_by))
+
+                conn.commit()
+                log_info(f"Added branch '{branch_name}' for component {component_id}")
+                return True, f"Branch '{branch_name}' added successfully"
+
+    except Exception as e:
+        log_error(f"Error adding component branch: {str(e)}")
+        return False, f"Error adding branch: {str(e)}"
+
+def update_component_branch(branch_id, data, updated_by):
+    """Update a component branch"""
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cursor:
+                # Build update query dynamically based on provided data
+                updates = []
+                params = []
+
+                if 'branch_status' in data:
+                    updates.append("branch_status = ?")
+                    params.append(data['branch_status'])
+
+                if 'auto_build' in data:
+                    updates.append("auto_build = ?")
+                    params.append(1 if data['auto_build'] else 0)
+
+                if 'description' in data:
+                    updates.append("description = ?")
+                    params.append(data['description'])
+
+                if 'path_pattern_override' in data:
+                    updates.append("path_pattern_override = ?")
+                    params.append(data['path_pattern_override'])
+
+                if 'major_version' in data:
+                    updates.append("major_version = ?")
+                    params.append(data['major_version'])
+
+                if 'minor_version' in data:
+                    updates.append("minor_version = ?")
+                    params.append(data['minor_version'])
+
+                if 'patch_version' in data:
+                    updates.append("patch_version = ?")
+                    params.append(data['patch_version'])
+
+                if 'build_number' in data:
+                    updates.append("build_number = ?")
+                    params.append(data['build_number'])
+
+                if not updates:
+                    return False, "No data provided for update"
+
+                updates.append("updated_date = GETDATE()")
+                updates.append("updated_by = ?")
+                params.append(updated_by)
+                params.append(branch_id)
+
+                query = f"UPDATE component_branches SET {', '.join(updates)} WHERE branch_id = ?"
+                cursor.execute(query, params)
+
+                conn.commit()
+                log_info(f"Updated branch {branch_id}")
+                return True, "Branch updated successfully"
+
+    except Exception as e:
+        log_error(f"Error updating component branch: {str(e)}")
+        return False, f"Error updating branch: {str(e)}"
+
+def delete_component_branch(branch_id, updated_by):
+    """Soft delete a component branch"""
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    UPDATE component_branches
+                    SET is_active = 0, updated_date = GETDATE(), updated_by = ?
+                    WHERE branch_id = ?
+                """, (updated_by, branch_id))
+
+                conn.commit()
+                log_info(f"Soft deleted branch {branch_id}")
+                return True, "Branch deleted successfully"
+
+    except Exception as e:
+        log_error(f"Error deleting component branch: {str(e)}")
+        return False, f"Error deleting branch: {str(e)}"

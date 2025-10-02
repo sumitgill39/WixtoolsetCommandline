@@ -79,10 +79,10 @@ class ComponentAPI:
                 SELECT c.component_id, c.component_name, c.component_key, c.description,
                        c.component_type, c.file_path, c.install_path, c.guid,
                        c.project_id, p.project_name, c.created_date, c.modified_date,
-                       c.is_active
+                       c.is_enabled
                 FROM Components c
                 LEFT JOIN Projects p ON c.project_id = p.project_id
-                WHERE c.project_id = ? AND c.is_active = 1
+                WHERE c.project_id = ?
                 ORDER BY c.component_name
                 """
                 results = self.db.execute_query(query, (project_id,))
@@ -92,10 +92,9 @@ class ComponentAPI:
                 SELECT c.component_id, c.component_name, c.component_key, c.description,
                        c.component_type, c.file_path, c.install_path, c.guid,
                        c.project_id, p.project_name, c.created_date, c.modified_date,
-                       c.is_active
+                       c.is_enabled
                 FROM Components c
                 LEFT JOIN Projects p ON c.project_id = p.project_id
-                WHERE c.is_active = 1
                 ORDER BY c.component_name
                 """
                 results = self.db.execute_query(query)
@@ -115,7 +114,7 @@ class ComponentAPI:
                         'project_name': row[9],
                         'created_date': row[10].isoformat() if row[10] else None,
                         'modified_date': row[11].isoformat() if row[11] else None,
-                        'is_active': bool(row[12])
+                        'is_enabled': bool(row[12])
                     }
                     components.append(component)
             
@@ -147,10 +146,10 @@ class ComponentAPI:
             SELECT c.component_id, c.component_name, c.component_key, c.description,
                    c.component_type, c.file_path, c.install_path, c.guid,
                    c.project_id, p.project_name, c.created_date, c.modified_date,
-                   c.is_active
+                   c.is_enabled
             FROM Components c
             LEFT JOIN Projects p ON c.project_id = p.project_id
-            WHERE c.component_id = ? AND c.is_active = 1
+            WHERE c.component_id = ?
             """
             
             results = self.db.execute_query(query, (component_id,))
@@ -172,7 +171,7 @@ class ComponentAPI:
                 'project_name': row[9],
                 'created_date': row[10].isoformat() if row[10] else None,
                 'modified_date': row[11].isoformat() if row[11] else None,
-                'is_active': bool(row[12])
+                'is_enabled': bool(row[12])
             }
             
             return True, f"Component {component_id} retrieved successfully", component
@@ -199,10 +198,10 @@ class ComponentAPI:
             SELECT c.component_id, c.component_name, c.component_key, c.description,
                    c.component_type, c.file_path, c.install_path, c.guid,
                    c.project_id, p.project_name, c.created_date, c.modified_date,
-                   c.is_active
+                   c.is_enabled
             FROM Components c
             LEFT JOIN Projects p ON c.project_id = p.project_id
-            WHERE c.component_key = ? AND c.is_active = 1
+            WHERE c.component_key = ?
             """
             
             results = self.db.execute_query(query, (component_key,))
@@ -224,7 +223,7 @@ class ComponentAPI:
                 'project_name': row[9],
                 'created_date': row[10].isoformat() if row[10] else None,
                 'modified_date': row[11].isoformat() if row[11] else None,
-                'is_active': bool(row[12])
+                'is_enabled': bool(row[12])
             }
             
             return True, f"Component '{component_key}' retrieved successfully", component
@@ -306,7 +305,7 @@ class ComponentAPI:
                 return False, error_msg, None
             
             # Verify project exists
-            project_check = "SELECT project_id FROM Projects WHERE project_id = ? AND is_active = 1"
+            project_check = "SELECT project_id FROM Projects WHERE project_id = ? AND is_enabled = 1"
             project_exists = self.db.execute_query(project_check, (data['project_id'],))
             if not project_exists:
                 duration_ms = int((time.time() - start_time) * 1000)
@@ -331,7 +330,7 @@ class ComponentAPI:
             INSERT INTO Components (
                 component_name, component_key, description, component_type,
                 file_path, install_path, guid, project_id, created_date, 
-                modified_date, is_active
+                modified_date, is_enabled
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, GETDATE(), GETDATE(), 1)
             """
             
@@ -466,7 +465,7 @@ class ComponentAPI:
                 return False, "Database not available"
             
             # Check if component exists
-            check_query = "SELECT component_id FROM Components WHERE component_id = ? AND is_active = 1"
+            check_query = "SELECT component_id FROM Components WHERE component_id = ?"
             existing = self.db.execute_query(check_query, (component_id,))
             if not existing:
                 return False, f"Component with ID {component_id} not found"
@@ -538,7 +537,7 @@ class ComponentAPI:
                 action = "permanently deleted"
             else:
                 # Soft delete
-                delete_query = "UPDATE Components SET is_active = 0, modified_date = GETDATE() WHERE component_id = ?"
+                delete_query = "UPDATE Components SET is_enabled = 0, modified_date = GETDATE() WHERE component_id = ?"
                 action = "archived"
             
             result = self.db.execute_non_query(delete_query, (component_id,))

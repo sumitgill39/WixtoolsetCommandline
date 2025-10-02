@@ -88,22 +88,7 @@ def add_project_to_database(form_data, username):
             # Get the project ID from the OUTPUT clause
             project_id = result.fetchone()[0]
 
-            # Insert project environments with servers and region
-            for env in selected_environments:
-                servers_text = form_data.get(f'servers_{env}', '')
-                region = form_data.get(f'region_{env}', '').upper()
-
-                env_insert = """
-                    INSERT INTO project_environments (project_id, environment_name, environment_description, servers, region)
-                    VALUES (:project_id, :environment_name, :environment_description, :servers, :region)
-                """
-                db_session.execute(text(env_insert), {
-                    'project_id': project_id,
-                    'environment_name': env,
-                    'environment_description': f"{env} Environment",
-                    'servers': servers_text,
-                    'region': region
-                })
+            # Environment functionality disabled - no environment operations
 
             # Insert components if any (check for duplicates first)
             inserted_components = set()
@@ -205,28 +190,7 @@ def edit_project_in_database(form_data, project_id, username=None):
                 'artifact_password': form_data.get('artifact_password', '')
             })
 
-            # Delete existing environments
-            db_session.execute(
-                text("DELETE FROM project_environments WHERE project_id = :project_id"),
-                {'project_id': project_id}
-            )
-
-            # Insert new environments
-            for env in selected_environments:
-                servers_text = form_data.get(f'servers_{env}', '')
-                region = form_data.get(f'region_{env}', '').upper()
-
-                env_insert = """
-                    INSERT INTO project_environments (project_id, environment_name, environment_description, servers, region)
-                    VALUES (:project_id, :environment_name, :environment_description, :servers, :region)
-                """
-                db_session.execute(text(env_insert), {
-                    'project_id': project_id,
-                    'environment_name': env,
-                    'environment_description': f"{env} Environment",
-                    'servers': servers_text,
-                    'region': region
-                })
+            # Environment functionality disabled - no environment operations
 
         # Execute database operations
         execute_with_retry(update_project_in_db)
@@ -376,21 +340,48 @@ def add_component_to_project(project_id, component_data, username):
             if result.fetchone()[0] > 0:
                 raise ValueError(f"Component '{component_name}' already exists in this project")
 
-            # If not exists, insert the new component
+            # If not exists, insert the new component with all form fields
             comp_insert = """
-                INSERT INTO components (project_id, component_name, component_type,
-                                      framework, artifact_source, created_by)
+                INSERT INTO components (
+                    project_id, component_name, component_type, framework, description,
+                    artifact_source, created_by, is_enabled,
+                    app_name, app_version, manufacturer,
+                    target_server, install_folder,
+                    iis_website_name, iis_app_pool_name, port,
+                    service_name, service_display_name,
+                    artifact_url
+                )
                 OUTPUT INSERTED.component_id
-                VALUES (:project_id, :component_name, :component_type,
-                       :framework, :artifact_source, :created_by)
+                VALUES (
+                    :project_id, :component_name, :component_type, :framework, :description,
+                    :artifact_source, :created_by, :is_enabled,
+                    :app_name, :app_version, :manufacturer,
+                    :target_server, :install_folder,
+                    :iis_website_name, :iis_app_pool_name, :port,
+                    :service_name, :service_display_name,
+                    :artifact_url
+                )
             """
             result = db_session.execute(text(comp_insert), {
                 'project_id': project_id,
                 'component_name': component_name,
                 'component_type': component_data.get('component_type'),
                 'framework': component_data.get('framework'),
+                'description': component_data.get('description', ''),
                 'artifact_source': component_data.get('artifact_source', ''),
-                'created_by': username
+                'created_by': username,
+                'is_enabled': component_data.get('is_enabled', True),
+                'app_name': component_data.get('app_name'),
+                'app_version': component_data.get('app_version', '1.0.0.0'),
+                'manufacturer': component_data.get('manufacturer'),
+                'target_server': component_data.get('target_server'),
+                'install_folder': component_data.get('install_folder'),
+                'iis_website_name': component_data.get('iis_website_name'),
+                'iis_app_pool_name': component_data.get('iis_app_pool_name'),
+                'port': component_data.get('port'),
+                'service_name': component_data.get('service_name'),
+                'service_display_name': component_data.get('service_display_name'),
+                'artifact_url': component_data.get('artifact_url')
             })
 
             component_id = result.fetchone()[0]
@@ -537,7 +528,7 @@ def remove_component_from_project(component_id):
         def remove_component_in_db(db_session):
             # First verify the component exists
             check_result = db_session.execute(
-                text("SELECT component_name, is_active FROM components WHERE component_id = :component_id"),
+                text("SELECT component_name, is_enabled FROM components WHERE component_id = :component_id"),
                 {'component_id': component_id}
             ).fetchone()
 
@@ -640,39 +631,6 @@ def get_project_components(project_id):
         log_error(f"ERROR fetching components for project {project_id}: {e}")
         return []
 
-def get_project_environments(project_id):
-    """Get all environments for a project"""
-    try:
-        def fetch_environments(db_session):
-            result = db_session.execute(
-                text("""
-                    SELECT environment_id, environment_name, environment_description,
-                           servers, region, is_active, created_date
-                    FROM project_environments
-                    WHERE project_id = :project_id
-                    ORDER BY environment_name
-                """),
-                {'project_id': project_id}
-            )
-
-            environments = []
-            for row in result:
-                environments.append({
-                    'environment_id': row[0],
-                    'environment_name': row[1],
-                    'environment_description': row[2],
-                    'servers': row[3],
-                    'region': row[4],
-                    'is_active': row[5],
-                    'created_date': row[6]
-                })
-            return environments
-
-        return execute_with_retry(fetch_environments)
-
-    except Exception as e:
-        log_error(f"ERROR fetching environments for project {project_id}: {e}")
-        return []
 
 def get_project_build_history(project_id):
     """Get build history for a project"""
@@ -715,14 +673,20 @@ def get_project_build_history(project_id):
 
 
 def get_component_details(component_id):
-    """Get detailed component information for deletion confirmation"""
+    """Get complete component information for editing and operations"""
     try:
         def get_component_from_db(db_session):
             query = text("""
                 SELECT c.component_id, c.component_name, c.component_type,
                        c.framework, c.component_guid, c.install_folder,
                        p.project_name, p.project_key, c.created_date,
-                       c.created_by, c.is_active
+                       c.created_by, c.is_enabled,
+                       c.description, c.app_name, c.app_version,
+                       c.manufacturer, c.target_server, c.artifact_url,
+                       c.iis_website_name, c.iis_app_pool_name, c.port,
+                       c.service_name, c.service_display_name,
+                       c.artifact_source, c.branch_name, c.dependencies,
+                       p.project_id, c.updated_date, c.updated_by
                 FROM components c
                 INNER JOIN projects p ON c.project_id = p.project_id
                 WHERE c.component_id = :component_id
@@ -743,7 +707,24 @@ def get_component_details(component_id):
                 'project_key': component_data[7],
                 'created_date': component_data[8],
                 'created_by': component_data[9],
-                'is_active': component_data[10]
+                'is_enabled': component_data[10],
+                'description': component_data[11],
+                'app_name': component_data[12],
+                'app_version': component_data[13],
+                'manufacturer': component_data[14],
+                'target_server': component_data[15],
+                'artifact_url': component_data[16],
+                'iis_website_name': component_data[17],
+                'iis_app_pool_name': component_data[18],
+                'port': component_data[19],
+                'service_name': component_data[20],
+                'service_display_name': component_data[21],
+                'artifact_source': component_data[22],
+                'branch_name': component_data[23],
+                'dependencies': component_data[24],
+                'project_id': component_data[25],
+                'updated_date': component_data[26],
+                'updated_by': component_data[27]
             }
         else:
             return None

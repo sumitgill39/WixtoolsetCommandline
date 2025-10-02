@@ -1,0 +1,89 @@
+<div class="component-card"
+     data-component-id="{{ component.component_id }}"
+     data-component-type="{{ component.component_type|lower }}"
+     data-component-name="{{ component.component_name|lower }}"
+     data-project="{{ component.project_name|lower }}"
+     data-status="{{ 'configured' if component.config_id else 'pending' }}">
+
+    <!-- Card Header with Gradient -->
+    <div class="card-header {{ component.component_type|lower }}">
+        <h3 class="card-title">
+            {{ component.component_name }}
+            <span class="component-number">#{{ component.component_id }}</span>
+        </h3>
+        <p class="card-subtitle">{{ component.project_name }}</p>
+
+        <!-- Status Ribbon -->
+        <div class="status-ribbon {{ 'configured' if component.config_id else 'pending' }}">
+            {{ 'Configured' if component.config_id else 'Needs Setup' }}
+        </div>
+
+        <!-- Component Enable/Disable Status -->
+        {% set is_enabled = component.is_enabled if component.is_enabled is defined else true %}
+        <div class="component-status-badge {{ 'active' if is_enabled else 'inactive' }}">
+            <i class="fas fa-{{ 'check-circle' if is_enabled else 'times-circle' }}"></i>
+            {{ 'ACTIVE' if is_enabled else 'INACTIVE' }}
+        </div>
+    </div>
+
+    <!-- Card Body -->
+    <div class="card-body">
+        <div class="info-grid">
+            <div class="info-item guid-item">
+                <span class="info-label">GUID</span>
+                <span class="info-value guid-value">{{ component.component_guid or 'Not Generated' }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Version</span>
+                <span class="info-value">{{ component.app_version or '1.0.0.0' }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Environment</span>
+                <span class="info-value">{{ component.target_environment or 'Not Set' }}</span>
+            </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="tags-section">
+            <span class="tag tag-project">
+                <i class="fas fa-folder"></i> {{ component.project_key }}
+            </span>
+            <span class="tag tag-type">
+                <i class="fas fa-cube"></i> {{ component.component_type }}
+            </span>
+            {% if component.framework %}
+            <span class="tag tag-framework">
+                <i class="fas fa-code"></i> {{ component.framework }}
+            </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Card Actions -->
+    <div class="card-actions">
+        <a href="/edit-component/{{ component.component_id }}" class="configure-btn" style="text-decoration: none;">
+            <i class="fas fa-edit"></i> Edit
+        </a>
+        <button class="view-details-btn" hx-get="/htmx/component/{{ component.component_id }}/details" hx-target="#modal-container" hx-swap="innerHTML">
+            <i class="fas fa-eye"></i> Details
+        </button>
+
+        <!-- Status Toggle Button -->
+        {% set is_enabled = component.is_enabled if component.is_enabled is defined else true %}
+        <button type="button"
+                class="status-toggle-btn {{ 'btn-disable' if is_enabled else 'btn-enable' }}"
+                hx-post="/api/component/{{ component.component_id }}/toggle-status"
+                hx-vals='{"is_enabled": {{ "false" if is_enabled else "true" }}}'
+                hx-target="closest .component-card"
+                hx-swap="outerHTML"
+                title="{{ 'Click to Disable' if is_enabled else 'Click to Enable' }}">
+            <i class="fas fa-{{ 'pause' if is_enabled else 'play' }}"></i>
+            {{ 'Disable' if is_enabled else 'Enable' }}
+        </button>
+    </div>
+
+    <!-- Expanded Configuration Panel -->
+    <div class="config-panel">
+        <!-- Configuration form will be loaded here via HTMX -->
+    </div>
+</div>

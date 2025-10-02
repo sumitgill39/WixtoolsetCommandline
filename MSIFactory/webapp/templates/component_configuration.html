@@ -1,125 +1,204 @@
 {% extends "base_sidebar.html" %}
 
-{% block title %}Component Configuration - MSI Factory{% endblock %}
+{% block title %}Component Configuration - CelerDeploy{% endblock %}
 {% block page_title %}Component Configuration{% endblock %}
 
 {% block content %}
 <style>
-    /* Card-based Layout */
+    /* Professional Modern Theme */
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 0 0 20px 20px;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .page-header h1 {
+        font-size: 2.5rem;
+        font-weight: 300;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .page-header .subtitle {
+        opacity: 0.9;
+        font-size: 1.1rem;
+        margin-top: 0.5rem;
+    }
+
+    /* Enhanced Statistics Cards */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .stat-card {
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        border: 1px solid rgba(255,255,255,0.25);
+        backdrop-filter: blur(10px);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+
+    .stat-number {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-top: 0.8rem;
+        opacity: 0.8;
+    }
+
+    /* Component Grid Layout */
     .components-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 15px;
-        padding: 15px 0;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        padding: 1rem;
+        margin: 0;
     }
-    
+
     .component-card {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 20px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.1);
         overflow: hidden;
-        transition: all 0.3s ease;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
-        cursor: pointer;
-        border: 1px solid #e0e0e0;
+        border: 1px solid rgba(255,255,255,0.3);
+        backdrop-filter: blur(12px);
     }
-    
+
     .component-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-        border-color: #87ceeb;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
     }
+
     
-    .component-card.expanded {
-        grid-column: 1/-1;
-        cursor: default;
-        max-width: 1200px;
-        margin: 0 auto;
-        width: 100%;
-    }
-    
-    /* Card Header with Light Sky Blue */
+    /* Modern Card Headers */
     .card-header {
-        background: #87ceeb;
-        padding: 12px 15px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 1.5rem;
         position: relative;
         overflow: hidden;
+        color: white;
     }
-    
+
+    .card-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(4px);
+    }
+
+    .card-header * {
+        position: relative;
+        z-index: 1;
+    }
+
     .card-header.webapp {
-        background: #87ceeb;
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     }
     
     .card-header.api {
-        background: #87ceeb;
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
     }
-    
+
     .card-header.service {
-        background: #87ceeb;
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
     }
-    
+
+    .card-header.website {
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+    }
+
+    .card-header.scheduler {
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    }
+
     .card-header.desktop {
-        background: #87ceeb;
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
     }
-    
+
     .card-header.library {
-        background: #87ceeb;
+        background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%);
     }
-    
-    /* Card Header Content */
+
+    /* Enhanced Card Header Content */
     .card-title {
         color: white;
-        font-size: 1rem;
+        font-size: 1.25rem;
         font-weight: 600;
-        margin: 0 0 4px 0;
+        margin: 0 0 8px 0;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 12px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
-    
+
     .component-number {
-        background: rgba(255, 255, 255, 0.2);
-        padding: 1px 6px;
-        border-radius: 10px;
-        font-size: 0.7rem;
-        font-weight: 500;
+        background: rgba(255, 255, 255, 0.25);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        backdrop-filter: blur(4px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
     }
-    
+
     .card-subtitle {
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 0.9rem;
         margin: 0;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        font-weight: 500;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
     
-    /* Status Ribbon */
-    .status-ribbon {
-        position: absolute;
-        top: 8px;
-        right: -30px;
-        transform: rotate(45deg);
-        width: 120px;
-        padding: 3px 0;
-        text-align: center;
-        font-size: 0.65rem;
-        font-weight: 600;
-        color: white;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-    }
-    
-    .status-ribbon.configured {
-        background: #4682b4;
-    }
-    
-    .status-ribbon.pending {
-        background: #87ceeb;
-    }
     
     /* Card Body */
     .card-body {
@@ -251,128 +330,27 @@
     }
     
     .configure-btn:hover, .edit-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(70, 130, 180, 0.3);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(70, 130, 180, 0.2);
         background: #5a9bd4;
     }
     
-    .view-details-btn {
-        background: transparent;
-        color: #4682b4;
-        border: 1px solid #4682b4;
-        padding: 5px 10px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 0.75rem;
-        transition: all 0.2s ease;
-        flex: 1;
-        text-align: center;
-    }
     
-    .view-details-btn:hover {
-        background: #4682b4;
-        color: white;
-    }
-    
-    /* Expanded Configuration Form */
-    .config-panel {
-        display: none;
-        padding: 20px;
-        background: white;
-        border-top: 2px solid #ecf0f1;
-    }
-    
-    .component-card.expanded .config-panel {
-        display: block;
-    }
-    
-    .form-section {
-        margin-bottom: 20px;
-    }
-    
-    .form-section h5 {
-        color: #000000;
-        font-size: 0.9rem;
-        margin: 0 0 12px 0;
-        padding-bottom: 6px;
-        border-bottom: 1px solid #ecf0f1;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-    
-    .form-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 15px;
-        margin-bottom: 15px;
-    }
-    
-    .form-group {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .form-group label {
-        color: #000000;
-        font-size: 0.85rem;
-        margin-bottom: 5px;
-        font-weight: 500;
-    }
-    
-    .form-group input,
-    .form-group select {
-        padding: 8px 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 0.85rem;
-        transition: all 0.2s ease;
-        color: #000000;
-    }
-    
-    .form-group input:focus,
-    .form-group select:focus {
-        outline: none;
-        border-color: #87ceeb;
-        box-shadow: 0 0 0 3px rgba(135, 206, 235, 0.1);
-    }
-    
-    /* Save Button */
-    .save-config-btn {
-        background: #4682b4;
-        color: white;
-        border: none;
-        padding: 10px 24px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 0.9rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        margin-top: 15px;
-    }
-    
-    .save-config-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(70, 130, 180, 0.3);
-        background: #5a9bd4;
-    }
     
     /* Filter and Search Bar */
     .filters-bar {
-        background: white;
-        padding: 12px 15px;
-        border-radius: 8px;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-        margin-bottom: 15px;
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        padding: 20px 25px;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+        margin-bottom: 25px;
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
-        gap: 10px;
-        border: 1px solid #e0e0e0;
+        gap: 15px;
+        border: 1px solid rgba(255,255,255,0.25);
+        backdrop-filter: blur(8px);
     }
     
     .search-group {
@@ -463,68 +441,174 @@
         margin-top: 3px;
     }
     
-    /* Loading Animation */
-    @keyframes pulse {
-        0% { opacity: 1; }
-        50% { opacity: 0.5; }
-        100% { opacity: 1; }
+    /* Minimal Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
-    
-    .loading {
-        animation: pulse 1.5s ease-in-out infinite;
+
+    .component-card {
+        animation: fadeIn 0.3s ease-out;
     }
-    
+
+    .stat-card {
+        animation: fadeIn 0.2s ease-out;
+    }
+
     /* Responsive Design */
     @media (max-width: 768px) {
         .components-grid {
             grid-template-columns: 1fr;
         }
-        
+
         .component-card.expanded {
             grid-column: span 1;
         }
+
+        .stats-container {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Component Status Indicators */
+    .component-status-badge {
+        position: absolute;
+        top: 45px;
+        right: 8px;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        z-index: 10;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .component-status-badge.active {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        color: white;
+    }
+
+    .component-status-badge.inactive {
+        background: linear-gradient(45deg, #6c757d, #adb5bd);
+        color: white;
+    }
+
+    /* Status Toggle Button */
+    .status-toggle-btn {
+        padding: 4px 8px;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .status-toggle-btn.btn-enable {
+        background: #28a745;
+        color: white;
+    }
+
+    .status-toggle-btn.btn-enable:hover {
+        background: #218838;
+    }
+
+    .status-toggle-btn.btn-disable {
+        background: #ffc107;
+        color: #212529;
+    }
+
+    .status-toggle-btn.btn-disable:hover {
+        background: #e0a800;
     }
 </style>
 
-<!-- Statistics Row -->
-<div class="stats-row">
-    <div class="stat-card">
-        <h3 class="stat-number">{{ components|length }}</h3>
-        <p class="stat-label">Total Components</p>
+<!-- Professional Page Header (Removed as requested) -->
+<!--
+<div class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-cubes me-3"></i>Component Configuration</h1>
+        <p class="subtitle">Manage and configure your application components with enterprise-grade tools</p>
     </div>
-    <div class="stat-card">
-        <h3 class="stat-number">{{ components|selectattr('config_id')|list|length }}</h3>
-        <p class="stat-label">Configured</p>
-    </div>
-    <div class="stat-card">
-        <h3 class="stat-number">{{ (components|length) - (components|selectattr('config_id')|list|length) }}</h3>
-        <p class="stat-label">Pending Setup</p>
-    </div>
-    <div class="stat-card">
-        <h3 class="stat-number">{{ components|map(attribute='project_name')|unique|list|length }}</h3>
-        <p class="stat-label">Active Projects</p>
+</div>
+-->
+
+<!-- Enhanced Statistics Dashboard -->
+<div class="container-fluid">
+    <div class="stats-container">
+        <div class="stat-card">
+            <h3 class="stat-number" data-count="{{ components|length }}">0</h3>
+            <p class="stat-label">Total Components</p>
+            <i class="fas fa-cubes position-absolute top-0 end-0 m-3" style="font-size: 3rem; opacity: 0.15; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></i>
+        </div>
+        <div class="stat-card">
+            <h3 class="stat-number" data-count="{{ components|selectattr('is_enabled')|list|length }}">0</h3>
+            <p class="stat-label">Active Components</p>
+            <i class="fas fa-check-circle position-absolute top-0 end-0 m-3" style="font-size: 3rem; opacity: 0.15; color: #28a745;"></i>
+        </div>
+        <div class="stat-card">
+            <h3 class="stat-number" data-count="{{ components|rejectattr('is_enabled')|list|length }}">0</h3>
+            <p class="stat-label">Inactive Components</p>
+            <i class="fas fa-pause-circle position-absolute top-0 end-0 m-3" style="font-size: 3rem; opacity: 0.15; color: #6c757d;"></i>
+        </div>
+        <div class="stat-card">
+            <h3 class="stat-number" data-count="{{ components|map(attribute='project_name')|unique|list|length }}">0</h3>
+            <p class="stat-label">Active Projects</p>
+            <i class="fas fa-project-diagram position-absolute top-0 end-0 m-3" style="font-size: 3rem; opacity: 0.15; color: #17a2b8;"></i>
+        </div>
     </div>
 </div>
 
-<!-- Filters Bar -->
-<div class="filters-bar">
-    <div class="search-group">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" class="search-input" id="componentSearch" 
-               placeholder="Search components, projects, or GUIDs..." 
-               onkeyup="filterComponents()">
+<!-- Enhanced Filters Bar -->
+<div class="container-fluid">
+    <div class="filters-bar">
+        <div class="search-group">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" id="componentSearch"
+                   placeholder="Search components, projects, or GUIDs..."
+                   hx-post="/htmx/component/search" hx-trigger="keyup changed delay:300ms" hx-target="#componentsGrid" hx-swap="innerHTML">
+        </div>
+        <div class="filter-chips">
+            <button class="filter-chip active">All</button>
+            <button class="filter-chip">Web Apps</button>
+            <button class="filter-chip">APIs</button>
+            <button class="filter-chip">Services</button>
+            <button class="filter-chip">Active</button>
+            <button class="filter-chip">Inactive</button>
+            <a href="/add-component" class="btn btn-primary" style="margin-left: auto; text-decoration: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; padding: 12px 24px; font-weight: 600;">
+                <i class="fas fa-plus me-2"></i>Add Component
+            </a>
+        </div>
     </div>
-    <div class="filter-chips">
-        <button class="filter-chip active" onclick="filterByType('all')">All</button>
-        <button class="filter-chip" onclick="filterByType('webapp')">Web Apps</button>
-        <button class="filter-chip" onclick="filterByType('api')">APIs</button>
-        <button class="filter-chip" onclick="filterByType('service')">Services</button>
-        <button class="filter-chip" onclick="filterByStatus('configured')">Configured</button>
-        <button class="filter-chip" onclick="filterByStatus('pending')">Pending</button>
-    </div>
-</div>
 
-<!-- Components Grid -->
+    <!-- Professional Components Grid -->
 <div class="components-grid" id="componentsGrid">
     {% for component in components %}
     <div class="component-card" 
@@ -532,7 +616,7 @@
          data-component-type="{{ component.component_type|lower }}"
          data-component-name="{{ component.component_name|lower }}"
          data-project="{{ component.project_name|lower }}"
-         data-status="{{ 'configured' if component.config_id else 'pending' }}">
+         data-status="{{ 'active' if component.is_enabled else 'inactive' }}">
         
         <!-- Card Header with Gradient -->
         <div class="card-header {{ component.component_type|lower }}">
@@ -541,10 +625,11 @@
                 <span class="component-number">#{{ component.component_id }}</span>
             </h3>
             <p class="card-subtitle">{{ component.project_name }}</p>
-            
-            <!-- Status Ribbon -->
-            <div class="status-ribbon {{ 'configured' if component.config_id else 'pending' }}">
-                {{ 'Configured' if component.config_id else 'Needs Setup' }}
+
+            <!-- Component Status Badge -->
+            <div class="component-status-badge {{ 'active' if component.is_enabled else 'inactive' }}">
+                <i class="fas fa-{{ 'check-circle' if component.is_enabled else 'times-circle' }}"></i>
+                {{ 'ACTIVE' if component.is_enabled else 'INACTIVE' }}
             </div>
         </div>
         
@@ -563,6 +648,14 @@
                     <span class="info-label">Environment</span>
                     <span class="info-value">{{ component.target_environment or 'Not Set' }}</span>
                 </div>
+                <div class="info-item">
+                    <span class="info-label">Version Strategy</span>
+                    <span class="info-value">{{ component.version_strategy or 'auto_increment' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">JFrog Path Pattern</span>
+                    <span class="info-value" style="font-family: monospace; font-size: 0.7rem; max-width: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ component.jfrog_path_pattern or '{branch}/Build{date}.{buildNumber}/{componentName}.zip' }}</span>
+                </div>
             </div>
             
             <!-- Tags -->
@@ -578,316 +671,331 @@
                     <i class="fas fa-code"></i> {{ component.framework }}
                 </span>
                 {% endif %}
+                <span class="tag tag-version" style="background: #e3f2fd; color: #1976d2;">
+                    <i class="fas fa-tag"></i> v{{ component.current_major_version or '1' }}.{{ component.current_minor_version or '0' }}.{{ component.current_patch_version or '0' }}
+                </span>
+                {% if component.auto_version_increment %}
+                <span class="tag tag-auto" style="background: #e8f5e8; color: #2e7d32;">
+                    <i class="fas fa-robot"></i> Auto-Increment
+                </span>
+                {% endif %}
             </div>
         </div>
         
         <!-- Card Actions -->
         <div class="card-actions">
-            <button class="configure-btn" onclick="toggleConfiguration({{ component.component_id }})">
-                <i class="fas fa-cog"></i> Configure
-            </button>
-            <button class="view-details-btn" onclick="viewDetails({{ component.component_id }})">
-                <i class="fas fa-eye"></i> Details
-            </button>
+            <a href="/edit-component/{{ component.component_id }}" class="configure-btn" style="text-decoration: none;">
+                <i class="fas fa-edit"></i> Edit
+            </a>
         </div>
         
-        <!-- Expanded Configuration Panel -->
-        <div class="config-panel">
-            <form id="config-form-{{ component.component_id }}" onsubmit="saveConfiguration(event, {{ component.component_id }})">
-                <input type="hidden" name="component_id" value="{{ component.component_id }}">
-                
-                <!-- Basic MSI Settings -->
-                <div class="form-section">
-                    <h5><i class="fas fa-box"></i> MSI Package Settings</h5>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Application Name</label>
-                            <input type="text" name="app_name" value="{{ component.app_name or component.component_name }}" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Version</label>
-                            <input type="text" name="app_version" value="{{ component.app_version or '1.0.0.0' }}" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Manufacturer</label>
-                            <input type="text" name="manufacturer" value="{{ component.manufacturer or 'Your Company' }}" required>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Deployment Settings -->
-                <div class="form-section">
-                    <h5><i class="fas fa-server"></i> Deployment Configuration</h5>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Target Server</label>
-                            <input type="text" name="target_server" value="{{ component.target_server or '' }}" placeholder="e.g., SERVER01">
-                        </div>
-                        <div class="form-group">
-                            <label>Environment</label>
-                            <select name="target_environment">
-                                <option value="">Select Environment</option>
-                                <option value="DEV" {% if component.target_environment == 'DEV' %}selected{% endif %}>Development</option>
-                                <option value="QA" {% if component.target_environment == 'QA' %}selected{% endif %}>QA/Testing</option>
-                                <option value="UAT" {% if component.target_environment == 'UAT' %}selected{% endif %}>UAT</option>
-                                <option value="PROD" {% if component.target_environment == 'PROD' %}selected{% endif %}>Production</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Install Folder</label>
-                            <input type="text" name="install_folder" 
-                                   value="{{ component.install_folder or 'C:\\Program Files\\' + (component.app_name or component.component_name) }}">
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Component-Specific Settings -->
-                {% if component.component_type|lower in ['webapp', 'api'] %}
-                <div class="form-section">
-                    <h5><i class="fas fa-globe"></i> IIS Configuration</h5>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Website Name</label>
-                            <input type="text" name="iis_website_name" value="{{ component.iis_website_name or 'Default Web Site' }}">
-                        </div>
-                        <div class="form-group">
-                            <label>App Pool Name</label>
-                            <input type="text" name="iis_app_pool_name" 
-                                   value="{{ component.iis_app_pool_name or component.component_name + 'AppPool' }}">
-                        </div>
-                        <div class="form-group">
-                            <label>.NET Version</label>
-                            <select name="app_pool_dotnet_version">
-                                <option value="v4.0">v4.0</option>
-                                <option value="v2.0">v2.0</option>
-                                <option value="">No Managed Code</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-                
-                {% if component.component_type|lower == 'service' %}
-                <div class="form-section">
-                    <h5><i class="fas fa-cogs"></i> Windows Service Configuration</h5>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Service Name</label>
-                            <input type="text" name="service_name" value="{{ component.service_name or component.component_name }}">
-                        </div>
-                        <div class="form-group">
-                            <label>Display Name</label>
-                            <input type="text" name="service_display_name" value="{{ component.component_name }}">
-                        </div>
-                        <div class="form-group">
-                            <label>Start Type</label>
-                            <select name="service_start_type">
-                                <option value="Automatic">Automatic</option>
-                                <option value="Manual">Manual</option>
-                                <option value="Disabled">Disabled</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-                
-                <button type="submit" class="save-config-btn">
-                    <i class="fas fa-save"></i> Save Configuration
-                </button>
-            </form>
-        </div>
     </div>
     {% endfor %}
 </div>
 
+<!-- Modal Container for Details -->
+<div id="modal-container"></div>
+
+{# Counter animation and component functionality #}
 <script>
-// Toggle configuration panel
-function toggleConfiguration(componentId) {
-    const card = document.querySelector(`[data-component-id="${componentId}"]`);
-    const allCards = document.querySelectorAll('.component-card');
-    
-    // Close all other expanded cards
-    allCards.forEach(c => {
-        if (c !== card) {
-            c.classList.remove('expanded');
-        }
-    });
-    
-    // Toggle current card
-    card.classList.toggle('expanded');
-    
-    // Scroll to card if expanded
-    if (card.classList.contains('expanded')) {
-        setTimeout(() => {
-            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
-    }
-}
-
-// Filter components by search term
-function filterComponents() {
-    const searchTerm = document.getElementById('componentSearch').value.toLowerCase();
-    const cards = document.querySelectorAll('.component-card');
-    
-    cards.forEach(card => {
-        const name = card.dataset.componentName || '';
-        const project = card.dataset.project || '';
-        const visible = name.includes(searchTerm) || project.includes(searchTerm);
-        
-        card.style.display = visible ? 'block' : 'none';
-    });
-}
-
-// Filter by component type
-function filterByType(type) {
-    const cards = document.querySelectorAll('.component-card');
-    const chips = document.querySelectorAll('.filter-chip');
-    
-    // Update active chip
-    chips.forEach(chip => chip.classList.remove('active'));
-    event.target.classList.add('active');
-    
-    cards.forEach(card => {
-        if (type === 'all') {
-            card.style.display = 'block';
-        } else {
-            const cardType = card.dataset.componentType;
-            card.style.display = cardType === type ? 'block' : 'none';
-        }
-    });
-}
-
-// Filter by status
-function filterByStatus(status) {
-    const cards = document.querySelectorAll('.component-card');
-    const chips = document.querySelectorAll('.filter-chip');
-    
-    // Update active chip
-    chips.forEach(chip => chip.classList.remove('active'));
-    event.target.classList.add('active');
-    
-    cards.forEach(card => {
-        const cardStatus = card.dataset.status;
-        card.style.display = cardStatus === status ? 'block' : 'none';
-    });
-}
-
-// View component details
-function viewDetails(componentId) {
-    // Could open a modal or navigate to a details page
-    console.log('View details for component:', componentId);
-}
-
-// Save configuration
-function saveConfiguration(event, componentId) {
-    event.preventDefault();
-    
-    const form = document.getElementById(`config-form-${componentId}`);
-    const formData = new FormData(form);
-    const submitBtn = form.querySelector('.save-config-btn');
-    
-    // Show loading state
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-    submitBtn.disabled = true;
-    
-    fetch('/save-msi-config', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showNotification('Configuration saved successfully!', 'success');
-            updateCardStatus(componentId, 'configured');
-        } else {
-            showNotification(data.message || 'Error saving configuration', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showNotification('Error saving configuration', 'error');
-    })
-    .finally(() => {
-        submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Configuration';
-        submitBtn.disabled = false;
-    });
-}
-
-// Update card status after saving
-function updateCardStatus(componentId, status) {
-    const card = document.querySelector(`[data-component-id="${componentId}"]`);
-    if (card) {
-        card.dataset.status = status;
-        const ribbon = card.querySelector('.status-ribbon');
-        if (ribbon) {
-            ribbon.className = 'status-ribbon ' + status;
-            ribbon.textContent = status === 'configured' ? 'Configured' : 'Needs Setup';
-        }
-    }
-}
-
-// Show notification
-function showNotification(message, type) {
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 25px;
-        border-radius: 8px;
-        color: white;
-        font-weight: 500;
-        z-index: 9999;
-        animation: slideIn 0.3s ease;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    `;
-    
-    switch(type) {
-        case 'success':
-            notification.style.background = '#4682b4';
-            break;
-        case 'error':
-            notification.style.background = '#dc3545';
-            break;
-        default:
-            notification.style.background = '#87ceeb';
-    }
-    
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
-    }, 3000);
-}
-
-// Add CSS animations
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    
-    @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-    }
-`;
-document.head.appendChild(style);
-
-// Initialize
+// Animate stat counters
 document.addEventListener('DOMContentLoaded', function() {
-    // Add keyboard shortcut for search
-    document.addEventListener('keydown', function(e) {
-        if (e.ctrlKey && e.key === 'f') {
-            e.preventDefault();
-            document.getElementById('componentSearch').focus();
-        }
+    const statNumbers = document.querySelectorAll('.stat-number');
+
+    statNumbers.forEach(function(statNumber) {
+        const target = parseInt(statNumber.getAttribute('data-count'));
+        let current = 0;
+        const increment = target / 20; // 20 steps animation
+        const timer = setInterval(function() {
+            current += increment;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            statNumber.textContent = Math.floor(current);
+        }, 50); // 50ms per step = 1 second total
     });
+
+    // Add debug logging
+    console.log('Statistics initialized:', {
+        totalComponents: {{ components|length }},
+        activeComponents: {{ components|selectattr('is_enabled')|list|length }},
+        inactiveComponents: {{ components|rejectattr('is_enabled')|list|length }},
+        activeProjects: {{ components|map(attribute='project_name')|unique|list|length }}
+    });
+
+    // Component filtering functionality
+    const filterChips = document.querySelectorAll('.filter-chip');
+    const searchInput = document.getElementById('componentSearch');
+    const componentCards = document.querySelectorAll('.component-card');
+
+    // Filter chip functionality
+    filterChips.forEach(function(chip) {
+        chip.addEventListener('click', function() {
+            // Remove active class from all chips
+            filterChips.forEach(c => c.classList.remove('active'));
+            // Add active class to clicked chip
+            this.classList.add('active');
+
+            // Get filter type
+            const filterType = this.textContent.toLowerCase().trim();
+            filterComponents(filterType);
+        });
+    });
+
+    // Search functionality
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        searchComponents(searchTerm);
+    });
+
+    function filterComponents(filterType) {
+        componentCards.forEach(function(card) {
+            const componentType = card.getAttribute('data-component-type') || '';
+            const status = card.getAttribute('data-status') || '';
+            let shouldShow = true;
+
+            switch(filterType) {
+                case 'all':
+                    shouldShow = true;
+                    break;
+                case 'web apps':
+                    shouldShow = componentType === 'webapp' || componentType === 'website';
+                    break;
+                case 'apis':
+                    shouldShow = componentType === 'api';
+                    break;
+                case 'services':
+                    shouldShow = componentType === 'service';
+                    break;
+                case 'active':
+                    shouldShow = status === 'active';
+                    break;
+                case 'inactive':
+                    shouldShow = status === 'inactive';
+                    break;
+                default:
+                    shouldShow = true;
+            }
+
+            if (shouldShow) {
+                card.style.display = 'block';
+                card.style.animation = 'fadeIn 0.2s ease-out';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        updateVisibleCount();
+    }
+
+    function searchComponents(searchTerm) {
+        if (!searchTerm) {
+            // If search is empty, show all components (respect current filter)
+            const activeFilter = document.querySelector('.filter-chip.active');
+            if (activeFilter) {
+                filterComponents(activeFilter.textContent.toLowerCase().trim());
+            }
+            return;
+        }
+
+        componentCards.forEach(function(card) {
+            const componentName = card.getAttribute('data-component-name') || '';
+            const projectName = card.getAttribute('data-project') || '';
+            const componentType = card.getAttribute('data-component-type') || '';
+            const guidElement = card.querySelector('.guid-value');
+            const guid = guidElement ? guidElement.textContent.toLowerCase() : '';
+
+            const matchesSearch = componentName.includes(searchTerm) ||
+                                projectName.includes(searchTerm) ||
+                                componentType.includes(searchTerm) ||
+                                guid.includes(searchTerm);
+
+            if (matchesSearch) {
+                card.style.display = 'block';
+                card.style.animation = 'fadeIn 0.2s ease-out';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        updateVisibleCount();
+    }
+
+    function updateVisibleCount() {
+        const visibleCards = document.querySelectorAll('.component-card[style*="display: block"], .component-card:not([style*="display: none"])');
+        const totalStat = document.querySelector('.stat-number[data-count]');
+        if (totalStat) {
+            totalStat.textContent = visibleCards.length;
+        }
+    }
 });
+
+// Branch Management Functions
+function manageBranches(componentId, componentName) {
+    // Create modal for branch management
+    const modalHTML = `
+        <div class="modal fade" id="branchModal" tabindex="-1" aria-labelledby="branchModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                        <h5 class="modal-title" id="branchModalLabel">
+                            <i class="fas fa-code-branch me-2"></i>Branch Management - ${componentName}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0">Component Branches</h6>
+                                    <button class="btn btn-success btn-sm" onclick="addBranch(${componentId})">
+                                        <i class="fas fa-plus me-1"></i>Add Branch
+                                    </button>
+                                </div>
+
+                                <div id="branchList">
+                                    <div class="text-center">
+                                        <div class="spinner-border" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Remove existing modal if present
+    const existingModal = document.getElementById('branchModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Store component ID in modal for reference
+    document.getElementById('branchModal').setAttribute('data-component-id', componentId);
+
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('branchModal'));
+    modal.show();
+
+    // Load branch data
+    loadBranches(componentId);
+}
+
+function loadBranches(componentId) {
+    fetch(`/api/components/${componentId}/branches`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayBranches(data.branches, componentId);
+            } else {
+                document.getElementById('branchList').innerHTML =
+                    '<div class="alert alert-warning">No branches configured yet</div>';
+            }
+        })
+        .catch(error => {
+            document.getElementById('branchList').innerHTML =
+                '<div class="alert alert-danger">Error loading branches: ' + error + '</div>';
+        });
+}
+
+function displayBranches(branches, componentId) {
+    if (!branches || branches.length === 0) {
+        document.getElementById('branchList').innerHTML =
+            '<div class="alert alert-info">No branches configured. Click "Add Branch" to get started.</div>';
+        return;
+    }
+
+    let html = '<div class="branch-list">';
+
+    branches.forEach(branch => {
+        // Format: [branchName] - {baseURL}/{ComponentName}/{branch}/Build{date}.{buildNumber}/{componentName}.zip - Version[Major,Minor,Build,Revision] - What should Auto Increment[Major,Minor,Build,Revision]
+        const branchDisplay = `[${branch.branch_name}] - {baseURL}/{ComponentName}/${branch.branch_name}/Build{date}.{buildNumber}/{componentName}.zip - Version[${branch.major_version || 1},${branch.minor_version || 0},${branch.patch_version || 0},${branch.build_number || 0}] - Auto Increment[Major,Minor,Build,Revision]`;
+
+        html += `
+            <div class="branch-item mb-2 p-2 border rounded">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="branch-info">
+                        <code class="text-dark">${branchDisplay}</code>
+                    </div>
+                    <div class="branch-actions">
+                        <button class="btn btn-sm btn-outline-primary" onclick="editBranch(${branch.branch_id})" title="Edit Branch">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-info" onclick="viewBuilds(${branch.branch_id})" title="View Builds">
+                            <i class="fas fa-history"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    html += '</div>';
+    document.getElementById('branchList').innerHTML = html;
+}
+
+function addBranch(componentId) {
+    const branchName = prompt('Enter branch name (e.g., main, develop, feature/auth):');
+    if (branchName && branchName.trim()) {
+        fetch(`/api/components/${componentId}/branches`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                branch_name: branchName.trim(),
+                branch_status: 'active'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                loadBranches(componentId);
+                showAlert(`Branch '${branchName.trim()}' added successfully`, 'success');
+            } else {
+                showAlert(`Error adding branch: ` + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            showAlert(`Error adding branch: ` + error, 'error');
+        });
+    }
+}
+
+function editBranch(branchId) {
+    showAlert('Branch editing will be implemented soon', 'info');
+}
+
+function viewBuilds(branchId) {
+    showAlert('Build history will be implemented soon', 'info');
+}
+
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.top = '20px';
+    alertDiv.style.right = '20px';
+    alertDiv.style.zIndex = '9999';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    document.body.appendChild(alertDiv);
+
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.parentNode.removeChild(alertDiv);
+        }
+    }, 5000);
+}
 </script>
 {% endblock %}

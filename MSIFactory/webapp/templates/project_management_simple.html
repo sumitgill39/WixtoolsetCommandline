@@ -1,0 +1,133 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}Project Management - CelerDeploy{% endblock %}
+{% block page_title %}Project Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h2 class="mb-4">Project Management Dashboard</h2>
+
+    <!-- Simple Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5>Total Projects</h5>
+                    <h2>{{ all_projects|length if all_projects else 0 }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5>Active Projects</h5>
+                    <h2>{{ all_projects|selectattr('status', 'equalto', 'active')|list|length if all_projects else 0 }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5>Recent Builds</h5>
+                    <h2>0</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5>Your Access</h5>
+                    <h2>{{ all_projects|length if all_projects else 0 }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Projects List -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Projects</h5>
+        </div>
+        <div class="card-body">
+            {% if all_projects and all_projects|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Project Name</th>
+                                <th>Key</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Owner</th>
+                                <th>Components</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for project in all_projects %}
+                            <tr>
+                                <td>{{ project.get('project_name', 'Unknown') }}</td>
+                                <td><span class="badge badge-primary">{{ project.get('project_key', 'N/A') }}</span></td>
+                                <td>{{ project.get('project_type', 'N/A') }}</td>
+                                <td>
+                                    <span class="badge badge-{{ 'success' if project.get('status') == 'active' else 'warning' }}">
+                                        {{ project.get('status', 'unknown')|title }}
+                                    </span>
+                                </td>
+                                <td>{{ project.get('owner_team', 'N/A') }}</td>
+                                <td>
+                                    {% if project.get('components') %}
+                                        {{ project.components|length }} component(s)
+                                    {% else %}
+                                        0 components
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-sm btn-primary" onclick="viewProject({{ project.get('project_id', 0) }})">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                        <button class="btn btn-sm btn-secondary" onclick="editProject({{ project.get('project_id', 0) }})">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        <button class="btn btn-sm btn-success" onclick="generateMSI({{ project.get('project_id', 0) }})">
+                                            <i class="fas fa-rocket"></i> MSI
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-folder-plus fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No Projects Found</h5>
+                    <p class="text-muted">Create your first project to get started.</p>
+                    <a href="{{ url_for('add_project_page') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Add New Project
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Basic action functions
+function viewProject(projectId) {
+    window.location.href = `/project/${projectId}`;
+}
+
+function editProject(projectId) {
+    window.location.href = `/edit-project/${projectId}`;
+}
+
+function generateMSI(projectId) {
+    if (confirm('Generate MSI package for this project?')) {
+        alert('MSI generation feature will be implemented soon!');
+    }
+}
+</script>
+{% endblock %}

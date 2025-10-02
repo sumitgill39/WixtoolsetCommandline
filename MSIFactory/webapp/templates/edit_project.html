@@ -1,6 +1,6 @@
 {% extends "base_sidebar.html" %}
 
-{% block title %}Edit Project - MSI Factory{% endblock %}
+{% block title %}Edit Project - CelerDeploy{% endblock %}
 {% block page_title %}Edit Project{% endblock %}
 
 {% block content %}
@@ -66,275 +66,28 @@
                             <label for="owner_team" class="form-label">Owner Team <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="owner_team" name="owner_team" value="{{ project.owner_team }}" required placeholder="e.g., Development Team, DevOps Team">
                         </div>
-                    </div>
-
-                    <!-- Components Section -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h6 class="border-bottom pb-2 mb-3">
-                                <i class="fas fa-cubes me-2"></i>Components
-                                <button type="button" class="btn btn-sm btn-success ms-2" onclick="addNewComponent()">
-                                    <i class="fas fa-plus"></i> Add Component
-                                </button>
-                            </h6>
-                        </div>
-
-                        <div class="col-12">
-                            <div id="componentsContainer">
-                                {% if components %}
-                                    {% for component in components %}
-                                    <div class="card border-light mb-3 component-card {% if component.is_enabled == False %}component-disabled{% endif %}" data-component-id="{{ component.component_id }}" data-enabled="{{ component.is_enabled }}">
-                                        <!-- Component Header (Always Visible) -->
-                                        <div class="component-header" onclick="toggleComponent({{ component.component_id }})">
-                                            <div class="component-main-info">
-                                                <div class="component-icon" style="background: linear-gradient(135deg, {% if component.is_enabled == False %}#6c757d, #5a6268{% else %}#007bff, #0056b3{% endif %});">
-                                                    {% if component.component_type == 'webapp' %}
-                                                    <i class="fas fa-globe"></i>
-                                                    {% elif component.component_type == 'service' %}
-                                                    <i class="fas fa-cogs"></i>
-                                                    {% elif component.component_type == 'api' %}
-                                                    <i class="fas fa-plug"></i>
-                                                    {% elif component.component_type == 'website' %}
-                                                    <i class="fas fa-window-restore"></i>
-                                                    {% elif component.component_type == 'desktop' %}
-                                                    <i class="fas fa-desktop"></i>
-                                                    {% else %}
-                                                    <i class="fas fa-cube"></i>
-                                                    {% endif %}
-                                                </div>
-                                                <div class="component-title-section">
-                                                    <h6 class="component-name">
-                                                        {{ component.component_name }}
-                                                        {% if component.is_enabled == False %}
-                                                        <span class="badge bg-warning ms-2">Disabled</span>
-                                                        {% endif %}
-                                                    </h6>
-                                                    <div class="component-meta">
-                                                        <span class="badge bg-primary">{{ component.component_type|upper }}</span>
-                                                        {% if component.framework %}
-                                                        <span class="badge bg-secondary">{{ component.framework|upper }}</span>
-                                                        {% endif %}
-                                                        <span class="text-muted ms-2">ID: {{ component.component_id }}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="component-actions d-flex align-items-center gap-2">
-                                                <div class="component-expand-icon">
-                                                    <i class="fas fa-chevron-down"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Expandable Details Section (Hidden by Default) -->
-                                        <div class="component-details-curtain" id="component-details-{{ component.component_id }}">
-                                            <div class="component-details-content">
-                                            <input type="hidden" name="component_guid_existing_{{ loop.index0 }}" value="{{ component.component_guid }}">
-                                            <input type="hidden" name="component_id_{{ loop.index0 }}" value="{{ component.component_id }}">
-
-                                            <!-- Component Status Toggle -->
-                                            <div class="row mb-3">
-                                                <div class="col-12">
-                                                    <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
-                                                        <div>
-                                                            <label class="form-label mb-0">Component Status</label>
-                                                            <small class="text-muted d-block">Enable or disable this component for deployments</small>
-                                                        </div>
-                                                        <div class="form-check form-switch">
-                                                            <input class="form-check-input" type="checkbox" role="switch"
-                                                                   id="component_enabled_{{ component.component_id }}"
-                                                                   name="component_enabled_existing_{{ loop.index0 }}"
-                                                                   {% if component.is_enabled == True %}checked{% endif %}
->
-                                                            <label class="form-check-label ms-2" for="component_enabled_{{ component.component_id }}">
-                                                                <span class="badge {% if component.is_enabled == True %}bg-success{% else %}bg-secondary{% endif %}" id="status_badge_{{ component.component_id }}">
-                                                                    {% if component.is_enabled == True %}Enabled{% else %}Disabled{% endif %}
-                                                                </span>
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Component GUID Display -->
-                                            <div class="row mb-3">
-                                                <div class="col-12">
-                                                    <label class="form-label">Component GUID</label>
-                                                    <input type="text" class="form-control bg-light" name="component_guid_display_{{ loop.index0 }}" value="{{ component.component_guid or 'No GUID in database' }}" readonly>
-                                                    {% if component.component_guid %}
-                                                    <small class="text-muted">Component GUID from database (cannot be changed for data integrity)</small>
-                                                    {% else %}
-                                                    <small class="text-warning">⚠️ Component missing GUID - will be generated when project is saved</small>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-
-                                            <!-- Basic Component Information -->
-                                            <div class="row mb-3">
-                                                <div class="col-md-4">
-                                                    <label class="form-label">Component Name <span class="text-danger">*</span></label>
-                                                    <input type="text" class="form-control" name="component_name_existing_{{ loop.index0 }}" value="{{ component.component_name }}" required>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label class="form-label">Component Type <span class="text-danger">*</span></label>
-                                                    <select class="form-select" name="component_type_existing_{{ loop.index0 }}" onchange="toggleComponentFields(this, '{{ component.component_id }}')" required>
-                                                        <option value="webapp" {% if component.component_type == 'webapp' %}selected{% endif %}>Web App</option>
-                                                        <option value="website" {% if component.component_type == 'website' %}selected{% endif %}>Website</option>
-                                                        <option value="service" {% if component.component_type == 'service' %}selected{% endif %}>Windows Service</option>
-                                                        <option value="api" {% if component.component_type == 'api' %}selected{% endif %}>API</option>
-                                                        <option value="scheduler" {% if component.component_type == 'scheduler' %}selected{% endif %}>Scheduler</option>
-                                                        <option value="desktop" {% if component.component_type == 'desktop' %}selected{% endif %}>Desktop App</option>
-                                                        <option value="library" {% if component.component_type == 'library' %}selected{% endif %}>Library/DLL</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label class="form-label">Framework <span class="text-danger">*</span></label>
-                                                    <select class="form-select" name="component_framework_existing_{{ loop.index0 }}" required>
-                                                        <option value="netframework" {% if component.framework == 'netframework' %}selected{% endif %}>.NET Framework</option>
-                                                        <option value="netcore" {% if component.framework == 'netcore' %}selected{% endif %}>.NET Core/.NET 5+</option>
-                                                        <option value="react" {% if component.framework == 'react' %}selected{% endif %}>React</option>
-                                                        <option value="angular" {% if component.framework == 'angular' %}selected{% endif %}>Angular</option>
-                                                        <option value="vue" {% if component.framework == 'vue' %}selected{% endif %}>Vue.js</option>
-                                                        <option value="python" {% if component.framework == 'python' %}selected{% endif %}>Python</option>
-                                                        <option value="nodejs" {% if component.framework == 'nodejs' %}selected{% endif %}>Node.js</option>
-                                                        <option value="static" {% if component.framework == 'static' %}selected{% endif %}>Static HTML</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-
-                                            <!-- Description -->
-                                            <div class="row mb-3">
-                                                <div class="col-12">
-                                                    <label class="form-label">Description</label>
-                                                    <input type="text" class="form-control" name="component_description_existing_{{ loop.index0 }}" value="{{ component.description or '' }}" placeholder="Brief description of this component">
-                                                </div>
-                                            </div>
-
-                                            <!-- MSI Package Information -->
-                                            <div class="row mb-3">
-                                                <div class="col-md-4">
-                                                    <label class="form-label">Application Name</label>
-                                                    <input type="text" class="form-control" name="component_app_name_existing_{{ loop.index0 }}" value="{{ component.app_name or component.component_name }}">
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label class="form-label">Version</label>
-                                                    <input type="text" class="form-control" name="component_version_existing_{{ loop.index0 }}" value="{{ component.app_version or '1.0.0.0' }}">
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label class="form-label">Manufacturer</label>
-                                                    <input type="text" class="form-control" name="component_manufacturer_existing_{{ loop.index0 }}" value="{{ component.manufacturer or 'Your Company' }}">
-                                                </div>
-                                            </div>
-
-                                            <!-- Deployment Configuration -->
-                                            <div class="row mb-3">
-                                                <div class="col-12">
-                                                    <label class="form-label">Install Folder</label>
-                                                    <input type="text" class="form-control" name="component_install_folder_existing_{{ loop.index0 }}" value="{{ component.install_folder or 'C:\\inetpub\\wwwroot\\' + component.component_name }}">
-                                                </div>
-                                            </div>
-
-                                            <!-- IIS Configuration (for Web Apps) -->
-                                            <div class="row mb-3 iis-config-{{ component.component_id }}" {% if component.component_type not in ['webapp', 'website', 'api'] %}style="display: none;"{% endif %}>
-                                                <div class="col-12">
-                                                    <h6 class="text-primary mb-2"><i class="fas fa-globe me-1"></i>IIS Configuration</h6>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label class="form-label">Website Name</label>
-                                                    <input type="text" class="form-control" name="component_iis_website_existing_{{ loop.index0 }}" value="{{ component.iis_website_name or 'Default Web Site' }}">
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label class="form-label">Application Pool</label>
-                                                    <input type="text" class="form-control" name="component_app_pool_existing_{{ loop.index0 }}" value="{{ component.iis_app_pool_name or component.component_name + 'AppPool' }}">
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label class="form-label">Port</label>
-                                                    <input type="number" class="form-control" name="component_port_existing_{{ loop.index0 }}" value="{{ component.port or 80 }}">
-                                                </div>
-                                            </div>
-
-                                            <!-- Windows Service Configuration -->
-                                            <div class="row mb-3 service-config-{{ component.component_id }}" {% if component.component_type != 'service' %}style="display: none;"{% endif %}>
-                                                <div class="col-12">
-                                                    <h6 class="text-primary mb-2"><i class="fas fa-cog me-1"></i>Service Configuration</h6>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label">Service Name</label>
-                                                    <input type="text" class="form-control" name="component_service_name_existing_{{ loop.index0 }}" value="{{ component.service_name or component.component_name }}">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label">Service Display Name</label>
-                                                    <input type="text" class="form-control" name="component_service_display_existing_{{ loop.index0 }}" value="{{ component.service_display_name or component.component_name + ' Service' }}">
-                                                </div>
-                                            </div>
-
-                                            <!-- Component Action Buttons -->
-                                            <div class="row">
-                                                <div class="col-12">
-                                                    <div class="d-flex justify-content-end gap-2">
-                                                        <button type="button" class="btn btn-primary" onclick="event.stopPropagation(); updateComponent('{{ component.component_id }}')">
-                                                            <i class="fas fa-save me-1"></i>Update Component
-                                                        </button>
-                                                        <button type="button" class="btn btn-danger" onclick="event.stopPropagation(); removeComponent('{{ component.component_id }}')">
-                                                            <i class="fas fa-trash me-1"></i>Delete This Component
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    {% endfor %}
-                                {% else %}
-                                <div class="text-center py-4 text-muted" id="noComponentsMessage">
-                                    <i class="fas fa-cubes fa-2x mb-2"></i>
-                                    <p>No components added yet. Click "Add Component" to define project components.</p>
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Project Styling -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <h6 class="border-bottom pb-2 mb-3"><i class="fas fa-palette me-2"></i>Project Styling</h6>
-                        </div>
 
                         <div class="col-md-6 mb-3">
-                            <label for="color_primary" class="form-label">Primary Color</label>
-                            <input type="color" class="form-control form-control-color" id="color_primary" name="color_primary" value="{{ project.color_primary }}">
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label for="color_secondary" class="form-label">Secondary Color</label>
-                            <input type="color" class="form-control form-control-color" id="color_secondary" name="color_secondary" value="{{ project.color_secondary }}">
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label for="status" class="form-label">Project Status</label>
-                            <select class="form-select" id="status" name="status" required
-                                    hx-get="/htmx/project/status-preview/{{ project.project_id }}"
-                                    hx-target="#status-preview"
-                                    hx-trigger="change"
-                                    hx-vals="js:{status: event.target.value}"
-                                    hx-swap="innerHTML">
+                            <label for="status" class="form-label">Project Status <span class="text-danger">*</span></label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="">Select Status</option>
                                 <option value="active" {% if project.status == 'active' %}selected{% endif %}>Active</option>
                                 <option value="inactive" {% if project.status == 'inactive' %}selected{% endif %}>Inactive</option>
                                 <option value="maintenance" {% if project.status == 'maintenance' %}selected{% endif %}>Maintenance</option>
                                 <option value="archived" {% if project.status == 'archived' %}selected{% endif %}>Archived</option>
                             </select>
-                            <div class="form-text">Changes to project status will automatically affect all components in this project.</div>
-                        </div>
-                    </div>
-
-                    <!-- Project Status Impact Preview -->
-                    <div class="row mb-3">
-                        <div class="col-12">
-                            <div id="status-preview" class="mt-2">
-                                <!-- Dynamic content loaded via HTMX when status changes -->
+                            <div class="form-text">
+                                <small class="text-muted">
+                                    <strong>Active:</strong> Project is running normally.
+                                    <strong>Inactive:</strong> Project is paused.
+                                    <strong>Maintenance:</strong> Project is under maintenance.
+                                    <strong>Archived:</strong> Project is archived.
+                                </small>
                             </div>
                         </div>
                     </div>
+
+
 
                     <!-- Form Actions -->
                     <div class="row">

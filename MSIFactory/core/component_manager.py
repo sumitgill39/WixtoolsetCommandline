@@ -24,23 +24,122 @@ class ComponentManager:
             "Connection Timeout=10;"
         )
 
+        # Component type field mappings - defines which fields are relevant for each type
+        self.COMPONENT_TYPE_FIELDS = {
+            'webapp': {
+                'core_fields': ['component_name', 'component_type', 'framework', 'description', 'app_name', 'app_version', 'manufacturer', 'target_server', 'install_folder', 'artifact_url'],
+                'specific_fields': ['iis_website_name', 'iis_app_pool_name', 'port'],
+                'excluded_fields': ['service_name', 'service_display_name']
+            },
+            'website': {
+                'core_fields': ['component_name', 'component_type', 'framework', 'description', 'app_name', 'app_version', 'manufacturer', 'target_server', 'install_folder', 'artifact_url'],
+                'specific_fields': ['iis_website_name', 'iis_app_pool_name', 'port'],
+                'excluded_fields': ['service_name', 'service_display_name']
+            },
+            'api': {
+                'core_fields': ['component_name', 'component_type', 'framework', 'description', 'app_name', 'app_version', 'manufacturer', 'target_server', 'install_folder', 'artifact_url'],
+                'specific_fields': ['iis_website_name', 'iis_app_pool_name', 'port'],
+                'excluded_fields': ['service_name', 'service_display_name']
+            },
+            'service': {
+                'core_fields': ['component_name', 'component_type', 'framework', 'description', 'app_name', 'app_version', 'manufacturer', 'target_server', 'install_folder', 'artifact_url'],
+                'specific_fields': ['service_name', 'service_display_name'],
+                'excluded_fields': ['iis_website_name', 'iis_app_pool_name', 'port']
+            },
+            'scheduler': {
+                'core_fields': ['component_name', 'component_type', 'framework', 'description', 'app_name', 'app_version', 'manufacturer', 'target_server', 'install_folder', 'artifact_url'],
+                'specific_fields': ['service_name', 'service_display_name'],
+                'excluded_fields': ['iis_website_name', 'iis_app_pool_name', 'port']
+            },
+            'desktop': {
+                'core_fields': ['component_name', 'component_type', 'framework', 'description', 'app_name', 'app_version', 'manufacturer', 'target_server', 'install_folder', 'artifact_url'],
+                'specific_fields': [],
+                'excluded_fields': ['iis_website_name', 'iis_app_pool_name', 'port', 'service_name', 'service_display_name']
+            },
+            'library': {
+                'core_fields': ['component_name', 'component_type', 'framework', 'description', 'app_name', 'app_version', 'manufacturer', 'target_server', 'install_folder', 'artifact_url'],
+                'specific_fields': [],
+                'excluded_fields': ['iis_website_name', 'iis_app_pool_name', 'port', 'service_name', 'service_display_name']
+            }
+        }
+
+    # =================== COMPONENT TYPE HELPERS ===================
+
+    def get_relevant_fields_for_type(self, component_type: str) -> List[str]:
+        """Get all relevant fields for a component type"""
+        if component_type not in self.COMPONENT_TYPE_FIELDS:
+            return []
+
+        config = self.COMPONENT_TYPE_FIELDS[component_type]
+        return config['core_fields'] + config['specific_fields']
+
+    def get_excluded_fields_for_type(self, component_type: str) -> List[str]:
+        """Get fields that should be excluded/ignored for a component type"""
+        if component_type not in self.COMPONENT_TYPE_FIELDS:
+            return []
+
+        return self.COMPONENT_TYPE_FIELDS[component_type]['excluded_fields']
+
+    def clean_component_data_for_type(self, component_data: Dict, component_type: str) -> Dict:
+        """Clean component data by setting excluded fields to None for the given type"""
+        cleaned_data = component_data.copy()
+        excluded_fields = self.get_excluded_fields_for_type(component_type)
+
+        for field in excluded_fields:
+            if field in cleaned_data:
+                cleaned_data[field] = None
+
+        return cleaned_data
+
+    def validate_required_fields_for_type(self, component_data: Dict, component_type: str) -> Tuple[bool, List[str]]:
+        """Validate that required fields are present for the component type"""
+        errors = []
+
+        if component_type not in self.COMPONENT_TYPE_FIELDS:
+            errors.append(f"Unsupported component type: {component_type}")
+            return False, errors
+
+        config = self.COMPONENT_TYPE_FIELDS[component_type]
+        required_core_fields = ['component_name', 'component_type', 'framework']
+
+        for field in required_core_fields:
+            if not component_data.get(field):
+                errors.append(f"{field.replace('_', ' ').title()} is required")
+
+        # Type-specific validation
+        if component_type in ['webapp', 'website', 'api']:
+            if component_data.get('port'):
+                try:
+                    port = int(component_data['port'])
+                    if port < 1 or port > 65535:
+                        errors.append("Port must be between 1 and 65535")
+                except (ValueError, TypeError):
+                    errors.append("Port must be a valid number")
+
+        return len(errors) == 0, errors
+
     # =================== COMPONENT CRUD OPERATIONS ===================
 
     def create_component(self, project_id: int, component_data: Dict, username: str = 'system') -> Tuple[bool, str, Optional[int]]:
         """Create a new component with all validation"""
         try:
-            # Validate required fields
-            if not component_data.get('component_name'):
-                return False, "Component name is required", None
+            # Validate component type and required fields
+            component_type = component_data.get('component_type')
+            is_valid, validation_errors = self.validate_required_fields_for_type(component_data, component_type)
 
-            if not component_data.get('component_type'):
-                return False, "Component type is required", None
+            if not is_valid:
+                return False, "Validation errors: " + "; ".join(validation_errors), None
 
-            if not component_data.get('framework'):
-                return False, "Framework is required", None
+            # Clean component data for the specific type (set excluded fields to None)
+            cleaned_data = self.clean_component_data_for_type(component_data, component_type)
 
-            # Generate component GUID
-            component_guid = self.generate_component_guid(project_id, component_data.get('component_name'))
+            # Use provided GUID or generate new one
+            component_guid = component_data.get('component_guid', '').strip()
+            if not component_guid:
+                component_guid = self.generate_component_guid(project_id, component_data.get('component_name'))
+            else:
+                # Ensure provided GUID is unique
+                component_guid = self.ensure_unique_guid(component_guid)
 
             with pyodbc.connect(self.conn_str) as conn:
                 with conn.cursor() as cursor:
@@ -55,21 +154,21 @@ class ComponentManager:
                         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE())
                     """, (
                         project_id,
-                        component_data.get('component_name'),
-                        component_data.get('component_type'),
-                        component_data.get('framework'),
+                        cleaned_data.get('component_name'),
+                        cleaned_data.get('component_type'),
+                        cleaned_data.get('framework'),
                         component_guid,
-                        component_data.get('app_name', component_data.get('component_name')),
-                        component_data.get('app_version', '1.0.0.0'),
-                        component_data.get('manufacturer', 'Your Company'),
-                        component_data.get('install_folder', ''),
-                        component_data.get('iis_website_name', ''),
-                        component_data.get('iis_app_pool_name', ''),
-                        component_data.get('port', None),
-                        component_data.get('service_name', ''),
-                        component_data.get('service_display_name', ''),
-                        component_data.get('description', ''),
-                        component_data.get('is_enabled', True),
+                        cleaned_data.get('app_name', cleaned_data.get('component_name')),
+                        cleaned_data.get('app_version', '1.0.0.0'),
+                        cleaned_data.get('manufacturer', 'Your Company'),
+                        cleaned_data.get('install_folder', ''),
+                        cleaned_data.get('iis_website_name', None),
+                        cleaned_data.get('iis_app_pool_name', None),
+                        cleaned_data.get('port', None),
+                        cleaned_data.get('service_name', None),
+                        cleaned_data.get('service_display_name', None),
+                        cleaned_data.get('description', ''),
+                        cleaned_data.get('is_enabled', False),  # Default to disabled for safety
                         username
                     ))
 
@@ -96,9 +195,12 @@ class ComponentManager:
 
             with pyodbc.connect(self.conn_str) as conn:
                 with conn.cursor() as cursor:
+                    # Component GUID is immutable - use existing GUID
+                    component_guid = existing_component.get('component_guid')
+
                     cursor.execute("""
                         UPDATE components SET
-                            component_name = ?, component_type = ?, framework = ?,
+                            component_name = ?, component_type = ?, framework = ?, component_guid = ?,
                             app_name = ?, app_version = ?, manufacturer = ?,
                             install_folder = ?, iis_website_name = ?, iis_app_pool_name = ?,
                             port = ?, service_name = ?, service_display_name = ?,
@@ -109,6 +211,7 @@ class ComponentManager:
                         component_data.get('component_name', existing_component['component_name']),
                         component_data.get('component_type', existing_component['component_type']),
                         component_data.get('framework', existing_component['framework']),
+                        component_guid,
                         component_data.get('app_name', existing_component['app_name']),
                         component_data.get('app_version', existing_component['app_version']),
                         component_data.get('manufacturer', existing_component['manufacturer']),
@@ -137,49 +240,28 @@ class ComponentManager:
             logging.error(error_msg)
             return False, error_msg
 
-    def delete_component(self, component_id: int, project_id: int, username: str = 'system') -> Tuple[bool, str]:
-        """Delete a component (soft delete by setting is_enabled = False)"""
+    def toggle_component_status(self, component_id: int, is_enabled: bool, username: str = 'system') -> Tuple[bool, str]:
+        """Toggle component status between Active (is_enabled=True) and Inactive (is_enabled=False)"""
         try:
             with pyodbc.connect(self.conn_str) as conn:
                 with conn.cursor() as cursor:
-                    # Soft delete - set is_enabled to False instead of actual deletion
+                    # Update component status
                     cursor.execute("""
                         UPDATE components
-                        SET is_enabled = 0, updated_date = GETDATE(), updated_by = ?
-                        WHERE component_id = ? AND project_id = ?
-                    """, (username, component_id, project_id))
+                        SET is_enabled = ?, updated_date = GETDATE(), updated_by = ?
+                        WHERE component_id = ?
+                    """, (is_enabled, username, component_id))
 
                     if cursor.rowcount > 0:
                         conn.commit()
-                        logging.info(f"Component {component_id} deleted (disabled) by {username}")
-                        return True, "Component removed successfully"
+                        status_text = "activated" if is_enabled else "deactivated"
+                        logging.info(f"Component {component_id} {status_text} by {username}")
+                        return True, f"Component {status_text} successfully"
                     else:
                         return False, "Component not found"
 
         except Exception as e:
-            error_msg = f"Error deleting component: {str(e)}"
-            logging.error(error_msg)
-            return False, error_msg
-
-    def hard_delete_component(self, component_id: int, project_id: int, username: str = 'system') -> Tuple[bool, str]:
-        """Permanently delete a component from database"""
-        try:
-            with pyodbc.connect(self.conn_str) as conn:
-                with conn.cursor() as cursor:
-                    cursor.execute("""
-                        DELETE FROM components
-                        WHERE component_id = ? AND project_id = ?
-                    """, (component_id, project_id))
-
-                    if cursor.rowcount > 0:
-                        conn.commit()
-                        logging.info(f"Component {component_id} permanently deleted by {username}")
-                        return True, "Component permanently deleted"
-                    else:
-                        return False, "Component not found"
-
-        except Exception as e:
-            error_msg = f"Error permanently deleting component: {str(e)}"
+            error_msg = f"Error updating component status: {str(e)}"
             logging.error(error_msg)
             return False, error_msg
 
@@ -678,10 +760,10 @@ def create_component(project_id: int, component_data: Dict, username: str = 'sys
     manager = ComponentManager()
     return manager.create_component(project_id, component_data, username)
 
-def delete_component(component_id: int, project_id: int, username: str = 'system') -> Tuple[bool, str]:
-    """Quick function to delete a component"""
+def toggle_component_status(component_id: int, is_enabled: bool, username: str = 'system') -> Tuple[bool, str]:
+    """Quick function to toggle component status"""
     manager = ComponentManager()
-    return manager.delete_component(component_id, project_id, username)
+    return manager.toggle_component_status(component_id, is_enabled, username)
 
 def get_project_components(project_id: int, include_disabled: bool = True) -> List[Dict]:
     """Quick function to get project components"""

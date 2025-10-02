@@ -319,3 +319,204 @@ def get_all_integrations_status():
     except Exception as e:
         log_error(f"Error fetching integrations status: {e}")
         return []
+
+def test_jfrog_connection(config):
+    """Test JFrog Artifactory connection"""
+    try:
+        if not config or not config.get('base_url'):
+            return False, "JFrog configuration not found or base URL missing"
+
+        base_url = config.get('base_url')
+        username = config.get('username')
+        password = config.get('password')
+        ssl_verify = config.get('ssl_verify', True)
+
+        if not username or not password:
+            return False, "JFrog username or password missing"
+
+        # Test connection by getting system ping
+        ping_url = f"{base_url}/api/system/ping"
+
+        response = requests.get(
+            ping_url,
+            auth=(username, password),
+            timeout=10,
+            verify=ssl_verify
+        )
+
+        if response.status_code == 200:
+            log_info("JFrog connection test successful")
+            return True, "Connection successful"
+        else:
+            error_msg = f"JFrog connection failed with status {response.status_code}"
+            log_error(error_msg)
+            return False, error_msg
+
+    except requests.exceptions.RequestException as e:
+        error_msg = f"JFrog connection error: {str(e)}"
+        log_error(error_msg)
+        return False, error_msg
+    except Exception as e:
+        error_msg = f"Unexpected error testing JFrog connection: {str(e)}"
+        log_error(error_msg)
+        return False, error_msg
+
+def get_jfrog_artifacts(config, component_name=None, branch=None):
+    """Get artifacts from JFrog Artifactory"""
+    try:
+        if not config or not config.get('base_url'):
+            return False, [], "JFrog configuration not found or base URL missing"
+
+        base_url = config.get('base_url')
+        repository = config.get('repository')
+        username = config.get('username')
+        password = config.get('password')
+        ssl_verify = config.get('ssl_verify', True)
+
+        if not all([username, password, repository]):
+            return False, [], "JFrog credentials or repository missing"
+
+        # Build search URL for the repository
+        search_url = f"{base_url}/api/search/aql"
+
+        # Build AQL query based on filters
+        aql_query = f'items.find({{"repo":"{repository}"}}'
+
+        if component_name:
+            aql_query += f'.include("name").include("path").include("size").include("created")'
+        else:
+            aql_query += f').include("name").include("path").include("size").include("created")'
+
+        aql_query += '.sort({"$desc":["created"]}).limit(50)'
+
+        headers = {
+            'Content-Type': 'text/plain'
+        }
+
+        response = requests.post(
+            search_url,
+            data=aql_query,
+            auth=(username, password),
+            headers=headers,
+            timeout=30,
+            verify=ssl_verify
+        )
+
+        if response.status_code == 200:
+            result = response.json()
+            artifacts = []
+
+            for item in result.get('results', []):
+                # Parse the path to extract branch and build info
+                path_parts = item.get('path', '').split('/')
+                artifact_name = item.get('name', '')
+
+                if len(path_parts) >= 2 and artifact_name.endswith('.zip'):
+                    branch_name = path_parts[0] if path_parts[0] else 'unknown'
+                    build_folder = path_parts[1] if len(path_parts) > 1 else 'unknown'
+
+                    # Extract component name from filename (remove .zip)
+                    component = artifact_name.replace('.zip', '')
+
+                    artifacts.append({
+                        'branch': branch_name,
+                        'build': build_folder,
+                        'component': component,
+                        'path': f"{item.get('path', '')}/{artifact_name}",
+                        'size': format_bytes(item.get('size', 0)),
+                        'date': item.get('created', '').split('T')[0] if item.get('created') else 'Unknown',
+                        'download_url': f"{base_url}/{repository}/{item.get('path', '')}/{artifact_name}"
+                    })
+
+            log_info(f"Retrieved {len(artifacts)} JFrog artifacts")
+            return True, artifacts, f"Found {len(artifacts)} artifacts"
+        else:
+            error_msg = f"JFrog search failed with status {response.status_code}"
+            log_error(error_msg)
+            return False, [], error_msg
+
+    except requests.exceptions.RequestException as e:
+        error_msg = f"JFrog API error: {str(e)}"
+        log_error(error_msg)
+        return False, [], error_msg
+    except Exception as e:
+        error_msg = f"Unexpected error getting JFrog artifacts: {str(e)}"
+        log_error(error_msg)
+        return False, [], error_msg
+
+def format_bytes(bytes_value):
+    """Format bytes to human readable string"""
+    try:
+        bytes_value = int(bytes_value)
+        for unit in ['B', 'KB', 'MB', 'GB']:
+            if bytes_value < 1024.0:
+                return f"{bytes_value:.1f} {unit}"
+            bytes_value /= 1024.0
+        return f"{bytes_value:.1f} TB"
+    except:
+        return "Unknown"
+
+def get_component_artifacts_from_jfrog(config, component_name, branch=None):
+    """Get artifacts for a specific component from JFrog"""
+    try:
+        if not config or not config.get('base_url'):
+            return False, [], "JFrog configuration not found"
+
+        base_url = config.get('base_url')
+        repository = config.get('repository')
+        username = config.get('username')
+        password = config.get('password')
+        artifact_path_pattern = config.get('artifact_path_pattern', '{branch}/Build{date}.{buildNumber}/{componentName}.zip')
+        ssl_verify = config.get('ssl_verify', True)
+
+        # Build search for specific component
+        search_pattern = artifact_path_pattern.replace('{componentName}', component_name)
+        if branch:
+            search_pattern = search_pattern.replace('{branch}', branch)
+        else:
+            search_pattern = search_pattern.replace('{branch}', '*')
+
+        # Replace other placeholders with wildcards for searching
+        search_pattern = search_pattern.replace('{date}', '*').replace('{buildNumber}', '*')
+
+        # Use AQL to search for specific patterns
+        aql_query = f'items.find({{"repo":"{repository}","name":"{component_name}.zip"}}).include("name").include("path").include("size").include("created").sort({{"$desc":["created"]}}).limit(20)'
+
+        search_url = f"{base_url}/api/search/aql"
+
+        response = requests.post(
+            search_url,
+            data=aql_query,
+            auth=(username, password),
+            headers={'Content-Type': 'text/plain'},
+            timeout=30,
+            verify=ssl_verify
+        )
+
+        if response.status_code == 200:
+            result = response.json()
+            builds = []
+
+            for item in result.get('results', []):
+                path_parts = item.get('path', '').split('/')
+                if len(path_parts) >= 2:
+                    branch_name = path_parts[0]
+                    build_folder = path_parts[1]
+
+                    builds.append({
+                        'branch': branch_name,
+                        'build': build_folder,
+                        'path': f"{item.get('path', '')}/{item.get('name', '')}",
+                        'size': format_bytes(item.get('size', 0)),
+                        'created': item.get('created', ''),
+                        'download_url': f"{base_url}/{repository}/{item.get('path', '')}/{item.get('name', '')}"
+                    })
+
+            return True, builds, f"Found {len(builds)} builds for {component_name}"
+        else:
+            return False, [], f"Search failed with status {response.status_code}"
+
+    except Exception as e:
+        error_msg = f"Error getting component artifacts: {str(e)}"
+        log_error(error_msg)
+        return False, [], error_msg

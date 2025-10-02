@@ -1,6 +1,6 @@
 {% extends "base_sidebar.html" %}
 
-{% block title %}Integrations - MSI Factory{% endblock %}
+{% block title %}Integrations - CelerDeploy{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
@@ -9,9 +9,147 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1><i class="fas fa-plug me-2"></i>External System Integrations</h1>
                 <div>
-                    <button type="button" class="btn btn-success" onclick="testAllConnections()">
-                        <i class="fas fa-check-circle me-1"></i>Test All Connections
-                    </button>
+                    <form method="POST" action="/integrations/test_all" style="display: inline;">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check-circle me-1"></i>Test All Connections
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- JFrog Artifactory Integration -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-archive me-2"></i>JFrog Artifactory Integration
+                            <span id="jfrogStatus" class="badge bg-secondary ms-2">Not Configured</span>
+                        </h5>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>JFrog Central Configuration:</strong> Configure your global JFrog Artifactory credentials here.
+                        Path patterns and version strategies are configured per component in the
+                        <a href="/component_configuration" class="alert-link">Component Configuration</a> page.
+                    </div>
+
+                    <form method="POST" action="/integrations/jfrog/save">
+                        <!-- Hidden field to preserve config_id for UPDATE operations -->
+                        {% if jfrog_config and jfrog_config.config_id %}
+                        <input type="hidden" name="config_id" value="{{ jfrog_config.config_id }}">
+                        {% endif %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="jfrog_base_url" class="form-label">Artifactory Base URL <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="url" class="form-control" id="jfrog_base_url" name="jfrog_base_url"
+                                               placeholder="https://company.jfrog.io/artifactory" required
+                                               value="{{ jfrog_config.base_url if jfrog_config else '' }}"
+                                               {% if jfrog_config and jfrog_config.base_url and not jfrog_url_edit_mode %}readonly{% endif %}>
+                                        {% if jfrog_config and jfrog_config.base_url and not jfrog_url_edit_mode %}
+                                        <form method="POST" action="/integrations/jfrog/edit_url" style="display: inline;">
+                                            <button type="submit" class="btn btn-outline-secondary">
+                                                <i class="fas fa-edit me-1"></i>Edit URL
+                                            </button>
+                                        </form>
+                                        {% elif jfrog_url_edit_mode %}
+                                        <form method="POST" action="/integrations/jfrog/lock_url" style="display: inline;">
+                                            <button type="submit" class="btn btn-outline-warning">
+                                                <i class="fas fa-lock me-1"></i>Lock URL
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-text">
+                                        Your JFrog Artifactory base URL (without repository path)
+                                        {% if jfrog_config and jfrog_config.base_url and not jfrog_url_edit_mode %}
+                                        <br><small class="text-warning"><i class="fas fa-lock me-1"></i>URL is locked to prevent multiple entries. Click "Edit URL" to modify.</small>
+                                        {% elif jfrog_url_edit_mode %}
+                                        <br><small class="text-info"><i class="fas fa-unlock me-1"></i>URL is unlocked for editing. Click "Lock URL" when finished.</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="jfrog_username" class="form-label">Username <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="jfrog_username" name="jfrog_username" required
+                                               value="{{ jfrog_config.username if jfrog_config else '' }}"
+                                               {% if jfrog_config and jfrog_config.username and not jfrog_url_edit_mode %}readonly{% endif %}>
+                                        {% if jfrog_config and jfrog_config.username and not jfrog_url_edit_mode %}
+                                        <form method="POST" action="/integrations/jfrog/edit_url" style="display: inline;">
+                                            <button type="submit" class="btn btn-outline-secondary">
+                                                <i class="fas fa-edit me-1"></i>Edit
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-text">
+                                        JFrog Artifactory username
+                                        {% if jfrog_config and jfrog_config.username and not jfrog_url_edit_mode %}
+                                        <br><small class="text-warning"><i class="fas fa-lock me-1"></i>Username is locked. Click "Edit" to modify.</small>
+                                        {% elif jfrog_url_edit_mode %}
+                                        <br><small class="text-info"><i class="fas fa-unlock me-1"></i>Username is unlocked for editing.</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="jfrog_password" class="form-label">Password/API Token <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="jfrog_password" name="jfrog_password" required
+                                               {% if jfrog_config and jfrog_config.has_password and not jfrog_password_edit_mode %}value="********" readonly{% endif %}>
+                                        {% if jfrog_config and jfrog_config.has_password and not jfrog_password_edit_mode %}
+                                        <form method="POST" action="/integrations/jfrog/edit_password" style="display: inline;">
+                                            <button type="submit" class="btn btn-outline-secondary">
+                                                <i class="fas fa-edit me-1"></i>Edit
+                                            </button>
+                                        </form>
+                                        {% elif jfrog_password_edit_mode %}
+                                        <form method="POST" action="/integrations/jfrog/lock_password" style="display: inline;">
+                                            <button type="submit" class="btn btn-outline-warning">
+                                                <i class="fas fa-lock me-1"></i>Lock Password
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-text">
+                                        JFrog password or API token
+                                        {% if jfrog_config and jfrog_config.has_password and not jfrog_password_edit_mode %}
+                                        <br><small class="text-warning"><i class="fas fa-lock me-1"></i>Password is locked (displayed as ********). Click "Edit" to modify.</small>
+                                        {% elif jfrog_password_edit_mode %}
+                                        <br><small class="text-info"><i class="fas fa-unlock me-1"></i>Password is unlocked for editing. Click "Lock Password" when finished.</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="jfrog_curl_path" class="form-label">Curl.exe Path</label>
+                                    <input type="text" class="form-control" id="jfrog_curl_path" name="jfrog_curl_path"
+                                           placeholder="Leave empty for auto-detection"
+                                           value="{{ jfrog_config.curl_path if jfrog_config else '' }}">
+                                    <div class="form-text">Path to curl.exe for artifact downloads (auto-detected if not specified)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <hr>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Save Configuration
+                                </button>
+                                <a href="/integrations" class="btn btn-outline-secondary ms-2">
+                                    <i class="fas fa-times me-1"></i>Cancel
+                                </a>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
 
@@ -24,17 +162,21 @@
                             <span id="snowStatus" class="badge bg-secondary ms-2">Not Configured</span>
                         </h5>
                         <div>
-                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="testServiceNowConnection()">
-                                <i class="fas fa-check me-1"></i>Test Connection
-                            </button>
-                            <button type="button" class="btn btn-primary btn-sm" onclick="syncFromServiceNow()">
-                                <i class="fas fa-sync me-1"></i>Sync Servers
-                            </button>
+                            <form method="POST" action="/integrations/servicenow/test" style="display: inline;">
+                                <button type="submit" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-check me-1"></i>Test Connection
+                                </button>
+                            </form>
+                            <form method="POST" action="/integrations/servicenow/sync" style="display: inline;">
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-sync me-1"></i>Sync Servers
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
                 <div class="card-body">
-                    <form id="serviceNowForm">
+                    <form method="POST" action="/integrations/servicenow/save">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -54,9 +196,9 @@
                                     <label for="snow_password" class="form-label">Password *</label>
                                     <div class="input-group">
                                         <input type="password" class="form-control" id="snow_password" name="snow_password" required>
-                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('snow_password')">
+                                        <span class="input-group-text">
                                             <i class="fas fa-eye"></i>
-                                        </button>
+                                        </span>
                                     </div>
                                     <div class="form-text">ServiceNow API password (stored securely in Vault)</div>
                                 </div>
@@ -111,12 +253,12 @@
                         <div class="row">
                             <div class="col-12">
                                 <hr>
-                                <button type="button" class="btn btn-primary" onclick="saveServiceNowConfig()">
+                                <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-save me-1"></i>Save Configuration
                                 </button>
-                                <button type="button" class="btn btn-outline-danger ms-2" onclick="clearServiceNowConfig()">
+                                <a href="/integrations/servicenow/clear" class="btn btn-outline-danger ms-2">
                                     <i class="fas fa-trash me-1"></i>Clear Configuration
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </form>
@@ -132,17 +274,21 @@
                             <span id="vaultStatus" class="badge bg-secondary ms-2">Not Configured</span>
                         </h5>
                         <div>
-                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="testVaultConnection()">
-                                <i class="fas fa-check me-1"></i>Test Connection
-                            </button>
-                            <button type="button" class="btn btn-info btn-sm" onclick="viewVaultSecrets()">
-                                <i class="fas fa-key me-1"></i>View Secrets
-                            </button>
+                            <form method="POST" action="/integrations/vault/test" style="display: inline;">
+                                <button type="submit" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-check me-1"></i>Test Connection
+                                </button>
+                            </form>
+                            <form method="GET" action="/integrations/vault/secrets" style="display: inline;">
+                                <button type="submit" class="btn btn-info btn-sm">
+                                    <i class="fas fa-key me-1"></i>View Secrets
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
                 <div class="card-body">
-                    <form id="vaultForm">
+                    <form method="POST" action="/integrations/vault/save">
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
@@ -154,7 +300,7 @@
 
                                 <div class="mb-3">
                                     <label for="vault_auth_method" class="form-label">Authentication Method</label>
-                                    <select class="form-select" id="vault_auth_method" name="vault_auth_method" onchange="toggleVaultAuthFields()">
+                                    <select class="form-select" id="vault_auth_method" name="vault_auth_method">
                                         <option value="token" selected>Token</option>
                                         <option value="userpass">Username/Password</option>
                                         <option value="ldap">LDAP</option>
@@ -167,9 +313,9 @@
                                     <label for="vault_token" class="form-label">Vault Token *</label>
                                     <div class="input-group">
                                         <input type="password" class="form-control" id="vault_token" name="vault_token">
-                                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('vault_token')">
+                                        <span class="input-group-text">
                                             <i class="fas fa-eye"></i>
-                                        </button>
+                                        </span>
                                     </div>
                                     <div class="form-text">Vault authentication token</div>
                                 </div>
@@ -184,9 +330,9 @@
                                         <label for="vault_user_password" class="form-label">Password</label>
                                         <div class="input-group">
                                             <input type="password" class="form-control" id="vault_user_password" name="vault_user_password">
-                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('vault_user_password')">
+                                            <span class="input-group-text">
                                                 <i class="fas fa-eye"></i>
-                                            </button>
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -201,9 +347,9 @@
                                         <label for="vault_secret_id" class="form-label">Secret ID</label>
                                         <div class="input-group">
                                             <input type="password" class="form-control" id="vault_secret_id" name="vault_secret_id">
-                                            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('vault_secret_id')">
+                                            <span class="input-group-text">
                                                 <i class="fas fa-eye"></i>
-                                            </button>
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -221,7 +367,7 @@
                                     <label for="vault_app_path" class="form-label">Application Secret Path</label>
                                     <input type="text" class="form-control" id="vault_app_path" name="vault_app_path"
                                            value="msifactory" placeholder="msifactory">
-                                    <div class="form-text">Path where MSI Factory secrets are stored</div>
+                                    <div class="form-text">Path where CelerDeploy secrets are stored</div>
                                 </div>
 
                                 <div class="mb-3">
@@ -254,50 +400,19 @@
                         <div class="row">
                             <div class="col-12">
                                 <hr>
-                                <button type="button" class="btn btn-primary" onclick="saveVaultConfig()">
+                                <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-save me-1"></i>Save Configuration
                                 </button>
-                                <button type="button" class="btn btn-outline-danger ms-2" onclick="clearVaultConfig()">
+                                <a href="/integrations/vault/clear" class="btn btn-outline-danger ms-2">
                                     <i class="fas fa-trash me-1"></i>Clear Configuration
-                                </button>
+                                </a>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Integration Status Dashboard -->
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Integration Status Dashboard</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6 class="text-primary mb-3">Recent Activity</h6>
-                            <div id="recentActivity">
-                                <div class="text-muted">
-                                    <i class="fas fa-info-circle me-1"></i>No recent integration activity
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="text-primary mb-3">Quick Actions</h6>
-                            <div class="d-grid gap-2">
-                                <button type="button" class="btn btn-outline-primary" onclick="exportIntegrationConfig()">
-                                    <i class="fas fa-download me-1"></i>Export Configuration
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary" onclick="importIntegrationConfig()">
-                                    <i class="fas fa-upload me-1"></i>Import Configuration
-                                </button>
-                                <button type="button" class="btn btn-outline-info" onclick="viewIntegrationLogs()">
-                                    <i class="fas fa-file-alt me-1"></i>View Integration Logs
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
         </div>
     </div>
 </div>
@@ -338,360 +453,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-// Load configuration on page load
-document.addEventListener('DOMContentLoaded', function() {
-    loadIntegrationConfigs();
-});
-
-// ServiceNow Functions
-function saveServiceNowConfig() {
-    const formData = new FormData(document.getElementById('serviceNowForm'));
-
-    fetch('/api/integrations/servicenow/config', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            updateStatus('snowStatus', 'Configured', 'success');
-            showAlert('ServiceNow configuration saved successfully', 'success');
-        } else {
-            showAlert('Error saving ServiceNow configuration: ' + data.error, 'error');
-        }
-    })
-    .catch(error => {
-        showAlert('Error saving ServiceNow configuration: ' + error, 'error');
-    });
-}
-
-function testServiceNowConnection() {
-    const button = event.target;
-    const originalText = button.innerHTML;
-    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Testing...';
-    button.disabled = true;
-
-    fetch('/api/integrations/servicenow/test', {
-        method: 'POST'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            updateStatus('snowStatus', 'Connected', 'success');
-            showAlert('ServiceNow connection successful', 'success');
-        } else {
-            updateStatus('snowStatus', 'Connection Failed', 'danger');
-            showAlert('ServiceNow connection failed: ' + data.error, 'error');
-        }
-    })
-    .catch(error => {
-        updateStatus('snowStatus', 'Connection Failed', 'danger');
-        showAlert('ServiceNow connection failed: ' + error, 'error');
-    })
-    .finally(() => {
-        button.innerHTML = originalText;
-        button.disabled = false;
-    });
-}
-
-function syncFromServiceNow() {
-    const button = event.target;
-    const originalText = button.innerHTML;
-    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Syncing...';
-    button.disabled = true;
-
-    fetch('/api/integrations/servicenow/sync', {
-        method: 'POST'
-    })
-    .then(response => response.json())
-    .then(data => {
-        showSyncResults(data);
-        if (data.success) {
-            updateLastSync('snowLastSync', data);
-        }
-    })
-    .catch(error => {
-        showAlert('ServiceNow sync failed: ' + error, 'error');
-    })
-    .finally(() => {
-        button.innerHTML = originalText;
-        button.disabled = false;
-    });
-}
-
-// Vault Functions
-function saveVaultConfig() {
-    const formData = new FormData(document.getElementById('vaultForm'));
-
-    fetch('/api/integrations/vault/config', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            updateStatus('vaultStatus', 'Configured', 'success');
-            showAlert('Vault configuration saved successfully', 'success');
-        } else {
-            showAlert('Error saving Vault configuration: ' + data.error, 'error');
-        }
-    })
-    .catch(error => {
-        showAlert('Error saving Vault configuration: ' + error, 'error');
-    });
-}
-
-function testVaultConnection() {
-    const button = event.target;
-    const originalText = button.innerHTML;
-    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Testing...';
-    button.disabled = true;
-
-    fetch('/api/integrations/vault/test', {
-        method: 'POST'
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            updateStatus('vaultStatus', 'Connected', 'success');
-            updateLastCheck('vaultLastCheck', data);
-            showAlert('Vault connection successful', 'success');
-        } else {
-            updateStatus('vaultStatus', 'Connection Failed', 'danger');
-            showAlert('Vault connection failed: ' + data.error, 'error');
-        }
-    })
-    .catch(error => {
-        updateStatus('vaultStatus', 'Connection Failed', 'danger');
-        showAlert('Vault connection failed: ' + error, 'error');
-    })
-    .finally(() => {
-        button.innerHTML = originalText;
-        button.disabled = false;
-    });
-}
-
-function viewVaultSecrets() {
-    fetch('/api/integrations/vault/secrets')
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById('vaultSecretsContent').innerHTML = formatVaultSecrets(data);
-        new bootstrap.Modal(document.getElementById('vaultSecretsModal')).show();
-    })
-    .catch(error => {
-        showAlert('Error retrieving Vault secrets: ' + error, 'error');
-    });
-}
-
-// Utility Functions
-function togglePassword(fieldId) {
-    const field = document.getElementById(fieldId);
-    const icon = event.target.querySelector('i') || event.target;
-
-    if (field.type === 'password') {
-        field.type = 'text';
-        icon.className = 'fas fa-eye-slash';
-    } else {
-        field.type = 'password';
-        icon.className = 'fas fa-eye';
-    }
-}
-
-function toggleVaultAuthFields() {
-    const authMethod = document.getElementById('vault_auth_method').value;
-
-    document.getElementById('vaultTokenAuth').style.display = authMethod === 'token' ? 'block' : 'none';
-    document.getElementById('vaultUserPassAuth').style.display = authMethod === 'userpass' || authMethod === 'ldap' ? 'block' : 'none';
-    document.getElementById('vaultAppRoleAuth').style.display = authMethod === 'approle' ? 'block' : 'none';
-}
-
-function updateStatus(elementId, text, type) {
-    const element = document.getElementById(elementId);
-    element.textContent = text;
-    element.className = `badge bg-${type} ms-2`;
-}
-
-function showAlert(message, type) {
-    // Create Bootstrap alert
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
-    alertDiv.style.top = '20px';
-    alertDiv.style.right = '20px';
-    alertDiv.style.zIndex = '9999';
-    alertDiv.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-
-    document.body.appendChild(alertDiv);
-
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-        if (alertDiv.parentNode) {
-            alertDiv.parentNode.removeChild(alertDiv);
-        }
-    }, 5000);
-}
-
-function showSyncResults(data) {
-    const content = `
-        <div class="row">
-            <div class="col-md-3">
-                <div class="text-center">
-                    <h3 class="text-primary">${data.servers_synced || 0}</h3>
-                    <small class="text-muted">Total Servers</small>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="text-center">
-                    <h3 class="text-success">${data.servers_added || 0}</h3>
-                    <small class="text-muted">Added</small>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="text-center">
-                    <h3 class="text-info">${data.servers_updated || 0}</h3>
-                    <small class="text-muted">Updated</small>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="text-center">
-                    <h3 class="text-warning">${data.errors ? data.errors.length : 0}</h3>
-                    <small class="text-muted">Errors</small>
-                </div>
-            </div>
-        </div>
-        ${data.errors && data.errors.length > 0 ? `
-            <hr>
-            <h6>Errors:</h6>
-            <ul class="list-unstyled">
-                ${data.errors.map(error => `<li class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i>${error}</li>`).join('')}
-            </ul>
-        ` : ''}
-    `;
-
-    document.getElementById('syncResultsContent').innerHTML = content;
-    new bootstrap.Modal(document.getElementById('syncResultsModal')).show();
-}
-
-function formatVaultSecrets(data) {
-    if (!data.success || !data.secrets) {
-        return '<div class="text-danger">Error retrieving secrets</div>';
-    }
-
-    let html = '<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Secret Path</th><th>Keys</th><th>Last Updated</th></tr></thead><tbody>';
-
-    for (const secret of data.secrets) {
-        html += `
-            <tr>
-                <td><code>${secret.path}</code></td>
-                <td>${secret.keys ? secret.keys.join(', ') : 'N/A'}</td>
-                <td>${secret.updated || 'N/A'}</td>
-            </tr>
-        `;
-    }
-
-    html += '</tbody></table></div>';
-    return html;
-}
-
-function loadIntegrationConfigs() {
-    // Load ServiceNow config
-    fetch('/api/integrations/servicenow/config')
-    .then(response => response.json())
-    .then(data => {
-        if (data.success && data.config) {
-            const config = data.config;
-            document.getElementById('snow_instance_url').value = config.instance_url || '';
-            document.getElementById('snow_username').value = config.username || '';
-            document.getElementById('snow_table').value = config.table || 'cmdb_ci_server';
-            document.getElementById('snow_filter').value = config.filter || '';
-            document.getElementById('snow_sync_frequency').value = config.sync_frequency || 'daily';
-            document.getElementById('snow_auto_sync').checked = config.auto_sync || false;
-
-            if (config.configured) {
-                updateStatus('snowStatus', 'Configured', 'success');
-            }
-        }
-    })
-    .catch(error => console.log('ServiceNow config load error:', error));
-
-    // Load Vault config
-    fetch('/api/integrations/vault/config')
-    .then(response => response.json())
-    .then(data => {
-        if (data.success && data.config) {
-            const config = data.config;
-            document.getElementById('vault_url').value = config.url || '';
-            document.getElementById('vault_auth_method').value = config.auth_method || 'token';
-            document.getElementById('vault_mount_path').value = config.mount_path || 'secret';
-            document.getElementById('vault_app_path').value = config.app_path || 'msifactory';
-            document.getElementById('vault_ssl_verify').checked = config.ssl_verify !== false;
-            document.getElementById('vault_auto_renew').checked = config.auto_renew !== false;
-
-            toggleVaultAuthFields();
-
-            if (config.configured) {
-                updateStatus('vaultStatus', 'Configured', 'success');
-            }
-        }
-    })
-    .catch(error => console.log('Vault config load error:', error));
-}
-
-function testAllConnections() {
-    testServiceNowConnection();
-    setTimeout(() => testVaultConnection(), 1000);
-}
-
-function clearServiceNowConfig() {
-    if (confirm('Are you sure you want to clear the ServiceNow configuration?')) {
-        document.getElementById('serviceNowForm').reset();
-        updateStatus('snowStatus', 'Not Configured', 'secondary');
-    }
-}
-
-function clearVaultConfig() {
-    if (confirm('Are you sure you want to clear the Vault configuration?')) {
-        document.getElementById('vaultForm').reset();
-        updateStatus('vaultStatus', 'Not Configured', 'secondary');
-        toggleVaultAuthFields();
-    }
-}
-
-function updateLastSync(elementId, data) {
-    const element = document.getElementById(elementId);
-    const now = new Date().toLocaleString();
-    element.innerHTML = `
-        <i class="fas fa-check-circle text-success me-1"></i>
-        Last sync: ${now} (${data.servers_added} added, ${data.servers_updated} updated)
-    `;
-}
-
-function updateLastCheck(elementId, data) {
-    const element = document.getElementById(elementId);
-    const now = new Date().toLocaleString();
-    element.innerHTML = `
-        <i class="fas fa-check-circle text-success me-1"></i>
-        Last check: ${now} - Connection successful
-    `;
-}
-
-// Placeholder functions for future implementation
-function exportIntegrationConfig() {
-    showAlert('Export functionality will be implemented soon', 'info');
-}
-
-function importIntegrationConfig() {
-    showAlert('Import functionality will be implemented soon', 'info');
-}
-
-function viewIntegrationLogs() {
-    showAlert('Integration logs viewer will be implemented soon', 'info');
-}
-</script>
 {% endblock %}

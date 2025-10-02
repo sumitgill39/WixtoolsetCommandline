@@ -1,0 +1,372 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}User Role Management - CelerDeploy{% endblock %}
+{% block page_title %}User Role Management{% endblock %}
+
+{% block content %}
+<style>
+    /* Professional Role Management Theme */
+    .page-header {
+        background: linear-gradient(135deg, #003f7f 0%, #0066cc 100%);
+        color: white;
+        padding: 1.5rem 0;
+        margin-bottom: 1.5rem;
+        border-radius: 0 0 15px 15px;
+        box-shadow: 0 4px 20px rgba(0, 63, 127, 0.3);
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        font-weight: 400;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .role-card {
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        border: 1px solid rgba(0, 63, 127, 0.15);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        transition: all 0.3s ease;
+    }
+
+    .role-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 63, 127, 0.12);
+    }
+
+    .role-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .role-admin { background: #dc3545; color: white; }
+    .role-poweruser { background: #fd7e14; color: white; }
+    .role-user { background: #6c757d; color: white; }
+
+    .permission-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .permission-tag {
+        background: #e3f2fd;
+        color: #1976d2;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
+
+    .user-table {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-role-change {
+        padding: 4px 12px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+</style>
+
+<!-- Professional Page Header -->
+<div class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-users-cog me-3"></i>User Role Management</h1>
+        <p class="subtitle">Manage user roles and permissions across the CelerDeploy system</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Role Information Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="role-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0"><i class="fas fa-crown me-2"></i>Administrator</h5>
+                    <span class="role-badge role-admin">Admin</span>
+                </div>
+                <p class="text-muted mb-2">Full system access with all permissions</p>
+                <div class="permission-list">
+                    <span class="permission-tag">User Management</span>
+                    <span class="permission-tag">System Settings</span>
+                    <span class="permission-tag">All Components</span>
+                    <span class="permission-tag">All Projects</span>
+                    <span class="permission-tag">CMDB Full</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="role-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0"><i class="fas fa-user-tie me-2"></i>Power User</h5>
+                    <span class="role-badge role-poweruser">PowerUser</span>
+                </div>
+                <p class="text-muted mb-2">Technical Project Managers with component CRUD access</p>
+                <div class="permission-list">
+                    <span class="permission-tag">Component CRUD</span>
+                    <span class="permission-tag">Project Update</span>
+                    <span class="permission-tag">MSI Generate</span>
+                    <span class="permission-tag">CMDB Update</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="role-card">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0"><i class="fas fa-user me-2"></i>Standard User</h5>
+                    <span class="role-badge role-user">User</span>
+                </div>
+                <p class="text-muted mb-2">Read-only access to system information</p>
+                <div class="permission-list">
+                    <span class="permission-tag">View Components</span>
+                    <span class="permission-tag">View Projects</span>
+                    <span class="permission-tag">View MSI Status</span>
+                    <span class="permission-tag">View CMDB</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Management Table -->
+    <div class="user-table">
+        <div class="card-header bg-light">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="fas fa-users me-2"></i>System Users</h6>
+                <div class="input-group" style="width: 300px;">
+                    <input type="text" class="form-control" id="userSearch" placeholder="Search users...">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Current Role</th>
+                            <th>Status</th>
+                            <th>Last Login</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr data-user-id="{{ user.user_id }}">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar me-3">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            {{ user.first_name[0] }}{{ user.last_name[0] }}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">{{ user.first_name }} {{ user.last_name }}</div>
+                                        <small class="text-muted">{{ user.username }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <span class="role-badge role-{{ user.role }}">{{ user.role.title() }}</span>
+                            </td>
+                            <td>
+                                {% if user.status == 'approved' %}
+                                    <span class="badge bg-success">Active</span>
+                                {% elif user.status == 'pending' %}
+                                    <span class="badge bg-warning">Pending</span>
+                                {% else %}
+                                    <span class="badge bg-danger">{{ user.status.title() }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.last_login %}
+                                    {{ user.last_login.strftime('%Y-%m-%d %H:%M') if user.last_login else 'Never' }}
+                                {% else %}
+                                    <span class="text-muted">Never</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    {% if user.role != 'admin' %}
+                                        <button class="btn btn-sm btn-outline-warning btn-role-change"
+                                                onclick="changeRole({{ user.user_id }}, 'poweruser')"
+                                                title="Promote to PowerUser">
+                                            <i class="fas fa-user-tie"></i>
+                                        </button>
+                                    {% endif %}
+                                    {% if user.role != 'user' %}
+                                        <button class="btn btn-sm btn-outline-secondary btn-role-change"
+                                                onclick="changeRole({{ user.user_id }}, 'user')"
+                                                title="Demote to User">
+                                            <i class="fas fa-user"></i>
+                                        </button>
+                                    {% endif %}
+                                    {% if user.role != 'admin' %}
+                                        <button class="btn btn-sm btn-outline-danger btn-role-change"
+                                                onclick="changeRole({{ user.user_id }}, 'admin')"
+                                                title="Promote to Admin">
+                                            <i class="fas fa-crown"></i>
+                                        </button>
+                                    {% endif %}
+                                    <button class="btn btn-sm btn-outline-info"
+                                            onclick="viewUserPermissions({{ user.user_id }})"
+                                            title="View Permissions">
+                                        <i class="fas fa-list"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Role Change Confirmation Modal -->
+<div class="modal fade" id="roleChangeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Role Change</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to change <strong id="userName"></strong>'s role to <strong id="newRole"></strong>?</p>
+                <div class="mb-3">
+                    <label for="changeReason" class="form-label">Reason for change:</label>
+                    <textarea class="form-control" id="changeReason" rows="3" placeholder="Enter reason for role change..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="confirmRoleChange()">Confirm Change</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Permissions Modal -->
+<div class="modal fade" id="userPermissionsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">User Permissions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="permissionsContent">
+                <!-- Permissions will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedUserId = null;
+let selectedNewRole = null;
+
+function changeRole(userId, newRole) {
+    selectedUserId = userId;
+    selectedNewRole = newRole;
+
+    const userRow = document.querySelector(`[data-user-id="${userId}"]`);
+    const userName = userRow.querySelector('.fw-bold').textContent;
+
+    document.getElementById('userName').textContent = userName;
+    document.getElementById('newRole').textContent = newRole.toUpperCase();
+    document.getElementById('changeReason').value = '';
+
+    new bootstrap.Modal(document.getElementById('roleChangeModal')).show();
+}
+
+function confirmRoleChange() {
+    const reason = document.getElementById('changeReason').value.trim();
+
+    if (!reason) {
+        alert('Please provide a reason for the role change.');
+        return;
+    }
+
+    fetch('/update-user-role', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            user_id: selectedUserId,
+            new_role: selectedNewRole,
+            reason: reason
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload(); // Refresh page to show changes
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        alert('Error updating role: ' + error);
+    });
+
+    bootstrap.Modal.getInstance(document.getElementById('roleChangeModal')).hide();
+}
+
+function viewUserPermissions(userId) {
+    fetch(`/user-permissions/${userId}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const permissionsHtml = data.permissions.map(perm =>
+                `<div class="permission-item mb-2 p-2 border rounded">
+                    <strong>${perm.permission_name}</strong>
+                    <br><small class="text-muted">${perm.permission_description}</small>
+                    <span class="badge bg-info ms-2">${perm.module_name}</span>
+                </div>`
+            ).join('');
+
+            document.getElementById('permissionsContent').innerHTML = permissionsHtml;
+        } else {
+            document.getElementById('permissionsContent').innerHTML = '<p class="text-danger">Error loading permissions</p>';
+        }
+    })
+    .catch(error => {
+        document.getElementById('permissionsContent').innerHTML = '<p class="text-danger">Error loading permissions</p>';
+    });
+
+    new bootstrap.Modal(document.getElementById('userPermissionsModal')).show();
+}
+
+// Search functionality
+document.getElementById('userSearch').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const rows = document.querySelectorAll('tbody tr');
+
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+});
+</script>
+{% endblock %}

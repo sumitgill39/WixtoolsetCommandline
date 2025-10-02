@@ -71,3 +71,19 @@ def register_routes(app, components):
 
     # Register HTMX routes for dynamic updates
     register_htmx_routes(app, components)
+
+    # Register branch management blueprint
+    try:
+        from PackageBuilder.branch_routes import branch_blueprint
+        app.register_blueprint(branch_blueprint)
+        print("[INFO] Branch Management routes registered successfully")
+    except Exception as e:
+        print(f"[WARNING] Could not register branch management routes: {e}")
+
+    # Register integration management blueprint
+    try:
+        from PackageBuilder.integration_routes import integration_blueprint
+        app.register_blueprint(integration_blueprint)
+        print("[INFO] Integration Management routes registered successfully")
+    except Exception as e:
+        print(f"[WARNING] Could not register integration management routes: {e}")

@@ -1,0 +1,479 @@
+{% extends "base_sidebar.html" %}
+
+{% block title %}Branch Management - CelerDeploy{% endblock %}
+{% block page_title %}Branch Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-code-branch me-2"></i>Component Branch Management
+                        </h5>
+                        <button class="btn btn-success" onclick="addNewBranch()">
+                            <i class="fas fa-plus me-1"></i>Add Branch
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Component Filter -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="component_filter" class="form-label">Filter by Component</label>
+                            <select class="form-select" id="component_filter" onchange="filterByComponent()">
+                                <option value="">All Components</option>
+                                {% for component in components %}
+                                <option value="{{ component.component_id }}">{{ component.component_name }} ({{ component.project_name }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="search_branch" class="form-label">Search Branches</label>
+                            <input type="text" class="form-control" id="search_branch" placeholder="Search branch names..." onkeyup="searchBranches()">
+                        </div>
+                    </div>
+
+                    <!-- Branch List -->
+                    <div id="branchList">
+                        <div class="text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Branch Modal -->
+<div class="modal fade" id="branchModal" tabindex="-1" aria-labelledby="branchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="branchModalLabel">Add New Branch</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="branchForm">
+                    <input type="hidden" id="branch_id" name="branch_id">
+                    <input type="hidden" id="selected_project_key" name="selected_project_key">
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="project_id" class="form-label">Project <span class="text-danger">*</span></label>
+                            <select class="form-select" id="project_id" name="project_id" required onchange="loadComponentsByProject()">
+                                <option value="">Select Project</option>
+                                {% for project in projects %}
+                                <option value="{{ project.project_id }}" data-project-key="{{ project.project_key }}">{{ project.project_name }} ({{ project.project_key }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="component_id" class="form-label">Component <span class="text-danger">*</span></label>
+                            <select class="form-select" id="component_id" name="component_id" required disabled>
+                                <option value="">Select Project First</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="branch_name" class="form-label">Branch Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="branch_name" name="branch_name" placeholder="main" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="jfrog_path_pattern" class="form-label">JFrog Path Pattern</label>
+                            <input type="text" class="form-control" id="jfrog_path_pattern" name="jfrog_path_pattern"
+                                   value="{ProjectShortKey}/{ComponentName}/{branch}/Build{date}.{buildNumber}/{componentName}.zip"
+                                   placeholder="{ProjectShortKey}/{ComponentName}/{branch}/Build{date}.{buildNumber}/{componentName}.zip">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="version" class="form-label">Version</label>
+                            <input type="text" class="form-control" id="version" name="version"
+                                   value="1.0.0.0" placeholder="1.0.0.0">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="auto_increment" class="form-label">Auto Increment</label>
+                            <select name="auto_increment" id="auto_increment" class="form-select">
+                                <option value="major">Major</option>
+                                <option value="minor">Minor</option>
+                                <option value="build" selected>Build</option>
+                                <option value="revision">Revision</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="branch_status" class="form-label">Status</label>
+                            <select name="branch_status" id="branch_status" class="form-select">
+                                <option value="active" selected>Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="archived">Archived</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="description" class="form-label">Description</label>
+                            <input type="text" class="form-control" id="description" name="description" placeholder="Branch description">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveBranch()">Save Branch</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadAllBranches();
+});
+
+function loadAllBranches() {
+    fetch('/api/branches/all')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayAllBranches(data.branches);
+            } else {
+                document.getElementById('branchList').innerHTML =
+                    '<div class="alert alert-warning">No branches found</div>';
+            }
+        })
+        .catch(error => {
+            document.getElementById('branchList').innerHTML =
+                '<div class="alert alert-danger">Error loading branches: ' + error + '</div>';
+        });
+}
+
+function displayAllBranches(branches) {
+    if (!branches || branches.length === 0) {
+        document.getElementById('branchList').innerHTML =
+            '<div class="alert alert-info">No branches configured. Click "Add Branch" to get started.</div>';
+        return;
+    }
+
+    let html = '<div class="branch-list">';
+
+    branches.forEach(branch => {
+        // Build the full path by replacing variables in the path pattern
+        const jfrogBaseUrl = branch.jfrog_base_url || '{baseURL}';
+        let pathPattern = branch.path_pattern_override || '{ProjectShortKey}/{ComponentName}/{branch}/Build{date}.{buildNumber}/{componentName}.zip';
+
+        // Replace variables in the path pattern
+        pathPattern = pathPattern.replace(/{ProjectShortKey}/g, branch.project_key || '{ProjectShortKey}');
+        pathPattern = pathPattern.replace(/{ComponentName}/g, branch.component_name);
+        pathPattern = pathPattern.replace(/{componentName}/g, branch.component_name);
+        pathPattern = pathPattern.replace(/{branch}/g, branch.branch_name);
+
+        const fullPath = `${jfrogBaseUrl}/${pathPattern}`;
+        const branchDisplay = `[${branch.branch_name}] - ${fullPath} - Version[${branch.major_version || 1},${branch.minor_version || 0},${branch.patch_version || 0},${branch.build_number || 0}] - Auto Increment[${branch.auto_increment || 'build'}]`;
+
+        html += `
+            <div class="branch-item mb-2 p-3 border rounded" data-component-id="${branch.component_id}" data-branch-name="${branch.branch_name.toLowerCase()}">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="branch-info flex-grow-1">
+                        <div class="component-badge mb-1">
+                            <span class="badge bg-primary">${branch.component_name}</span>
+                            <span class="badge bg-secondary">${branch.project_name}</span>
+                        </div>
+                        <code class="text-dark d-block">${branchDisplay}</code>
+                    </div>
+                    <div class="branch-actions">
+                        <button class="btn btn-sm btn-outline-primary" onclick="editBranch(${branch.branch_id})" title="Edit Branch">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteBranch(${branch.branch_id}, '${branch.branch_name}')" title="Delete Branch">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    html += '</div>';
+    document.getElementById('branchList').innerHTML = html;
+}
+
+function filterByComponent() {
+    const selectedComponentId = document.getElementById('component_filter').value;
+    const branchItems = document.querySelectorAll('.branch-item');
+
+    branchItems.forEach(item => {
+        if (!selectedComponentId || item.getAttribute('data-component-id') === selectedComponentId) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function searchBranches() {
+    const searchTerm = document.getElementById('search_branch').value.toLowerCase();
+    const branchItems = document.querySelectorAll('.branch-item');
+
+    branchItems.forEach(item => {
+        const branchName = item.getAttribute('data-branch-name');
+        if (!searchTerm || branchName.includes(searchTerm)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function loadComponentsByProject() {
+    const projectSelect = document.getElementById('project_id');
+    const componentSelect = document.getElementById('component_id');
+    const projectId = projectSelect.value;
+    const selectedOption = projectSelect.options[projectSelect.selectedIndex];
+    const projectKey = selectedOption.getAttribute('data-project-key');
+
+    // Store project key in hidden field
+    document.getElementById('selected_project_key').value = projectKey || '';
+
+    if (!projectId) {
+        componentSelect.innerHTML = '<option value="">Select Project First</option>';
+        componentSelect.disabled = true;
+        componentSelect.value = ''; // Clear selection
+        return;
+    }
+
+    // Show loading state
+    componentSelect.innerHTML = '<option value="">Loading components...</option>';
+    componentSelect.disabled = true;
+    componentSelect.value = ''; // Clear any previous selection
+
+    // Fetch components for selected project
+    fetch(`/api/components/by_project/${projectId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.components) {
+                componentSelect.innerHTML = '<option value="">Select Component</option>';
+                data.components.forEach(component => {
+                    const option = document.createElement('option');
+                    option.value = component.component_id;
+                    option.textContent = component.component_name;
+                    option.setAttribute('data-component-name', component.component_name);
+                    option.setAttribute('data-project-key', component.project_key);
+                    componentSelect.appendChild(option);
+                });
+                componentSelect.disabled = false;
+                componentSelect.value = ''; // Ensure no component is selected by default
+            } else {
+                componentSelect.innerHTML = '<option value="">No components found</option>';
+                componentSelect.disabled = true;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading components:', error);
+            componentSelect.innerHTML = '<option value="">Error loading components</option>';
+            componentSelect.disabled = true;
+        });
+}
+
+function addNewBranch() {
+    document.getElementById('branchModalLabel').textContent = 'Add New Branch';
+    document.getElementById('branchForm').reset();
+    document.getElementById('branch_id').value = '';
+    document.getElementById('selected_project_key').value = '';
+
+    // Reset component dropdown
+    const componentSelect = document.getElementById('component_id');
+    componentSelect.innerHTML = '<option value="">Select Project First</option>';
+    componentSelect.disabled = true;
+
+    // Reset path pattern to default with ProjectShortKey
+    document.getElementById('jfrog_path_pattern').value = '{ProjectShortKey}/{ComponentName}/{branch}/Build{date}.{buildNumber}/{componentName}.zip';
+
+    const modal = new bootstrap.Modal(document.getElementById('branchModal'));
+    modal.show();
+}
+
+function editBranch(branchId) {
+    document.getElementById('branchModalLabel').textContent = 'Edit Branch';
+    // Fetch branch details and populate form
+    fetch(`/api/branches/${branchId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const branch = data.branch;
+                document.getElementById('branch_id').value = branch.branch_id;
+                document.getElementById('branch_name').value = branch.branch_name;
+                document.getElementById('jfrog_path_pattern').value = branch.path_pattern_override || '{ProjectShortKey}/{ComponentName}/{branch}/Build{date}.{buildNumber}/{componentName}.zip';
+                document.getElementById('version').value = `${branch.major_version || 1}.${branch.minor_version || 0}.${branch.patch_version || 0}.${branch.build_number || 0}`;
+                document.getElementById('auto_increment').value = branch.auto_increment || 'build';
+                document.getElementById('branch_status').value = branch.branch_status;
+                document.getElementById('description').value = branch.description || '';
+                document.getElementById('selected_project_key').value = branch.project_key || '';
+
+                // Find and set the project from component data
+                // We need to load components first, then select the component
+                const componentId = branch.component_id;
+
+                // Get project_id from component
+                fetch(`/api/components/dropdown`)
+                    .then(response => response.json())
+                    .then(componentData => {
+                        if (componentData.success) {
+                            const component = componentData.components.find(c => c.component_id === componentId);
+                            if (component) {
+                                // Find project option with matching project_key
+                                const projectSelect = document.getElementById('project_id');
+                                for (let i = 0; i < projectSelect.options.length; i++) {
+                                    if (projectSelect.options[i].getAttribute('data-project-key') === component.project_key) {
+                                        projectSelect.selectedIndex = i;
+                                        break;
+                                    }
+                                }
+
+                                // Trigger component loading for this project
+                                const projectId = projectSelect.value;
+                                if (projectId) {
+                                    fetch(`/api/components/by_project/${projectId}`)
+                                        .then(response => response.json())
+                                        .then(compData => {
+                                            if (compData.success) {
+                                                const componentSelect = document.getElementById('component_id');
+                                                componentSelect.innerHTML = '<option value="">Select Component</option>';
+                                                compData.components.forEach(comp => {
+                                                    const option = document.createElement('option');
+                                                    option.value = comp.component_id;
+                                                    option.textContent = comp.component_name;
+                                                    componentSelect.appendChild(option);
+                                                });
+                                                componentSelect.disabled = false;
+                                                componentSelect.value = componentId;
+                                            }
+                                        });
+                                }
+                            }
+                        }
+                    });
+
+                const modal = new bootstrap.Modal(document.getElementById('branchModal'));
+                modal.show();
+            }
+        })
+        .catch(error => {
+            showAlert('Error loading branch details: ' + error, 'error');
+        });
+}
+
+function saveBranch() {
+    const formData = new FormData(document.getElementById('branchForm'));
+    const branchId = formData.get('branch_id');
+    const isEdit = branchId && branchId !== '';
+
+    const url = isEdit ? `/api/branches/${branchId}` : '/api/branches';
+    const method = isEdit ? 'PUT' : 'POST';
+
+    // Parse version
+    const version = formData.get('version').split('.');
+    const branchData = {
+        component_id: formData.get('component_id'),
+        branch_name: formData.get('branch_name'),
+        path_pattern_override: formData.get('jfrog_path_pattern'),
+        major_version: parseInt(version[0]) || 1,
+        minor_version: parseInt(version[1]) || 0,
+        patch_version: parseInt(version[2]) || 0,
+        build_number: parseInt(version[3]) || 0,
+        auto_increment: formData.get('auto_increment'),
+        branch_status: formData.get('branch_status'),
+        description: formData.get('description')
+    };
+
+    // Validate component is selected
+    if (!branchData.component_id) {
+        showAlert('Please select a component before saving', 'error');
+        return;
+    }
+
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(branchData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('branchModal')).hide();
+            loadAllBranches();
+            showAlert(isEdit ? 'Branch updated successfully' : 'Branch added successfully', 'success');
+        } else {
+            // Provide user-friendly error messages
+            let errorMessage = data.error;
+
+            // Check for duplicate branch error
+            if (errorMessage.includes('already exists')) {
+                errorMessage = `A branch named "${branchData.branch_name}" already exists for this component. Please use a different branch name or edit the existing branch.`;
+            } else if (errorMessage.includes('duplicate key') || errorMessage.includes('UNIQUE KEY constraint')) {
+                errorMessage = `A branch named "${branchData.branch_name}" already exists for this component. Please use a different branch name.`;
+            }
+
+            showAlert(errorMessage, 'error');
+        }
+    })
+    .catch(error => {
+        showAlert('Error saving branch: ' + error, 'error');
+    });
+}
+
+function deleteBranch(branchId, branchName) {
+    if (confirm(`Are you sure you want to delete branch '${branchName}'? This action cannot be undone.`)) {
+        fetch(`/api/branches/${branchId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                loadAllBranches();
+                showAlert(`Branch '${branchName}' deleted successfully`, 'success');
+            } else {
+                showAlert('Error deleting branch: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            showAlert('Error deleting branch: ' + error, 'error');
+        });
+    }
+}
+
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.top = '20px';
+    alertDiv.style.right = '20px';
+    alertDiv.style.zIndex = '9999';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    document.body.appendChild(alertDiv);
+
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.parentNode.removeChild(alertDiv);
+        }
+    }, 5000);
+}
+</script>
+{% endblock %}

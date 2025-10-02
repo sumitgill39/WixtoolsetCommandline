@@ -730,35 +730,15 @@ class ProjectAPI:
     def get_project_environments(self, project_id: int) -> Tuple[bool, str, Optional[List[Dict]]]:
         """
         Get all environments for a project
-        
+
+        DISABLED: Environment concept removed from MSI Factory
+
         Args:
             project_id: The project ID
-        
+
         Returns:
             Tuple of (success, message, environments_list)
         """
-        if not self.db:
-            return False, "Database not available", None
-        
-        try:
-            with self.db.get_session() as session:
-                environments = session.query(ProjectEnvironment).filter_by(
-                    project_id=project_id,
-                    is_active=True
-                ).all()
-                
-                env_list = [
-                    {
-                        'env_id': env.env_id,
-                        'environment_name': env.environment_name,
-                        'environment_description': env.environment_description,
-                        'is_active': env.is_active,
-                        'created_date': str(env.created_date)
-                    } for env in environments
-                ]
-                
-                return True, f"Found {len(env_list)} environments", env_list
-                
-        except Exception as e:
-            self.logger.error(f"Error getting environments: {e}")
-            return False, f"Error getting environments: {str(e)}", None
+        # Environment concept has been removed - return empty list
+        self.logger.info(f"Environment query disabled for project {project_id}")
+        return True, "Environment functionality disabled", []

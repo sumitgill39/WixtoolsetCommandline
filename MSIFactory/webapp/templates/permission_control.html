@@ -1,0 +1,342 @@
+{% extends 'base_sidebar.html' %}
+
+{% block title %}Permission Control - CelerDeploy{% endblock %}
+
+{% block page_title %}
+<i class="fas fa-user-lock me-2"></i>Permission Control
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-info-circle text-primary me-2"></i>
+                        User Permission Management
+                    </h5>
+                    <p class="card-text">
+                        Control which users can view inactive (soft-deleted) records across the system.
+                        Admins always have full access to all records.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Selection and Current Permissions -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-users me-2"></i>Select User
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="GET" action="{{ url_for('permission_control') }}">
+                        <div class="mb-3">
+                            <label for="user_select" class="form-label">Choose a user to manage permissions:</label>
+                            <select class="form-select" id="user_select" name="user_id" onchange="this.form.submit()">
+                                <option value="">-- Select User --</option>
+                                {% for user in users %}
+                                {% if user.role != 'admin' %}
+                                <option value="{{ user.user_id }}" {% if selected_user and selected_user.user_id == user.user_id %}selected{% endif %}>
+                                    {{ user.first_name }} {{ user.last_name }} ({{ user.email }}) - {{ user.role|title }}
+                                </option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </form>
+
+                    {% if selected_user %}
+                    <div class="alert alert-info">
+                        <strong>Selected User:</strong> {{ selected_user.first_name }} {{ selected_user.last_name }}
+                        <br>
+                        <small>Role: {{ selected_user.role|title }}</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-shield-alt me-2"></i>Current Permissions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if selected_user %}
+                        {% if current_permissions %}
+                        <div class="list-group">
+                            {% for perm in current_permissions %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ perm.permission_type|replace('_', ' ')|title }}</strong>
+                                    {% if perm.expires_date %}
+                                    <br><small class="text-muted">Expires: {{ perm.expires_date.strftime('%Y-%m-%d') }}</small>
+                                    {% endif %}
+                                </div>
+                                <form method="POST" action="{{ url_for('revoke_permission') }}" style="display: inline;">
+                                    <input type="hidden" name="permission_id" value="{{ perm.permission_id }}">
+                                    <input type="hidden" name="user_id" value="{{ selected_user.user_id }}">
+                                    <button type="submit" class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Are you sure you want to revoke this permission?')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted">No special permissions granted to this user.</p>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted">Select a user to view their permissions.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if selected_user %}
+    <!-- Grant New Permissions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>Grant New Permissions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('grant_permission') }}">
+                        <input type="hidden" name="user_id" value="{{ selected_user.user_id }}">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Available Permissions</h6>
+
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="permissions"
+                                           value="view_inactive_components" id="perm_components">
+                                    <label class="form-check-label" for="perm_components">
+                                        <i class="fas fa-cube me-1"></i>
+                                        View Inactive Components
+                                        <br><small class="text-muted">Allow viewing soft-deleted components</small>
+                                    </label>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="permissions"
+                                           value="view_inactive_projects" id="perm_projects">
+                                    <label class="form-check-label" for="perm_projects">
+                                        <i class="fas fa-folder me-1"></i>
+                                        View Inactive Projects
+                                        <br><small class="text-muted">Allow viewing soft-deleted projects</small>
+                                    </label>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="permissions"
+                                           value="view_inactive_branches" id="perm_branches">
+                                    <label class="form-check-label" for="perm_branches">
+                                        <i class="fas fa-code-branch me-1"></i>
+                                        View Inactive Branches
+                                        <br><small class="text-muted">Allow viewing soft-deleted branches</small>
+                                    </label>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="permissions"
+                                           value="view_all_builds" id="perm_builds">
+                                    <label class="form-check-label" for="perm_builds">
+                                        <i class="fas fa-hammer me-1"></i>
+                                        View All Builds
+                                        <br><small class="text-muted">View builds from all users</small>
+                                    </label>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="permissions"
+                                           value="view_system_logs" id="perm_logs">
+                                    <label class="form-check-label" for="perm_logs">
+                                        <i class="fas fa-file-alt me-1"></i>
+                                        View System Logs
+                                        <br><small class="text-muted">Access to system audit logs</small>
+                                    </label>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="permissions"
+                                           value="export_data" id="perm_export">
+                                    <label class="form-check-label" for="perm_export">
+                                        <i class="fas fa-download me-1"></i>
+                                        Export Data
+                                        <br><small class="text-muted">Allow data export functionality</small>
+                                    </label>
+                                </div>
+
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="permissions"
+                                           value="api_access" id="perm_api">
+                                    <label class="form-check-label" for="perm_api">
+                                        <i class="fas fa-plug me-1"></i>
+                                        API Access
+                                        <br><small class="text-muted">Enable API endpoint access</small>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Permission Settings</h6>
+
+                                <div class="mb-3">
+                                    <label for="expires_date" class="form-label">Expiration Date (Optional)</label>
+                                    <input type="date" class="form-control" id="expires_date" name="expires_date">
+                                    <small class="text-muted">Leave empty for permanent permission</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description/Notes</label>
+                                    <textarea class="form-control" id="description" name="description" rows="3"
+                                              placeholder="Optional notes about why this permission was granted"></textarea>
+                                </div>
+
+                                <hr>
+
+                                <h6 class="mb-3">Quick Presets</h6>
+                                <div class="btn-group-vertical w-100" role="group">
+                                    {% for preset in presets %}
+                                    <button type="button" class="btn btn-outline-secondary text-start mb-2"
+                                            onclick="applyPreset('{{ preset.permissions }}')">
+                                        <strong>{{ preset.preset_name }}</strong>
+                                        <br><small>{{ preset.preset_description }}</small>
+                                    </button>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check me-2"></i>Grant Selected Permissions
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Permission Summary -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Permission Summary
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Role</th>
+                                    <th>Special Permissions</th>
+                                    <th>Last Modified</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users_with_permissions %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('permission_control', user_id=user.user_id) }}">
+                                            {{ user.first_name }} {{ user.last_name }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'danger' if user.role == 'admin' else 'primary' if user.role == 'poweruser' else 'secondary' }}">
+                                            {{ user.role|title }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if user.permissions %}
+                                            {% for perm in user.permissions %}
+                                            <span class="badge bg-info me-1">
+                                                {{ perm|replace('_', ' ')|title }}
+                                            </span>
+                                            {% endfor %}
+                                        {% else %}
+                                            <span class="text-muted">None</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.last_modified.strftime('%Y-%m-%d %H:%M') if user.last_modified else '-' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function applyPreset(permissions) {
+    // Parse the JSON string
+    var perms = JSON.parse(permissions);
+
+    // Uncheck all checkboxes first
+    document.querySelectorAll('input[name="permissions"]').forEach(function(checkbox) {
+        checkbox.checked = false;
+    });
+
+    // Check the preset permissions
+    perms.forEach(function(perm) {
+        var checkbox = document.querySelector('input[name="permissions"][value="' + perm + '"]');
+        if (checkbox) {
+            checkbox.checked = true;
+        }
+    });
+}
+</script>
+
+<style>
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.list-group-item {
+    border-left: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.list-group-item:hover {
+    border-left-color: var(--bs-primary);
+    background-color: var(--bs-light);
+}
+
+.form-check-label {
+    cursor: pointer;
+}
+
+.badge {
+    font-weight: normal;
+}
+</style>
+{% endblock %}

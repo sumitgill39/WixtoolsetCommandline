@@ -6,6 +6,8 @@ Common utility functions for MSI Factory - replaces JavaScript utilities
 import uuid
 import re
 import os
+import getpass
+import socket
 from datetime import datetime
 from logger import get_logger, log_info, log_error
 
@@ -394,3 +396,312 @@ def truncate_string(text, max_length=50, suffix="..."):
         return text
 
     return text[:max_length - len(suffix)] + suffix
+
+
+def get_current_windows_user():
+    """
+    Get the current Windows logon username
+
+    Returns:
+        str: Current Windows username (without domain) or None if unable to determine
+
+    Examples:
+        >>> get_current_windows_user()
+        'john.doe'
+    """
+    try:
+        # Method 1: Try getpass.getuser() - most reliable
+        username = getpass.getuser()
+
+        # Remove domain prefix if present (DOMAIN\username -> username)
+        if '\\' in username:
+            username = username.split('\\')[-1]
+
+        log_info(f"Retrieved Windows username: {username}")
+        return username.lower() if username else None
+
+    except Exception as e:
+        log_error(f"getpass.getuser() failed: {e}")
+
+        try:
+            # Method 2: Try os.getlogin() as fallback
+            username = os.getlogin()
+
+            # Remove domain prefix if present
+            if '\\' in username:
+                username = username.split('\\')[-1]
+
+            log_info(f"Retrieved Windows username via os.getlogin(): {username}")
+            return username.lower() if username else None
+
+        except Exception as e2:
+            log_error(f"os.getlogin() failed: {e2}")
+
+            try:
+                # Method 3: Try environment variables as last resort
+                username = os.environ.get('USERNAME') or os.environ.get('USER')
+
+                if username:
+                    # Remove domain prefix if present
+                    if '\\' in username:
+                        username = username.split('\\')[-1]
+                    log_info(f"Retrieved Windows username via environment: {username}")
+                    return username.lower()
+
+            except Exception as e3:
+                log_error(f"All username detection methods failed: {e3}")
+
+    return None
+
+
+def get_computer_domain_info():
+    """
+    Get computer name and domain information
+
+    Returns:
+        dict: Computer name, domain, and username info
+    """
+    try:
+        computer_name = socket.gethostname()
+        domain = os.environ.get('USERDOMAIN', 'COMPANY')
+        username = get_current_windows_user()
+
+        info = {
+            'computer_name': computer_name,
+            'domain': domain,
+            'username': username,
+            'full_computer_name': f"{computer_name}.{domain}" if domain != 'COMPANY' else computer_name
+        }
+
+        log_info(f"Computer info: {info}")
+        return info
+
+    except Exception as e:
+        log_error(f"Error getting computer info: {e}")
+        return {
+            'computer_name': 'Unknown',
+            'domain': 'COMPANY',
+            'username': get_current_windows_user(),
+            'full_computer_name': 'Unknown'
+        }
+
+
+def get_suggested_email(username=None, domain='company.com'):
+    """
+    Generate suggested email address based on username
+
+    Args:
+        username: Windows username (if None, gets current user)
+        domain: Email domain (default: company.com)
+
+    Returns:
+        str: Suggested email address
+    """
+    if not username:
+        username = get_current_windows_user()
+
+    if not username:
+        return ''
+
+    # Clean username for email
+    clean_username = username.lower().strip()
+
+    suggested_email = f"{clean_username}@{domain}"
+    log_info(f"Generated suggested email: {suggested_email}")
+    return suggested_email
+
+
+def get_auto_populated_user_data(email_domain='company.com'):
+    """
+    Get auto-populated user data for the access request form
+
+    Args:
+        email_domain: Domain to use for suggested email
+
+    Returns:
+        dict: User data for form population
+    """
+    username = get_current_windows_user()
+    computer_info = get_computer_domain_info()
+
+    user_data = {
+        'username': username or '',
+        'suggested_email': get_suggested_email(username, email_domain) if username else '',
+        'domain': computer_info['domain'],
+        'computer_name': computer_info['computer_name']
+    }
+
+    log_info(f"Auto-populated user data: {user_data}")
+    return user_data
+
+
+def validate_component_name_unique(component_name, project_id, component_id=None):
+    """
+    Validate that component name is unique within a project
+
+    Args:
+        component_name (str): Name of the component to validate
+        project_id (int): ID of the project
+        component_id (int, optional): ID of current component (for edit operations)
+
+    Returns:
+        dict: Validation result with 'valid', 'message', and optional 'existing_id'
+
+    Examples:
+        >>> validate_component_name_unique("API", 7)
+        {'valid': False, 'message': 'Component "API" already exists in this project (Active)', 'existing_id': 18}
+
+        >>> validate_component_name_unique("NewComponent", 7)
+        {'valid': True, 'message': 'Component name is available'}
+    """
+    try:
+        # Import here to avoid circular imports
+        from core.database_operations import get_db_connection
+
+        if not component_name or not project_id:
+            return {'valid': True, 'message': ''}
+
+        component_name = component_name.strip()
+        if not component_name:
+            return {'valid': True, 'message': ''}
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check for duplicate component name in the same project
+        # Exclude current component if component_id is provided (for edit operations)
+        if component_id:
+            cursor.execute("""
+                SELECT component_id, component_name, is_enabled
+                FROM components
+                WHERE project_id = ? AND component_name = ? AND component_id != ?
+            """, (project_id, component_name, component_id))
+        else:
+            cursor.execute("""
+                SELECT component_id, component_name, is_enabled
+                FROM components
+                WHERE project_id = ? AND component_name = ?
+            """, (project_id, component_name))
+
+        existing = cursor.fetchone()
+        conn.close()
+
+        if existing:
+            comp_id, name, is_enabled = existing
+            status = "Active" if is_enabled else "Inactive"
+            log_info(f"Component name validation failed: '{component_name}' already exists in project {project_id} (ID: {comp_id}, Status: {status})")
+            return {
+                'valid': False,
+                'message': f'Component "{name}" already exists in this project ({status})',
+                'existing_id': comp_id,
+                'existing_status': status
+            }
+
+        log_info(f"Component name validation passed: '{component_name}' is unique in project {project_id}")
+        return {'valid': True, 'message': 'Component name is available'}
+
+    except Exception as e:
+        log_error(f"Error validating component name uniqueness: {e}")
+        return {
+            'valid': False,
+            'message': 'Error checking component name availability',
+            'error': str(e)
+        }
+
+
+def auto_populate_application_name(component_name):
+    """
+    Auto-populate application name based on component name
+
+    Args:
+        component_name (str): The component name to base application name on
+
+    Returns:
+        str: Formatted application name suitable for MSI generation
+
+    Examples:
+        >>> auto_populate_application_name("CCPDBQueing")
+        "CCPDBQueing"
+
+        >>> auto_populate_application_name("user-api")
+        "User API"
+
+        >>> auto_populate_application_name("my_web_app")
+        "My Web App"
+    """
+    if not component_name:
+        return ""
+
+    # Clean and format the name
+    cleaned_name = component_name.strip()
+
+    # Replace common separators with spaces
+    formatted_name = re.sub(r'[-_]', ' ', cleaned_name)
+
+    # Title case each word
+    formatted_name = ' '.join(word.capitalize() for word in formatted_name.split())
+
+    log_info(f"Auto-populated application name: '{component_name}' -> '{formatted_name}'")
+    return formatted_name
+
+
+def suggest_component_name_alternatives(base_name, project_id, max_suggestions=5):
+    """
+    Suggest alternative component names if the desired name is taken
+
+    Args:
+        base_name (str): The desired component name
+        project_id (int): ID of the project
+        max_suggestions (int): Maximum number of suggestions to return
+
+    Returns:
+        list: List of available alternative names
+
+    Examples:
+        >>> suggest_component_name_alternatives("API", 7)
+        ["API_v2", "API_New", "API_2024", "API_Updated", "API_Service"]
+    """
+    try:
+        if not base_name or not project_id:
+            return []
+
+        suggestions = []
+        base_clean = base_name.strip()
+
+        # Generate different variations
+        variations = [
+            f"{base_clean}_v2",
+            f"{base_clean}_New",
+            f"{base_clean}_2024",
+            f"{base_clean}_Updated",
+            f"{base_clean}_Service",
+            f"{base_clean}_Component",
+            f"{base_clean}_App",
+            f"New_{base_clean}",
+            f"{base_clean}_II",
+            f"{base_clean}_Plus"
+        ]
+
+        # Check which variations are available
+        for variation in variations[:max_suggestions * 2]:  # Check more than needed
+            result = validate_component_name_unique(variation, project_id)
+            if result['valid']:
+                suggestions.append(variation)
+                if len(suggestions) >= max_suggestions:
+                    break
+
+        # If we still need more suggestions, add numbered versions
+        counter = 2
+        while len(suggestions) < max_suggestions and counter <= 10:
+            numbered_name = f"{base_clean}_{counter}"
+            result = validate_component_name_unique(numbered_name, project_id)
+            if result['valid']:
+                suggestions.append(numbered_name)
+            counter += 1
+
+        log_info(f"Generated {len(suggestions)} alternative names for '{base_name}' in project {project_id}")
+        return suggestions
+
+    except Exception as e:
+        log_error(f"Error generating component name alternatives: {e}")
+        return []
